@@ -20,6 +20,7 @@ const GlobalStyle = () => (
       body,
       * {
         font-family: "Pretendard", sans-serif;
+        color: #4B4B4B;
       }
 
       #nprogress .bar {
