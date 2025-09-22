@@ -1,0 +1,40 @@
+"use client";
+
+import * as _ from "./style";
+import Link from "next/link";
+import { Menu, Notice } from "./data";
+
+export default function Main() {
+    return (
+        <_.Container>
+            <_.Slider />
+            <_.Info>
+                <_.Wrapper>
+                    <_.Title>메뉴</_.Title>
+                    {Menu.map((menu) => (
+                        <Link key={menu.path} href={menu.path}>
+                            <_.Menu as="a">
+                                <_.Title>{menu.title}</_.Title>
+                                <_.Subtitle>{menu.subtitle}</_.Subtitle>
+                            </_.Menu>
+                        </Link>
+                    ))}
+                </_.Wrapper>
+                <_.Wrapper>
+                    <_.Group>
+                        <_.Title>공지사항</_.Title>
+                        <_.Subtitle>전체보기</_.Subtitle>
+                    </_.Group>
+                    {Notice.map((item) => (
+                        <Link key={item.path} href={item.path}>
+                            <_.NoticeGroup as="a">
+                                {item.type === "new" ? <_.Badge bgColor="#FF9B62">{item.badge}</_.Badge> : <_.Badge bgColor="#D1D1D1">{item.badge}</_.Badge>}
+                                <_.Notice>{item.notice}</_.Notice>
+                            </_.NoticeGroup>
+                        </Link>
+                    ))}
+                </_.Wrapper>
+            </_.Info>
+        </_.Container>
+    );
+}
