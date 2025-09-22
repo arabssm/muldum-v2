@@ -21,7 +21,7 @@ export default function TopAppBar() {
       <S.Wrapper>
         {Menu.map((item) => (
           <Link key={item.path} href={item.path}>
-            <S.Text as="span" isActive={pathname === item.path}>
+            <S.Text isActive={pathname === item.path}>
               {item.label}
             </S.Text>
           </Link>

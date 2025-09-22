@@ -13,7 +13,7 @@ export default function Main() {
                     <_.Title>메뉴</_.Title>
                     {Menu.map((menu) => (
                         <Link key={menu.path} href={menu.path}>
-                            <_.Menu as="a">
+                            <_.Menu>
                                 <_.Title>{menu.title}</_.Title>
                                 <_.Subtitle>{menu.subtitle}</_.Subtitle>
                             </_.Menu>
@@ -27,7 +27,7 @@ export default function Main() {
                     </_.Group>
                     {Notice.map((item) => (
                         <Link key={item.path} href={item.path}>
-                            <_.NoticeGroup as="a">
+                            <_.NoticeGroup>
                                 {item.type === "new" ? <_.Badge bgColor="#FF9B62">{item.badge}</_.Badge> : <_.Badge bgColor="#D1D1D1">{item.badge}</_.Badge>}
                                 <_.Notice>{item.notice}</_.Notice>
                             </_.NoticeGroup>
