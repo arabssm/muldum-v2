@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import * as S from "./style";
 
-const Menu = [
+const Menu: { label: string; path: string }[] = [
   { label: "홈화면", path: "/" },
   { label: "역대 동아리", path: "/clubs" },
   { label: "공유캘린더", path: "/calendar" },
@@ -20,8 +20,8 @@ export default function TopAppBar() {
     <S.Container>
       <S.Wrapper>
         {Menu.map((item) => (
-          <Link key={item.path} href={item.path} passHref>
-            <S.Text as="a" isActive={pathname === item.path}>
+          <Link key={item.path} href={item.path}>
+            <S.Text as="span" isActive={pathname === item.path}>
               {item.label}
             </S.Text>
           </Link>

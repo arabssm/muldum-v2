@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import type { Bar } from "@/types/barTypes";
+import type { Bar } from "@/types/main";
 
 const Basic = `
   display: flex;
@@ -9,7 +9,7 @@ const Basic = `
 export const Container = styled.div`
   ${Basic}
   justify-content: space-between;
-  padding: 1.5rem 3rem;
+  padding: 1.5rem 6rem;
 `;
 
 export const Wrapper = styled.div`
