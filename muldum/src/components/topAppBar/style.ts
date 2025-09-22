@@ -1,0 +1,56 @@
+import styled from "@emotion/styled";
+import type { Bar } from "@/types/barTypes";
+
+const Basic = `
+  display: flex;
+  align-items: center;
+`;
+
+export const Container = styled.div`
+  ${Basic}
+  justify-content: space-between;
+  padding: 1.5rem 3rem;
+`;
+
+export const Wrapper = styled.div`
+  ${Basic}
+  gap: 4rem;
+`;
+
+const BaseButton = styled.a`
+  ${Basic}
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: 10rem;
+  padding: 0.6rem 1rem;
+`;
+
+export const Text = styled.a<Bar>`
+  background-color: transparent;
+  font-weight: 500;
+  color: ${({ isActive }) => (isActive ? "#4B4B4B" : "#909090")}; /* 현재 페이지 진하게 */
+  border: none;
+  text-decoration: none;
+  cursor: pointer;
+
+  &:hover {
+    color: #4B4B4B;
+  }
+`;
+
+export const LoginBtn = styled(BaseButton)`
+  border: 1px solid #4B4B4B;
+  background-color: transparent;
+`;
+
+export const MyInfo = styled(BaseButton)`
+  border: none;
+  color: #fff;
+  background-color: #4B4B4B;
+`;
+
+export const BtnGroup = styled.div`
+  ${Basic}
+  gap: 1.25rem;
+`;
