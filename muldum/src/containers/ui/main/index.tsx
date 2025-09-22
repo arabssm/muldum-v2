@@ -3,11 +3,12 @@
 import * as _ from "./style";
 import Link from "next/link";
 import { Menu, Notice } from "./data";
+import Slider from "@/components/slider";
 
 export default function Main() {
     return (
         <_.Container>
-            <_.Slider />
+            <Slider />
             <_.Info>
                 <_.Wrapper>
                     <_.Title>메뉴</_.Title>

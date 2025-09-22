@@ -24,15 +24,6 @@ export const Info = styled.div`
     justify-content: space-between;
 `;
 
-export const Slider = styled.div`
-    ${flex}
-    width: 100%;
-    height: 25vh;
-    justify-content: center;
-    background-color: #898989;
-    border-radius: 4px;
-`;
-
 export const Wrapper = styled.div`
     ${flex}
     flex-direction: column;
