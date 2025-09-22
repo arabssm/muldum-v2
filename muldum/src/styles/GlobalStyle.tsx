@@ -1,8 +1,8 @@
 import { Global, css } from "@emotion/react";
 
 const GlobalStyle = () => (
-    <Global
-        styles={css`
+  <Global
+    styles={css`
       *, *::before, *::after {
         margin: 0;
         padding: 0;
@@ -21,6 +21,13 @@ const GlobalStyle = () => (
       * {
         font-family: "Pretendard", sans-serif;
         color: #4B4B4B;
+        // 임시 스크롤 방지
+        overflow: hidden;
+      }
+
+      a {
+      text-decoration: none;
+      color: inherit;
       }
 
       #nprogress .bar {
@@ -33,7 +40,7 @@ const GlobalStyle = () => (
       }
     
     `}
-    />
+  />
 );
 
 export default GlobalStyle;

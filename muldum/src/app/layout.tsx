@@ -2,6 +2,7 @@
 
 import GlobalStyle from "@/styles/GlobalStyle";
 import styled from "@emotion/styled";
+import TopAppBar from "@/components/topAppBar";
 
 export default function RootLayout({
   children,
@@ -10,8 +11,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <GlobalStyle />
       <body>
+        <GlobalStyle />
+        <TopAppBar />
         <Container>
           {children}
         </Container>
@@ -26,6 +28,5 @@ const Container = styled.div`
   width: 100%;
   max-width: 90%;
   min-height: 100vh;
-  padding: 4rem 1rem;
   margin: 0 auto;
 `;
