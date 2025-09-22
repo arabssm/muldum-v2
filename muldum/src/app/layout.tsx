@@ -2,6 +2,7 @@
 
 import GlobalStyle from "@/styles/GlobalStyle";
 import styled from "@emotion/styled";
+import TopAppBar from "@/components/topAppBar";
 
 export default function RootLayout({
   children,
@@ -10,8 +11,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <GlobalStyle />
       <body>
+        <GlobalStyle />
+        <TopAppBar />
         <Container>
           {children}
         </Container>
