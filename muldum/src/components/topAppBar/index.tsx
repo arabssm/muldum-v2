@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import Image from "next/image";
 import * as S from "./style";
 
 const Menu: { label: string; path: string }[] = [
@@ -21,9 +22,19 @@ export default function TopAppBar() {
       <S.Wrapper>
         {Menu.map((item) => (
           <Link key={item.path} href={item.path}>
-            <S.Text as="span" isActive={pathname === item.path}>
-              {item.label}
-            </S.Text>
+            {item.label === "홈화면" ? (
+              <Image
+                src="/assets/araLogo.svg"
+                alt="Ara Logo"
+                width={40}
+                height={40}
+                priority
+              />
+            ) : (
+              <S.Text as="span" isActive={pathname === item.path}>
+                {item.label}
+              </S.Text>
+            )}
           </Link>
         ))}
       </S.Wrapper>

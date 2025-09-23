@@ -6,7 +6,7 @@ export const Container = styled.div`
     gap: 2rem;
     justify-content: flex-start;
     white-space: normal;
-    padding: 4rem 3rem;
+    padding: 2.5rem 3rem;
     row-gap: 2rem;
 `;
 
