@@ -27,7 +27,7 @@ export const Info = styled.div`
 export const Wrapper = styled.div`
     ${flex}
     flex-direction: column;
-    row-gap: 1.5rem;
+    row-gap: 1rem;
     width: 48%;
 `;
 
@@ -86,5 +86,11 @@ export const Notice = styled.div`
 export const NoticeGroup = styled.div`
     ${centerAlign}
     gap: 0.8rem;
+    padding: 0.6rem;
     cursor: pointer;
+
+    &:hover{
+        background-color: #FAFAFA;
+        border-radius: 4px;
+    }
 `;
