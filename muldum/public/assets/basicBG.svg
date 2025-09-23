@@ -1,11 +1,11 @@
 <svg width="1800" height="600" viewBox="0 0 1800 600" fill="none" xmlns="http://www.w3.org/2000/svg">
 <g clip-path="url(#clip0_4343_3418)">
 <rect width="600" height="1800" transform="matrix(0 -1 1 0 0 600)" fill="url(#paint0_linear_4343_3418)"/>
-<foreignObject x="0" y="0" width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="backdrop-filter:blur(25px);clip-path:url(#bgblur_1_4343_3418_clip_path);height:100%;width:100%"></div></foreignObject><ellipse data-figma-bg-blur-radius="50" cx="108" cy="532.5" rx="362" ry="356.5" fill="#1E1E1E" fill-opacity="0.1"/>
-<foreignObject x="0" y="0" width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="backdrop-filter:blur(12.2px);clip-path:url(#bgblur_2_4343_3418_clip_path);height:100%;width:100%"></div></foreignObject><ellipse data-figma-bg-blur-radius="24.3904" cx="532.586" cy="97.9033" rx="176.586" ry="173.903" fill="#1E1E1E" fill-opacity="0.1"/>
-<foreignObject x="0" y="0" width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="backdrop-filter:blur(7.71px);clip-path:url(#bgblur_3_4343_3418_clip_path);height:100%;width:100%"></div></foreignObject><ellipse data-figma-bg-blur-radius="15.4278" cx="219.697" cy="34" rx="111.697" ry="110" fill="#1E1E1E" fill-opacity="0.1"/>
-<foreignObject x="0" y="0" width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="backdrop-filter:blur(7.71px);clip-path:url(#bgblur_4_4343_3418_clip_path);height:100%;width:100%"></div></foreignObject><ellipse data-figma-bg-blur-radius="15.4278" cx="1345.7" cy="600" rx="111.697" ry="110" fill="#1E1E1E" fill-opacity="0.1"/>
-<foreignObject x="0" y="0" width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="backdrop-filter:blur(25px);clip-path:url(#bgblur_5_4343_3418_clip_path);height:100%;width:100%"></div></foreignObject><ellipse data-figma-bg-blur-radius="50" cx="1736" cy="205.5" rx="362" ry="356.5" fill="#1E1E1E" fill-opacity="0.1"/>
+<foreignObject x="0" y="0" width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="backdrop-filter:blur(25px);clip-path:url(#bgblur_1_4343_3418_clip_path);height:100%;width:100%"></div></foreignObject><ellipse data-figma-bg-blur-radius="50" cx="108" cy="532.5" rx="362" ry="356.5" fill="#FF8D4C" fill-opacity="0.1"/>
+<foreignObject x="0" y="0" width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="backdrop-filter:blur(12.2px);clip-path:url(#bgblur_2_4343_3418_clip_path);height:100%;width:100%"></div></foreignObject><ellipse data-figma-bg-blur-radius="24.3904" cx="532.586" cy="97.9033" rx="176.586" ry="173.903" fill="#FF8D4C" fill-opacity="0.1"/>
+<foreignObject x="0" y="0" width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="backdrop-filter:blur(7.71px);clip-path:url(#bgblur_3_4343_3418_clip_path);height:100%;width:100%"></div></foreignObject><ellipse data-figma-bg-blur-radius="15.4278" cx="219.697" cy="34" rx="111.697" ry="110" fill="#FF8D4C" fill-opacity="0.1"/>
+<foreignObject x="0" y="0" width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="backdrop-filter:blur(7.71px);clip-path:url(#bgblur_4_4343_3418_clip_path);height:100%;width:100%"></div></foreignObject><ellipse data-figma-bg-blur-radius="15.4278" cx="1345.7" cy="600" rx="111.697" ry="110" fill="#FF8D4C" fill-opacity="0.1"/>
+<foreignObject x="0" y="0" width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="backdrop-filter:blur(25px);clip-path:url(#bgblur_5_4343_3418_clip_path);height:100%;width:100%"></div></foreignObject><ellipse data-figma-bg-blur-radius="50" cx="1736" cy="205.5" rx="362" ry="356.5" fill="#FF8D4C" fill-opacity="0.1"/>
 </g>
 <defs>
 <clipPath id="bgblur_1_4343_3418_clip_path" transform="translate(0 0)"><ellipse cx="108" cy="532.5" rx="362" ry="356.5"/>
@@ -15,7 +15,7 @@
 </clipPath><clipPath id="bgblur_5_4343_3418_clip_path" transform="translate(0 0)"><ellipse cx="1736" cy="205.5" rx="362" ry="356.5"/>
 </clipPath><linearGradient id="paint0_linear_4343_3418" x1="300" y1="0" x2="300" y2="1800" gradientUnits="userSpaceOnUse">
 <stop stop-color="white"/>
-<stop offset="1" stop-color="#999999"/>
+<stop offset="1" stop-color="#FFE9D7"/>
 </linearGradient>
 <clipPath id="clip0_4343_3418">
 <rect width="600" height="1800" fill="white" transform="matrix(0 -1 1 0 0 600)"/>
