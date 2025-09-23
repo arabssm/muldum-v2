@@ -29,4 +29,8 @@ const Container = styled.div`
   max-width: 90%;
   min-height: 100vh;
   margin: 0 auto;
+
+  @media screen and (max-width: 1620px){
+    width: 1620px;
+  }
 `;

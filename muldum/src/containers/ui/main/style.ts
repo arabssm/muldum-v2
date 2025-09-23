@@ -27,8 +27,14 @@ export const Info = styled.div`
 export const Wrapper = styled.div`
     ${flex}
     flex-direction: column;
-    row-gap: 1rem;
+    row-gap: 1.5rem;
     width: 48%;
+`;
+
+export const NoticeContainer = styled.div`
+    display: flex;
+    flex-direction: column;
+    row-gap: 0.2rem;
 `;
 
 export const Menu = styled.button`

@@ -26,14 +26,16 @@ export default function Main() {
                         <_.Title>공지사항</_.Title>
                         <_.Subtitle>전체보기</_.Subtitle>
                     </_.Group>
-                    {Notice.map((item) => (
-                        <Link key={item.path} href={item.path}>
-                            <_.NoticeGroup>
-                                {item.type === "new" ? <_.Badge bgColor="#FF9B62">{item.badge}</_.Badge> : <_.Badge bgColor="#D1D1D1">{item.badge}</_.Badge>}
-                                <_.Notice>{item.notice}</_.Notice>
-                            </_.NoticeGroup>
-                        </Link>
-                    ))}
+                    <_.NoticeContainer>
+                        {Notice.map((item) => (
+                            <Link key={item.path} href={item.path}>
+                                <_.NoticeGroup>
+                                    {item.type === "new" ? <_.Badge bgColor="#FF9B62">{item.badge}</_.Badge> : <_.Badge bgColor="#D1D1D1">{item.badge}</_.Badge>}
+                                    <_.Notice>{item.notice}</_.Notice>
+                                </_.NoticeGroup>
+                            </Link>
+                        ))}
+                    </_.NoticeContainer>
                 </_.Wrapper>
             </_.Info>
         </_.Container>

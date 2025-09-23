@@ -2,12 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import * as S from "./style";
+import Image from "next/image";
+import * as _ from "./style";
 
 const Menu: { label: string; path: string }[] = [
   { label: "홈화면", path: "/" },
   { label: "역대 동아리", path: "/clubs" },
-  { label: "공유캘린더", path: "/calendar" },
+  { label: "팀스페이스", path: "/team" },
   { label: "물품 관리", path: "/items" },
   { label: "월말평가", path: "/evaluation" },
   { label: "공지사항", path: "/notice" },
@@ -17,20 +18,30 @@ export default function TopAppBar() {
   const pathname = usePathname();
 
   return (
-    <S.Container>
-      <S.Wrapper>
+    <_.Container>
+      <_.Wrapper>
         {Menu.map((item) => (
           <Link key={item.path} href={item.path}>
-            <S.Text as="span" isActive={pathname === item.path}>
-              {item.label}
-            </S.Text>
+            {item.label === "홈화면" ? (
+              <Image
+                src="/assets/araLogo.svg"
+                alt="Logo"
+                width={40}
+                height={40}
+                priority
+              />
+            ) : (
+              <_.Text as="span" isActive={pathname === item.path}>
+                {item.label}
+              </_.Text>
+            )}
           </Link>
         ))}
-      </S.Wrapper>
-      <S.BtnGroup>
-        <S.LoginBtn>로그인</S.LoginBtn>
-        <S.MyInfo>내 정보</S.MyInfo>
-      </S.BtnGroup>
-    </S.Container>
+      </_.Wrapper>
+      <_.BtnGroup>
+        <_.LoginBtn>로그인</_.LoginBtn>
+        <_.MyInfo>내 정보</_.MyInfo>
+      </_.BtnGroup>
+    </_.Container>
   );
 }
