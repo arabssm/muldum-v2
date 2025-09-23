@@ -43,6 +43,10 @@ export const Menu = styled.button`
     background-color: #FAFAFA;
     border: none;
     cursor: pointer;
+
+    &:hover{
+        background-color: #F0F0F0;
+    }
 `;
 
 export const Title = styled.div`
@@ -53,10 +57,11 @@ export const Title = styled.div`
 export const Subtitle = styled.div`
     font-size: 1rem;
     color: #707070;
+    font-weight: 500;
     cursor: pointer;
 
     &:hover {
-        color: #FF9B62;
+        color: #3F3F3F;
     }
 `;
 
