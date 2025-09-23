@@ -76,8 +76,8 @@ export const Ddate = styled.div`
     position: absolute;
     font-size: 5rem; 
     font-weight: 600;
-    top: 27%;
-    left: 80%;
+    top: 30%;
+    left: 82%;
     color: #fff;
 `;
 

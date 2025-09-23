@@ -12,7 +12,7 @@ export default function SliderComponent() {
         {Data.map((item, index) => (
           <_.SlideWrapper key={index}>
            <Image
-                src={'/assets/bg3.svg'}
+                src={'/assets/basicBG.svg'}
                 alt={item.title}
                 width={1700}
                 height={320}
