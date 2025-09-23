@@ -9,7 +9,7 @@ const Basic = `
 export const Container = styled.div`
   ${Basic}
   justify-content: space-between;
-  padding: 2rem 9rem 0 9rem;
+  padding: 3rem 9rem 0 9rem;
 `;
 
 export const Wrapper = styled.div`
