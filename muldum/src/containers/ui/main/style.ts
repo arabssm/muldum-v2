@@ -27,7 +27,7 @@ export const Info = styled.div`
 export const Wrapper = styled.div`
     ${flex}
     flex-direction: column;
-    row-gap: 1.25rem;
+    row-gap: 1.5rem;
     width: 48%;
 `;
 

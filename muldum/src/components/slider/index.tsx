@@ -11,12 +11,13 @@ export default function SliderComponent() {
       <_.StyledSlider {...sliderSettings}>
         {Data.map((item, index) => (
           <_.SlideWrapper key={index}>
-            <Image
-              src={item.img}
-              alt={item.title}
-              fill
-              style={{ objectFit: "cover" }}
-            />
+           <Image
+                src={'/assets/basicBG.svg'}
+                alt={item.title}
+                width={1700}
+                height={320}
+                style={{ objectFit: "cover" }}
+              />
             <_.Overlay />
             <_.Title>{item.title}</_.Title>
             <_.Date>{item.date}</_.Date>
