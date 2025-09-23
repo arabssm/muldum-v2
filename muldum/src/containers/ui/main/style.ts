@@ -62,7 +62,7 @@ export const Title = styled.div`
 
 export const Subtitle = styled.div`
     font-size: 1rem;
-    color: #707070;
+    color: #B2B2B2;
     font-weight: 500;
     cursor: pointer;
 

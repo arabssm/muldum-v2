@@ -32,7 +32,7 @@ export const SlideWrapper = styled.div`
 export const Overlay = styled.div`
     position: absolute;
     inset: 0;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(70, 70, 70, 0.4);
 `;
 
 export const Legendimg = styled.img`
@@ -59,7 +59,7 @@ export const SubTitle = styled.div`
     font-weight: 400;
     left: 4%;
     top: 67%;
-    color: #D1D1D1;
+    color: #e9e9e9ff;
 `;
 
 export const Date = styled.div`
@@ -69,7 +69,7 @@ export const Date = styled.div`
     position: absolute;
     left: 4%;
     top: 52%;
-    color: #D1D1D1;
+    color: #e9e9e9ff;
 `;
 
 export const Ddate = styled.div`
