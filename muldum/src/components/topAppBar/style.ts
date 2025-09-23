@@ -9,7 +9,7 @@ const Basic = `
 export const Container = styled.div`
   ${Basic}
   justify-content: space-between;
-  padding: 1.5rem 6rem;
+  padding: 2rem 6rem 0 6rem;
 `;
 
 export const Wrapper = styled.div`
@@ -28,10 +28,9 @@ const BaseButton = styled.a`
 
 export const Text = styled.a<Bar>`
   background-color: transparent;
+  font-size: 1.25rem;
   font-weight: 500;
-  color: ${({ isActive }) => (isActive ? "#4B4B4B" : "#909090")}; /* 현재 페이지 진하게 */
-  border: none;
-  text-decoration: none;
+  color: ${({ isActive }) => (isActive ? "#4B4B4B" : "#909090")};
   cursor: pointer;
 
   &:hover {
@@ -42,12 +41,20 @@ export const Text = styled.a<Bar>`
 export const LoginBtn = styled(BaseButton)`
   border: 1px solid #4B4B4B;
   background-color: transparent;
+
+  &:hover {
+    background-color: #f6f6f6ff;
+  }
 `;
 
 export const MyInfo = styled(BaseButton)`
   border: none;
   color: #fff;
   background-color: #4B4B4B;
+
+  &:hover{
+    background-color: #2d2c2cff;
+  }
 `;
 
 export const BtnGroup = styled.div`

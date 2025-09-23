@@ -25,7 +25,7 @@ export default function RootLayout({
 const Container = styled.div`
   display: flex;
   flex-direction: column;
-  width: 100%;
+  width: 90%;
   max-width: 90%;
   min-height: 100vh;
   margin: 0 auto;
