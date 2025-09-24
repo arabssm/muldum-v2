@@ -106,7 +106,7 @@ export const MessageWrapper = styled.div`
   align-items: center;
   row-gap: 1.5rem;
   width: 100%;
-  height: 55vh; 
+  height: 60vh; 
 `;
 
 export const Message = styled.div`
