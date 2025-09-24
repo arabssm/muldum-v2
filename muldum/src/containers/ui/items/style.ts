@@ -98,3 +98,19 @@ export const BtnGroup = styled.div`
     justify-content: end;
     gap: 1.25rem;
 `;
+
+export const MessageWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  row-gap: 1.5rem;
+  width: 100%;
+  height: 55vh; 
+`;
+
+export const Message = styled.div`
+  font-size: 2rem;
+  font-weight: 500;
+  text-align: center;
+`;
