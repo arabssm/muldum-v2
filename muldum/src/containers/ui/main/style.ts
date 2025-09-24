@@ -1,6 +1,6 @@
 import styled from "@emotion/styled";
 import { css } from "@emotion/react";
-import type { Badgeprops } from "@/types/main";
+import type { Badgeprops } from "@/types";
 
 const flex = css`
     display: flex;
@@ -15,7 +15,6 @@ export const Container = styled.div`
     ${flex}
     flex-direction: column;
     justify-content: space-between;
-    padding: 1.5rem 3rem;
     row-gap: 2rem;
 `;
 

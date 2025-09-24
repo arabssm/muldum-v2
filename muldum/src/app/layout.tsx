@@ -28,6 +28,7 @@ const Container = styled.div`
   width: 90%;
   max-width: 90%;
   min-height: 100vh;
+  padding: 2.5rem 3rem;
   margin: 0 auto;
 
   @media screen and (max-width: 1620px){
