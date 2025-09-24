@@ -16,7 +16,6 @@ export const StyledSlider = styled(Slider)`
 export const CalendarContainer = styled.div`
   width: 100%;
   margin-left: auto;
-  margin-right: 1rem;
 `;
 
 export const SlideWrapper = styled.div`
@@ -25,7 +24,6 @@ export const SlideWrapper = styled.div`
     border-radius: 0.2rem;
     height: 24vh;
     overflow: hidden;
-    margin: 1% auto;
     color: #fff;
 `;
 
