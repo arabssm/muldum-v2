@@ -15,7 +15,6 @@ export const Container = styled.div`
     ${flex}
     flex-direction: column;
     justify-content: space-between;
-    padding: 1.5rem 3rem;
     row-gap: 2rem;
 `;
 
