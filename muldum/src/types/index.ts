@@ -5,3 +5,8 @@ export interface Bar {
 export interface Badgeprops {
   bgColor: string;
 }
+
+export interface BtnProps {
+    children: React.ReactNode;
+    onClick?: () => void;
+}
