@@ -1,6 +1,6 @@
 import styled from "@emotion/styled";
 import { css } from "@emotion/react";
-import type { Badgeprops } from "@/types/main";
+import type { Badgeprops } from "@/types";
 
 const flex = css`
     display: flex;

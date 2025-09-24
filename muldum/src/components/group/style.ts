@@ -1,18 +1,18 @@
 import styled from "@emotion/styled";
-import type { Bar } from "@/types/main";
+import type { Bar } from "@/types";
 
 export const Container = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  width: 100%;
   row-gap: 18rem;
 `;
 
 export const Wrapper = styled.div`
   display: flex;
   width: 100%;
+  margin: 0 auto;
 `;
 
 export const Text = styled.div<Bar>`
@@ -22,7 +22,7 @@ export const Text = styled.div<Bar>`
   font-weight: ${({ isActive }) => (isActive ? 500 : 400)};
   cursor: pointer;
   color: ${({ isActive }) => (isActive ? "#4B4B4B" : "#B2B2B2")};
-  border-bottom: 2px solid ${({ isActive }) => (isActive ? "#4B4B4B" : "#B2B2B2")};
+  border-bottom: 2.5px solid ${({ isActive }) => (isActive ? "#4B4B4B" : "#B2B2B2")};
 
   &:hover {
     background-color: ${({ isActive }) =>
@@ -34,8 +34,9 @@ export const MessageWrapper = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
-  align-items: center; 
+  align-items: center;
   row-gap: 1.5rem;
+  width: 100%;
 `;
 
 export const Message = styled.div`
