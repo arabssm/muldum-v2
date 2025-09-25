@@ -2,7 +2,7 @@
 
 import * as _ from "./style";
 import Link from "next/link";
-import { Menu, Notice } from "./data";
+import { Menu, NoticeData } from "./data";
 import Slider from "@/components/slider";
 
 export default function Main() {
@@ -27,7 +27,7 @@ export default function Main() {
                         <_.Subtitle>전체보기</_.Subtitle>
                     </_.Group>
                     <_.NoticeContainer>
-                        {Notice.map((item) => (
+                        {NoticeData.map((item) => (
                             <Link key={item.path} href={item.path}>
                                 <_.NoticeGroup>
                                     {item.type === "new" ? <_.Badge bgColor="#FF9B62">{item.badge}</_.Badge> : <_.Badge bgColor="#D1D1D1">{item.badge}</_.Badge>}
