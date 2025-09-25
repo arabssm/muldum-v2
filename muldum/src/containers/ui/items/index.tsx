@@ -46,9 +46,12 @@ export default function Items() {
                             <_.Title>수량</_.Title>
                             <_.Number>
                                 <_.Num>{quantity}</_.Num>
-                                <_.Icons>{icons.map(({ onClick, src, alt }) => <div key={alt} onClick={onClick}>
-                                    <Image src={src} alt={alt} width={8} height={8} />
-                                </div>)}
+                                <_.Icons>
+                                    {icons.map(({ onClick, src, alt }) => (
+                                        <div key={alt} onClick={onClick}>
+                                            <Image src={src} alt={alt} width={8} height={8} />
+                                        </div>
+                                    ))}
                                 </_.Icons>
                             </_.Number>
                         </_.Wrapper>
@@ -66,7 +69,11 @@ export default function Items() {
                         <BtnPrimary onClick={ClickPrimary}>신청하기</BtnPrimary>
                     </_.BtnGroup>
                 </>
-            ) : null}
+            ) : (
+                <_.MessageWrapper>
+                    <_.Message>물품 신청을 위해 폼을 선택해주세요</_.Message>
+                </_.MessageWrapper>
+            )}
         </_.Container>
     );
 }
