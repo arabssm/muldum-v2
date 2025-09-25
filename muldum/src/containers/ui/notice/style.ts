@@ -55,6 +55,7 @@ export const SearchWrapper = styled.div`
   width: fit-content;
 
   input {
+    background-color: #FAFAFA;
     border: none;
     outline: none;
     font-size: 0.9rem;
