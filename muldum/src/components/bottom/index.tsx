@@ -31,6 +31,10 @@ const ButtonPrimary = styled.button`
     font-size: 1.175rem;
     font-weight: 500;
     cursor: pointer;
+
+    &:hover {
+        background-color: #ff8843
+    }
 `;
 
 const ButtonSecondary = styled.button`
@@ -43,4 +47,8 @@ const ButtonSecondary = styled.button`
     font-size: 1.175rem;
     font-weight: 500;
     cursor: pointer;
+
+    &:hover {
+        background-color: #ff9c621c;
+    }
 `;
