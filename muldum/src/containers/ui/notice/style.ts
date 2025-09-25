@@ -4,6 +4,7 @@ import type { Badgeprops } from "@/types";
 export const Container = styled.div`
     display: flex;
     flex-direction: column;
+    min-height: 85vh;
     row-gap: 2rem;
 `;
 
