@@ -49,7 +49,7 @@ export default function Items() {
                                 <_.Icons>
                                     {icons.map(({ onClick, src, alt }) => (
                                         <div key={alt} onClick={onClick}>
-                                            <Image src={src} alt={alt} width={8} height={8} />
+                                            <Image src={src} alt={alt} width={12} height={12} />
                                         </div>
                                     ))}
                                 </_.Icons>
@@ -58,7 +58,7 @@ export default function Items() {
                     </_.Group>
                     <_.Wrapper>
                         <_.Title>물품링크</_.Title>
-                        <_.Input type="text" placeholder="링크를 입력하세요" />
+                        <_.Input type="text" placeholder="링크를 입력하세요" inputWidth="62rem"/>
                     </_.Wrapper>
                     <_.Wrapper>
                         <_.Title>신청사유</_.Title>
