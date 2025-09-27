@@ -17,7 +17,7 @@ export const Group = styled.div`
 export const Wrapper = styled.div`
     display: flex;
     flex-direction: column;
-    row-gap: 1rem;
+    row-gap: 0.85rem;
     width: auto;
 `;
 
@@ -32,9 +32,13 @@ export const InputWrapper = styled.div`
     align-items: center;
 `;
 
-export const Input = styled.input<{ inputWidth?: string }>`
+export const Num = styled.div`
+    font-size: 1rem;
+`;
+
+export const Input = styled.input<{ inputWidth?: string; isError?: boolean }>`
   font-size: 1rem;
-  border: 1px solid #D1D1D1;
+  border: 1px solid ${({ isError }) => (isError ? "#DF3636" : "#D1D1D1")};
   border-radius: 4px;
   padding: 0.75rem;
   width: ${({ inputWidth }) => inputWidth || "100%"};
@@ -50,19 +54,15 @@ export const Input = styled.input<{ inputWidth?: string }>`
   }
 `;
 
-export const Num = styled.div`
-    font-size: 1rem;
-`;
-
-export const Textarea = styled.textarea`
-    display: flex;
-    padding: 0.75rem;
-    height: 20vh;
-    font-size: 1rem;
-    border: 1px solid #D1D1D1;
-    border-radius: 4px;
-    resize: none;
-      
+export const Textarea = styled.textarea<{ isError?: boolean }>`
+  display: flex;
+  padding: 0.75rem;
+  height: 20vh;
+  font-size: 1rem;
+  border: 1px solid ${({ isError }) => (isError ? "#DF3636" : "#D1D1D1")};
+  border-radius: 4px;
+  resize: none;
+    
   ::placeholder {
     color: #D1D1D1;
   }
@@ -111,4 +111,11 @@ export const Message = styled.div`
   font-size: 2rem;
   font-weight: 500;
   text-align: center;
+`;
+
+export const ErrorMessage = styled.div`
+  display: flex;
+  font-size: 0.875rem;
+  gap: 0.25rem;
+  color: #DF3636;
 `;

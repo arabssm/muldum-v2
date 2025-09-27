@@ -8,3 +8,10 @@ export interface GroupProps {
     setActive: React.Dispatch<React.SetStateAction<GroupType | null>>;
     setMessage: React.Dispatch<React.SetStateAction<string>>;
 }
+
+export interface Errors {
+  item: boolean;
+  price: boolean;
+  link: boolean;
+  reason: boolean;
+}
