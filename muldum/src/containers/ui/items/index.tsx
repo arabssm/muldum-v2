@@ -71,6 +71,7 @@ export default function Items() {
                 </>
             ) : (
                 <_.MessageWrapper>
+                    <Image src="/assets/choice.svg" alt="No" width={120} height={120} />
                     <_.Message>물품 신청을 위해 폼을 선택해주세요</_.Message>
                 </_.MessageWrapper>
             )}
