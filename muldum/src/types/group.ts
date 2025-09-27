@@ -15,3 +15,12 @@ export interface Errors {
   link: boolean;
   reason: boolean;
 }
+
+export interface FormInputProps {
+    label: string;
+    value: string;
+    setValue: (val: string) => void;
+    placeholder: string;
+    width: string;
+    error?: string | false;
+}
