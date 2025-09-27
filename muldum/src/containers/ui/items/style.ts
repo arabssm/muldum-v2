@@ -3,11 +3,9 @@ import styled from "@emotion/styled";
 export const Container = styled.div`
     display: flex;
     flex-direction: column;
-    row-gap: 3rem;
+    row-gap: 3.5rem;
     width: 100%;
-    max-width: 80%;
     margin: 0 auto;
-    padding: 0 4rem;
 `;
 
 export const Group = styled.div`
@@ -19,7 +17,7 @@ export const Group = styled.div`
 export const Wrapper = styled.div`
     display: flex;
     flex-direction: column;
-    row-gap: 1rem;
+    row-gap: 0.85rem;
     width: auto;
 `;
 
@@ -34,9 +32,13 @@ export const InputWrapper = styled.div`
     align-items: center;
 `;
 
-export const Input = styled.input<{ inputWidth?: string }>`
+export const Num = styled.div`
+    font-size: 1rem;
+`;
+
+export const Input = styled.input<{ inputWidth?: string; isError?: boolean }>`
   font-size: 1rem;
-  border: 1px solid #D1D1D1;
+  border: 1px solid ${({ isError }) => (isError ? "#DF3636" : "#D1D1D1")};
   border-radius: 4px;
   padding: 0.75rem;
   width: ${({ inputWidth }) => inputWidth || "100%"};
@@ -52,19 +54,14 @@ export const Input = styled.input<{ inputWidth?: string }>`
   }
 `;
 
-export const Num = styled.div`
-    font-size: 1rem;
-`;
-
-export const Textarea = styled.textarea`
-    display: flex;
-    padding: 0.75rem;
-    height: 20vh;
-    font-size: 1rem;
-    border: 1px solid #D1D1D1;
-    border-radius: 4px;
-    resize: none;
-      
+export const Textarea = styled.textarea<{ isError?: boolean }>`
+  display: flex;
+  padding: 0.75rem;
+  font-size: 1rem;
+  border: 1px solid ${({ isError }) => (isError ? "#DF3636" : "#D1D1D1")};
+  border-radius: 4px;
+  resize: none;
+    
   ::placeholder {
     color: #D1D1D1;
   }
@@ -104,7 +101,7 @@ export const MessageWrapper = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  row-gap: 1.5rem;
+  row-gap: 2rem;
   width: 100%;
   height: 60vh; 
 `;
@@ -113,4 +110,11 @@ export const Message = styled.div`
   font-size: 2rem;
   font-weight: 500;
   text-align: center;
+`;
+
+export const ErrorMessage = styled.div`
+  display: flex;
+  font-size: 0.875rem;
+  gap: 0.25rem;
+  color: #DF3636;
 `;
