@@ -23,4 +23,5 @@ export interface FormInputProps {
     placeholder: string;
     width: string;
     error?: string | false;
+    height?: string;
 }

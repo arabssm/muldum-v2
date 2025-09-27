@@ -57,7 +57,6 @@ export const Input = styled.input<{ inputWidth?: string; isError?: boolean }>`
 export const Textarea = styled.textarea<{ isError?: boolean }>`
   display: flex;
   padding: 0.75rem;
-  height: 20vh;
   font-size: 1rem;
   border: 1px solid ${({ isError }) => (isError ? "#DF3636" : "#D1D1D1")};
   border-radius: 4px;
