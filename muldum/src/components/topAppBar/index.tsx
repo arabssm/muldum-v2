@@ -8,9 +8,8 @@ import * as _ from "./style";
 const Menu: { label: string; path: string }[] = [
   { label: "홈화면", path: "/" },
   { label: "역대 동아리", path: "/clubs" },
-  { label: "팀스페이스", path: "/team" },
   { label: "물품 관리", path: "/items" },
-  { label: "월말평가", path: "/evaluation" },
+  { label: "팀스페이스", path: "/team" },
   { label: "공지사항", path: "/notice" },
 ];
 
