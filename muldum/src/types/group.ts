@@ -1,3 +1,5 @@
+import React from "react";
+
 export const Groups = ["전공동아리", "네트워크", "자율동아리", "졸업작품"] as const;
 export type GroupType = typeof Groups[number];
 
@@ -24,4 +26,22 @@ export interface FormInputProps {
     width: string;
     error?: string | false;
     height?: string;
+}
+
+export interface ItemFormProps {
+  item: string;
+  setItem: (v: string) => void;
+  price: string;
+  setPrice: (v: string) => void;
+  link: string;
+  setLink: (v: string) => void;
+  reason: string;
+  setReason: (v: string) => void;
+  errors: { [key: string]: string };
+  quantity: number;
+  increase: () => void;
+  decrease: () => void;
+  handleSubmit: () => void;
+  handleSecondary: () => void;
+  FormInput: (props: FormInputProps & { height?: string }) => React.ReactElement;
 }
