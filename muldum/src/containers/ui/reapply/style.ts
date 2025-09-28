@@ -5,6 +5,7 @@ export const Container = styled.div`
     flex-direction: column;
     row-gap: 3.5rem;
     width: 100%;
+    padding: 1rem 0;
     margin: 0 auto;
 `;
 
@@ -56,16 +57,6 @@ export const Textarea = styled.textarea<{ isError?: boolean }>`
   }
 `;
 
-export const MessageWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  row-gap: 2rem;
-  width: 100%;
-  height: 60vh; 
-`;
-
 export const Message = styled.div`
   font-size: 2rem;
   font-weight: 500;
@@ -77,4 +68,41 @@ export const ErrorMessage = styled.div`
   font-size: 0.875rem;
   gap: 0.25rem;
   color: #DF3636;
+`;
+
+export const Box = styled.div<{ bgImage: string }>`
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  width: 15%;
+  aspect-ratio: 1 / 1;
+  border-radius: 4px;
+  padding: 1rem;
+  background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0,0,0,0.5)), url(${props => props.bgImage});
+  background-size: cover;
+  background-position: center;
+  color: #FAFAFA;
+  box-sizing: border-box;
+`;
+
+export const TextGroup = styled.div`
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+`;
+
+export const Text = styled.div`
+    font-size: 1.25rem;
+    font-weight: 500;
+    color: #fafafa;
+`;
+
+export const Small = styled.div`
+    font-size: 0.875;
+    color: #909090;
+`;
+
+export const Group = styled.div`
+    display: flex;
+    gap: 1rem
 `;

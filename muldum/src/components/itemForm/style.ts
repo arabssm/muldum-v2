@@ -1,24 +1,22 @@
 import styled from "@emotion/styled";
 
-export const Container = styled.div`
-    display: flex;
-    flex-direction: column;
-    row-gap: 3.5rem;
-    width: 100%;
-    margin: 0 auto;
+export const Group = styled.div`
+  display: flex;
+  gap: 4rem;
+  width: 100%;
 `;
 
 export const Wrapper = styled.div`
-    display: flex;
-    flex-direction: column;
-    row-gap: 0.85rem;
-    width: auto;
+  display: flex;
+  flex-direction: column;
+  row-gap: 0.85rem;
+  width: auto;
 `;
 
 export const Title = styled.div`
-    display: flex;
-    font-size: 1.5rem;
-    font-weight: 500;
+  display: flex;
+  font-size: 1.5rem;
+  font-weight: 500;
 `;
 
 export const Input = styled.input<{ inputWidth?: string; isError?: boolean }>`
@@ -29,7 +27,7 @@ export const Input = styled.input<{ inputWidth?: string; isError?: boolean }>`
   width: ${({ inputWidth }) => inputWidth || "100%"};
   box-sizing: border-box;
   line-height: 1rem;
-  
+
   ::placeholder {
     color: #D1D1D1;
   }
@@ -46,7 +44,7 @@ export const Textarea = styled.textarea<{ isError?: boolean }>`
   border: 1px solid ${({ isError }) => (isError ? "#DF3636" : "#D1D1D1")};
   border-radius: 4px;
   resize: none;
-    
+
   ::placeholder {
     color: #D1D1D1;
   }
@@ -56,20 +54,33 @@ export const Textarea = styled.textarea<{ isError?: boolean }>`
   }
 `;
 
-export const MessageWrapper = styled.div`
+export const Number = styled.div`
   display: flex;
-  flex-direction: column;
-  justify-content: center;
   align-items: center;
-  row-gap: 2rem;
-  width: 100%;
-  height: 60vh; 
+  justify-content: center;
+  font-size: 1rem;
+  border: 1px solid #D1D1D1;
+  border-radius: 4px;
+  padding: 0.75rem;
+  box-sizing: border-box;
+  gap: 1rem;
+  height: 2.8rem;
+  cursor: pointer;
 `;
 
-export const Message = styled.div`
-  font-size: 2rem;
-  font-weight: 500;
-  text-align: center;
+export const Num = styled.div`
+  font-size: 1rem;
+`;
+
+export const Icons = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+
+export const BtnGroup = styled.div`
+  display: flex;
+  justify-content: end;
+  gap: 1.25rem;
 `;
 
 export const ErrorMessage = styled.div`
