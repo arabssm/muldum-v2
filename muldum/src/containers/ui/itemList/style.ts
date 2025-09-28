@@ -37,10 +37,17 @@ export const Content = styled.div`
   font-size: 1rem;
   line-height: 1.4;
 `;
+
 export const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
   gap: 0.6rem;
+`;
+
+export const BtnWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 10rem;
 `;
 
 export const ToggleWrapper = styled.div`
@@ -67,4 +74,10 @@ export const Group = styled.div`
     width: 1.2rem;
     flex-shrink: 0;
   }
+`;
+
+export const BtnGroup = styled.div`
+  display: flex;
+  justify-content: end;
+  gap: 1.25rem;
 `;
