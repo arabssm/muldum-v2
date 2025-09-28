@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import styled from "@emotion/styled";
-import { css } from "@emotion/react";
 
 export default function NotFound() {
     return (
@@ -26,7 +25,7 @@ const Container = styled.div`
   text-align: center;
 `;
 
-const jejuFont = css`
+const jejuFont = `
   @font-face {
     font-family: 'JejuStoneWall';
     src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2210-EF@1.0/EF_jejudoldam.woff2') format('woff2');
