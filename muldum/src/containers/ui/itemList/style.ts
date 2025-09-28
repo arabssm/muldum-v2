@@ -38,6 +38,18 @@ export const Content = styled.div`
   line-height: 1.4;
 `;
 
+export const Reapply = styled.div`
+  display: block;
+  font-size: 1rem;
+  line-height: 2;
+  color: #909090;
+  cursor: pointer;
+
+  &:hover{
+    color: #FF9B62;
+  }
+`;
+
 export const Wrapper = styled.div`
   display: flex;
   flex-direction: column;

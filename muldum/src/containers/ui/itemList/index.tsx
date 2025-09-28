@@ -34,14 +34,17 @@ export default function ItemList() {
                                     <_.Content>{item.link}</_.Content>
                                     <_.Content>{item.quantity}개</_.Content>
                                     <_.Content>{item.reason}</_.Content>
+                                    {item.state === "승인 거부" && (
+                                        <_.Reapply onClick={() => router.push("/reapply")}> 재신청하기 </_.Reapply>
+                                    )}
                                 </_.Group>
                             )}
                         </_.Wrapper>
                     ))}
                 </_.InfoContainer>
                 <_.BtnGroup>
-                    <BtnSecondary onClick={() => router.back()}>물품 더 신청하기</BtnSecondary>
-                    <BtnPrimary onClick={() => router.back()}>돌아가기</BtnPrimary>
+                    <BtnSecondary onClick={() => router.back()}> 물품 더 신청하기 </BtnSecondary>
+                    <BtnPrimary onClick={() => router.back()}> 돌아가기 </BtnPrimary>
                 </_.BtnGroup>
             </_.BtnWrapper>
         </_.Containet>
