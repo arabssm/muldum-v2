@@ -2,6 +2,6 @@
 
 import Clubs from "@/containers/ui/clubs";
 
-export default function Home() {
+export default function ClubPage() {
   return <Clubs />
 }

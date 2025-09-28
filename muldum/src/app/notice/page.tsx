@@ -2,6 +2,6 @@
 
 import Notice from "@/containers/ui/notice";
 
-export default function Home() {
+export default function NoticePage() {
   return <Notice />
 }
