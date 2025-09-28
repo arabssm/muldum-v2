@@ -22,7 +22,7 @@ const GlobalStyle = () => (
         font-family: "Pretendard", sans-serif;
         color: #4B4B4B;
         // 임시 스크롤 방지
-        overflow: hidden;
+        /* overflow: hidden; */
       }
 
       a {

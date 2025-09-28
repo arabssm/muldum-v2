@@ -2,15 +2,24 @@
 
 import * as _ from "./style";
 import ItemForm from "@/components/itemForm";
+import { data } from "./data";
 
 export default function Main() {
   return (
     <_.Container>
       <_.Title>물품 재신청</_.Title>
-      <_.Title style={{ marginTop: "2rem", fontSize: "1.25rem", fontWeight: 500 }}>
-        추천 물품
-      </_.Title>
       <ItemForm />
+      <_.Title>비슷한 물품 추천</_.Title>
+      <_.Group>
+        {data.map((item, index) => (
+          <_.Box key={index} bgImage={item.image}>
+            <_.TextGroup>
+              <_.Small>{item.source}</_.Small>
+              <_.Text>{item.name}</_.Text>
+            </_.TextGroup>
+          </_.Box>
+        ))}
+      </_.Group>
     </_.Container>
   );
 }
