@@ -3,20 +3,71 @@
 import * as _ from "./style";
 import Image from "next/image";
 import { BtnPrimary, BtnSecondary } from "@/components/bottom";
-import type { ItemFormProps } from "@/types/group";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
+import type { ItemFormProps } from '@/types/group';
 
-export default function ItemForm({
-  item, setItem, price, setPrice,
-  link, setLink, reason, setReason,
-  errors, quantity, increase, decrease,
-  handleSubmit, FormInput,
-}: ItemFormProps) {
+export default function ItemForm({ handleSubmit }: ItemFormProps) {
   const router = useRouter();
+  const [item, setItem] = useState("");
+  const [price, setPrice] = useState("");
+  const [link, setLink] = useState("");
+  const [reason, setReason] = useState("");
+  const [quantity, setQuantity] = useState(1);
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+
+  const increase = () => setQuantity(prev => prev + 1);
+  const decrease = () => setQuantity(prev => (prev > 1 ? prev - 1 : 1));
+
+  const internalSubmit = () => {
+    const newErrors: { [key: string]: string } = {};
+    if (!item) newErrors.item = "물품명을 입력해주세요";
+    if (!price) newErrors.price = "가격을 입력해주세요";
+    if (!link) newErrors.link = "링크를 입력해주세요";
+    if (!reason || reason.length < 10) newErrors.reason = "10자 이상 입력해주세요";
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+
+    handleSubmit?.({ item, price, link, reason, quantity });
+    alert("신청이 완료되었습니다 ✅");
+  };
 
   const handleSecondary = () => {
-    router.push("/itemList"); 
+    router.push("/itemList");
   };
+
+  const FormInput = ({ label, value, setValue, placeholder, width, height, error }: any) => (
+    <_.Wrapper>
+      <_.Title>{label}</_.Title>
+      {height ? (
+        <_.Textarea
+          value={value}
+          onChange={e => setValue(e.target.value)}
+          placeholder={placeholder}
+          style={{ height }}
+          isError={!!error}
+        />
+      ) : (
+        <_.Input
+          type="text"
+          value={value}
+          onChange={e => setValue(e.target.value)}
+          placeholder={placeholder}
+          inputWidth={width}
+          isError={!!error}
+        />
+      )}
+      {error && (
+        <_.ErrorMessage>
+          <Image src="/assets/error.svg" alt="Error" width={16} height={16} />
+          {error}
+        </_.ErrorMessage>
+      )}
+    </_.Wrapper>
+  );
 
   const quantityIcons = [
     { onClick: increase, src: "/assets/Up.svg", alt: "Up" },
@@ -75,7 +126,7 @@ export default function ItemForm({
       />
       <_.BtnGroup>
         <BtnSecondary onClick={handleSecondary}>신청내역 보러가기</BtnSecondary>
-        <BtnPrimary onClick={handleSubmit}>신청하기</BtnPrimary>
+        <BtnPrimary onClick={internalSubmit}>신청하기</BtnPrimary>
       </_.BtnGroup>
     </>
   );
