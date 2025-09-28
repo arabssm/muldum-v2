@@ -29,19 +29,5 @@ export interface FormInputProps {
 }
 
 export interface ItemFormProps {
-  item: string;
-  setItem: (v: string) => void;
-  price: string;
-  setPrice: (v: string) => void;
-  link: string;
-  setLink: (v: string) => void;
-  reason: string;
-  setReason: (v: string) => void;
-  errors: { [key: string]: string };
-  quantity: number;
-  increase: () => void;
-  decrease: () => void;
-  handleSubmit: () => void;
-  handleSecondary: () => void;
-  FormInput: (props: FormInputProps & { height?: string }) => React.ReactElement;
+  handleSubmit?: (data: { item: string; price: string; link: string; reason: string; quantity: number }) => void;
 }
