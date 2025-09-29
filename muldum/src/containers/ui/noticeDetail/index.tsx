@@ -2,10 +2,14 @@
 
 import * as _ from './style';
 import Image from 'next/image';
+import { useRouter } from "next/navigation";
 
 export default function MoticeDetail() {
+    const router = useRouter();
+
     return (
         <_.Container>
+            <Image src="/assets/arrow.svg" alt="뒤로가기" width={24} height={24} style={{ cursor: "pointer" }} onClick={() => router.back()} />
             <_.Title>TSMC, AI칩 수요 견조 재확인…삼성·SK, HBM 사업 성장세 '쾌청'</_.Title>
             <_.Group>
                 <_.Subtitle>등록일 : 2025.04.21. 오후 1:42</_.Subtitle>
