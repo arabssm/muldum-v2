@@ -24,14 +24,19 @@ export const Group = styled.div`
     display: flex;
     gap: 1.25rem;
     width: 100%;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 0.5rem;
 `;
 
 export const Box = styled.div`
     display: flex;
     flex-direction: column;
     gap: 0.8rem;
-    padding: 2rem 1.8rem;
     width: 25%;
+    padding: 2rem 1.8rem;
+    flex: 0 0 auto;
     background-color: #FAFAFA;
     border-radius: 4px;
 `;
