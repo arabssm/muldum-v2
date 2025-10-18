@@ -11,8 +11,7 @@ export const Container = styled.div`
 
 export const Item = styled.div`
     display: flex;
-    flex: 0 0 32%;
-    box-sizing: border-box;
+    flex: 0 0 31.8%;
     padding: 3rem;
     border-radius: 1rem;
     justify-content: center;

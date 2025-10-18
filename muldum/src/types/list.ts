@@ -6,3 +6,13 @@ export interface ItemData {
     quantity: number;
     reason: string;
 }
+
+export interface Club {
+    name: string;
+    members: string[];
+}
+
+export interface ClubGroupProps {
+    title: string;
+    clubs: Club[];
+}
