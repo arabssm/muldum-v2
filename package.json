@@ -1,14 +1,28 @@
 {
+  "name": "muldum",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint"
+  },
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
-    "@types/react-dom": "19",
-    "axios": "^1.12.2",
-    "react-slick": "^0.31.0",
-    "slick-carousel": "^1.8.1",
+    "next": "^15.5.3",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
     "zustand": "^5.0.8"
   },
   "devDependencies": {
-    "@types/react": "19"
+    "@eslint/eslintrc": "^3",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "15.5.3",
+    "typescript": "^5"
   }
 }
