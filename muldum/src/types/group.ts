@@ -6,9 +6,9 @@ export type GroupType = typeof Groups[number];
 export const LockedGroups: readonly GroupType[] = ["자율동아리", "졸업작품"];
 
 export interface GroupProps {
-    active: GroupType | null;
-    setActive: React.Dispatch<React.SetStateAction<GroupType | null>>;
-    setMessage: React.Dispatch<React.SetStateAction<string>>;
+  active: GroupType | null;
+  setActive: React.Dispatch<React.SetStateAction<GroupType | null>>;
+  setMessage: React.Dispatch<React.SetStateAction<string>>;
 }
 
 export interface Errors {
@@ -19,15 +19,14 @@ export interface Errors {
 }
 
 export interface FormInputProps {
-    label: string;
-    value: string;
-    setValue: (val: string) => void;
-    placeholder: string;
-    width: string;
-    error?: string | false;
-    height?: string;
+  label: string;
+  value: string;
+  setValue: (v: string) => void;
+  placeholder?: string;
+  width?: string;
+  height?: string;
+  error?: string;
 }
-
 export interface ItemFormProps {
   handleSubmit?: (data: { item: string; price: string; link: string; reason: string; quantity: number }) => void;
 }
