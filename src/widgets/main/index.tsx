@@ -4,7 +4,7 @@ import * as _ from "./style";
 import Link from "next/link";
 import { Menu, NoticeData } from "./data";
 import { useRouter } from "next/navigation"; 
-import Slider from "@/components/slider";
+import Slider from "@/shared/ui/slider";
 
 export default function Main() {
     const router = useRouter();

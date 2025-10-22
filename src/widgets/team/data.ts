@@ -1,4 +1,4 @@
-import type { Club } from '@/types/list';
+import type { Club } from '@/shared/types/list';
 
 export const majorClubs: Club[] = [
     { name: '아라', members: ['학번이름', '학번이름', '학번이름', '학번이름', '학번이름', '학번이름'] },

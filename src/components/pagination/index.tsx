@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import { PaginationProps } from '@/types';
+import { PaginationProps } from '@/shared/types';
 
 export default function Pagination({ currentPage, totalPages, onPageChange }: PaginationProps) {
     return (

@@ -1,4 +1,4 @@
-import type { ItemData } from '@/types/list';
+import type { ItemData } from '@/shared/types/list';
 
 export const items: ItemData[] = [
     {

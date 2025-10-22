@@ -1,6 +1,6 @@
 "use client"
 
-import Main from "@/containers/ui/main";
+import Main from "@/widgets/main";
 
 export default function Home() {
   return <Main />

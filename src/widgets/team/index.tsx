@@ -1,6 +1,6 @@
 import * as _ from './style';
 import { majorClubs, freeClubs } from './data';
-import type { ClubGroupProps } from '@/types/list';
+import type { ClubGroupProps } from '@/shared/types/list';
 
 function ClubGroup({ title, clubs }: ClubGroupProps) {
     return (

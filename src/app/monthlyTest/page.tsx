@@ -1,6 +1,6 @@
 "use client"
 
-import MonthTest from '@/containers/ui/monthlyTest';
+import MonthTest from '@/widgets/monthlyTest';
 
 export default function NoticeDetailPage() {
   return <MonthTest />

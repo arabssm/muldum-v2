@@ -2,7 +2,7 @@
 
 import * as _ from "./style";
 import Image from "next/image";
-import type { FormInputProps } from "@/types/group";
+import type { FormInputProps } from "@/shared/types/group";
 
 export function FormInput({
     label,

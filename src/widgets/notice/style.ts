@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import type { Badgeprops } from "@/types";
+import type { Badgeprops } from "@/shared/types";
 
 export const Container = styled.div`
     display: flex;

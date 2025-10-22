@@ -2,7 +2,7 @@
 
 import GlobalStyle from "@/styles/GlobalStyle";
 import styled from "@emotion/styled";
-import TopAppBar from "@/components/topAppBar";
+import TopAppBar from "@/shared/ui/topAppBar";
 
 export default function RootLayout({
   children,

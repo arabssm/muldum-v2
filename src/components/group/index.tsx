@@ -1,5 +1,5 @@
 import * as _ from "./style";
-import { Groups, LockedGroups, GroupType, GroupProps } from "@/types/group";
+import { Groups, LockedGroups, GroupType, GroupProps } from "@/shared/types/group";
 
 export default function Group({ active, setActive, setMessage }: GroupProps) {
     const handleClick = (label: GroupType) => {

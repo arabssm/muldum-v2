@@ -1,6 +1,6 @@
 "use client"
 
-import NoticeDetail from '@/containers/ui/noticeDetail';
+import NoticeDetail from '@/widgets/noticeDetail';
 
 export default function NoticeDetailPage() {
   return <NoticeDetail />

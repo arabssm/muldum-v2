@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import type { ItemFormProps } from "@/types/group";
+import type { ItemFormProps } from "@/shared/types/group";
 
 export function useItemForm(handleSubmit?: ItemFormProps["handleSubmit"]) {
   const router = useRouter();

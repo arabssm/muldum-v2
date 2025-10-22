@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import type { BtnProps } from "@/types";
+import type { BtnProps } from "@/shared/types";
 
 export function BtnPrimary({ children, onClick }: BtnProps) {
     return (

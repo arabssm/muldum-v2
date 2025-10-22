@@ -4,7 +4,7 @@ import * as _ from "./style";
 import Image from "next/image";
 import Link from "next/link";
 import Pagination from "@/components/pagination";
-import { NoticeData } from "@/containers/ui/main/data";
+import { NoticeData } from "@/widgets/main/data";
 
 export default function Notice() {
     const page = 1;

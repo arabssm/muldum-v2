@@ -1,6 +1,6 @@
 "use client"
 
-import Team from "@/containers/ui/team";
+import Team from "@/widgets/team";
 
 export default function TeamPage() {
   return <Team />

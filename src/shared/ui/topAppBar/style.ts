@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import type { Bar } from "@/types";
+import type { Bar } from "@/shared/types";
 
 const Basic = `
   display: flex;
