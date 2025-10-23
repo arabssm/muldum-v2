@@ -4,6 +4,7 @@ import * as _ from "./style";
 import Image from "next/image";
 import { useState } from "react";
 import Group from "@/components/group/teams";
+import MonthlyTest from "../monthlyTest";
 
 const LockedGroups = ["노션", "화상통화", "공유캘린더"] as const;
 type GroupType = "공유캘린더" | "월말평가" | "화상통화" | "노션";
@@ -23,6 +24,7 @@ export default function Items() {
                 </_.MessageWrapper>
             ) : active ? (
                 <>
+                    <MonthlyTest />
                 </>
             ) : (
                 <_.MessageWrapper>
