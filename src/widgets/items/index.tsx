@@ -3,7 +3,7 @@
 import * as _ from "./style";
 import Image from "next/image";
 import { useState } from "react";
-import Group from "@/components/group";
+import Group from "@/components/group/items";
 import ItemForm from "@/components/itemForm";
 
 const LockedGroups = ["자율동아리", "졸업작품"] as const;
