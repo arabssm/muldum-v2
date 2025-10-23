@@ -8,7 +8,7 @@ export const Container = styled.div`
 
 export const Page = styled.div`
   width: 100%;
-  min-height: 100vh;
+  min-height: 70vh;
   background-color: #fff;
   display: flex;
   flex-direction: column;
@@ -72,8 +72,8 @@ export const Title = styled.div`
   cursor: text;
 `;
 
-export const ContentArea = styled.div`
-  padding: 0rem 3rem;
-  outline: none;
-  min-height: 60vh;
+export const EditorWrapper = styled.div`
+  .bn-container {
+    border-radius: 4px;
+  }
 `;

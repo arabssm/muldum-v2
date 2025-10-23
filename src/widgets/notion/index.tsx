@@ -1,11 +1,13 @@
-import * as _ from './style';
-import { BtnPrimary } from '@/shared/ui/button';
-import { useState } from 'react';
+import * as _ from "./style";
+import { BtnPrimary } from "@/shared/ui/button";
+import { useState } from "react";
+import BlockNoteEditor from "@/shared/ui/tag";
 
 export default function Notion() {
-    const [icon, setIcon] = useState('💕');
+    const [icon, setIcon] = useState("🌿");
     const [cover, setCover] = useState<string | null>(null);
-    const [title, setTitle] = useState('동아리이름');
+    const [title, setTitle] = useState("동아리이름");
+    const [content, setContent] = useState<string>("");
 
     const handleCoverChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -15,6 +17,10 @@ export default function Notion() {
             setCover(ev.target?.result as string);
         };
         reader.readAsDataURL(file);
+    };
+
+    const handleSave = () => {
+        // 저장 로직
     };
 
     return (
@@ -42,21 +48,27 @@ export default function Notion() {
                     <_.IconInput
                         contentEditable
                         suppressContentEditableWarning
-                        onInput={(e) => setIcon(e.currentTarget.textContent || '')}
+                        onInput={(e) => setIcon(e.currentTarget.textContent || "")}
                     >
                         {icon}
                     </_.IconInput>
+
                     <_.Title
                         contentEditable
                         suppressContentEditableWarning
-                        onInput={(e) => setTitle(e.currentTarget.textContent || '')}
+                        onInput={(e) => setTitle(e.currentTarget.textContent || "")}
                     >
                         {title}
                     </_.Title>
                 </_.HeaderSection>
-                <_.ContentArea contentEditable suppressContentEditableWarning />
-                <BtnPrimary>수정</BtnPrimary>
+                <_.EditorWrapper>
+                    <BlockNoteEditor
+                        initialContent={content}
+                        onChange={(value) => setContent(value)}
+                    />
+                </_.EditorWrapper>
             </_.Page>
+            <BtnPrimary onClick={handleSave}>저장</BtnPrimary>
         </_.Container>
     );
 }
