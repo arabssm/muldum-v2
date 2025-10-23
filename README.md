@@ -1,19 +1,36 @@
-## 커밋 컨벤션
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-| Type     | Description                              |
-|----------|------------------------------------------|
-| feat     | 새로운 기능 추가                         |
-| fix      | 버그 수정                                |
-| refactor | 코드 리팩토링 (기능 변경 없이 구조 개선) |
-| test     | 테스트 코드 작성                         |
-| chore    | 기타 자잘한 작업 (빌드 설정, 패키지 관리 등) |
-| docs     | 문서 추가 또는 수정                      |
-| delete   | 불필요한 코드나 파일 삭제                |
-| build    | 빌드 관련 파일 및 설정 변경              |
+## Getting Started
 
----
+First, run the development server:
 
-## 커밋 메시지 형식
+```bash
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
+```
 
-- 형식: `Type :: 변경 사항 요약`  
-- 제목은 **30자 이내**, 본문은 자유롭게 작성  
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+
+## Learn More
+
+To learn more about Next.js, take a look at the following resources:
+
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+
+## Deploy on Vercel
+
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
