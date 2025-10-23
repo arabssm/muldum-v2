@@ -5,8 +5,9 @@ import Image from "next/image";
 import { useState } from "react";
 import Group from "@/components/group/teams";
 import MonthlyTest from "../monthlyTest";
+import Calendar from "../calendar";
 
-const LockedGroups = ["노션", "화상통화", "공유캘린더"] as const;
+const LockedGroups = ["노션", "화상통화"] as const;
 type GroupType = "공유캘린더" | "월말평가" | "화상통화" | "노션";
 
 export default function Items() {
@@ -22,10 +23,10 @@ export default function Items() {
                     <Image src="/assets/nob.svg" alt="No" width={120} height={120} />
                     <_.Message>{lockedMessage}</_.Message>
                 </_.MessageWrapper>
-            ) : active ? (
-                <>
-                    <MonthlyTest />
-                </>
+            ) : active === "월말평가" ? (
+                <MonthlyTest />
+            ) : active === "공유캘린더" ? (
+                <Calendar />
             ) : (
                 <_.MessageWrapper>
                     <Image src="/assets/choice.svg" alt="No" width={120} height={120} />
