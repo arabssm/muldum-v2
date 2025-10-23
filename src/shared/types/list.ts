@@ -8,11 +8,12 @@ export interface ItemData {
 }
 
 export interface Club {
-    name: string;
-    members: string[];
+  id: number;
+  name: string;
+  members: string[];
 }
 
 export interface ClubGroupProps {
-    title: string;
-    clubs: Club[];
+  title: string;
+  clubs: Club[];
 }

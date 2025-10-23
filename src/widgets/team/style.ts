@@ -39,6 +39,7 @@ export const Box = styled.div`
     flex: 0 0 auto;
     background-color: #FAFAFA;
     border-radius: 4px;
+    cursor: pointer;
 `;
 
 export const Name = styled.div`

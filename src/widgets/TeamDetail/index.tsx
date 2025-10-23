@@ -1,6 +1,6 @@
 import * as _ from './style';
 
-export default function monthTest(){
+export default function TeamDetail(){
     return(
         <_.Container>
             
