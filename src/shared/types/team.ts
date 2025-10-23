@@ -30,3 +30,9 @@ export interface FormInputProps {
 export interface ItemFormProps {
   handleSubmit?: (data: { item: string; price: string; link: string; reason: string; quantity: number }) => void;
 }
+
+export interface FormSectionProps {
+  title: string;
+  placeholders: string[];
+  isTextarea?: boolean;
+}
