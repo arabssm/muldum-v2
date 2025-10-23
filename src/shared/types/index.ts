@@ -16,3 +16,8 @@ export interface PaginationProps {
     totalPages: number;
     onPageChange: (page: number) => void;
 }
+
+export interface BlockNoteEditorProps {
+    initialContent: string;
+    onChange: (content: string) => void;
+}
