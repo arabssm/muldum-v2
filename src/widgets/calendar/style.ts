@@ -7,7 +7,6 @@ export const Container = styled.div`
     align-items: center;
     width: 100%;
     height: 70vh;
-
 `;
 
 export const CalendarWrapper = styled.div`
@@ -15,6 +14,7 @@ export const CalendarWrapper = styled.div`
     flex-direction: column;
     width: 100%;
     height: 100%;
+    border-radius: 4px;
 `;
 
 export const HeaderRow = styled.div`
@@ -32,7 +32,9 @@ export const HeaderCell = styled.div`
     align-items: center;
     font-weight: 600;
     font-size: 1rem;
-    border-right: 1px solid #e5e7eb;
+    border-right: 1px solid #E7E8EA;
+    border-left: 1px solid #E7E8EA;
+    border-top: 1px solid #E7E8EA;
 `;
 
 export const Body = styled.div`
@@ -47,6 +49,5 @@ export const Cell = styled.div`
     align-items: flex-start;
     padding: 1rem;
     font-size: 0.95rem;
-    border-right: 1px solid #E7E8EA;
-    border-bottom: 1px solid #E7E8EA;
+    border: 1px solid #E7E8EA;
 `;
