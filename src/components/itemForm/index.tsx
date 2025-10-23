@@ -2,7 +2,7 @@
 
 import * as _ from "./style";
 import Image from "next/image";
-import { BtnPrimary, BtnSecondary } from "@/shared/ui/bottom";
+import { BtnPrimary, BtnSecondary } from "@/shared/ui/button";
 import { FormInput } from "./FormInput";
 import { useItemForm } from "@/shared/hooks/items";
 import type { ItemFormProps } from "@/shared/types/group";

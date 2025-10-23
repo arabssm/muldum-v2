@@ -4,7 +4,7 @@ import * as _ from "./style";
 import Image from "next/image";
 import { useState } from "react";
 import { items } from "./data";
-import { BtnPrimary, BtnSecondary } from "@/shared/ui/bottom";
+import { BtnPrimary, BtnSecondary } from "@/shared/ui/button";
 import { useRouter } from "next/navigation";
 
 export default function ItemList() {
