@@ -104,5 +104,6 @@ export const Small = styled.div`
 
 export const Group = styled.div`
     display: flex;
-    gap: 1rem
+    gap: 1rem;
+    cursor: pointer;
 `;
