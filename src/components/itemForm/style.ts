@@ -89,3 +89,29 @@ export const ErrorMessage = styled.div`
   gap: 0.25rem;
   color: #DF3636;
 `;
+
+export const SelectGroup = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+`;
+
+export const SelectWrapper = styled.div`
+  position: relative;
+  display: inline-block;
+`;
+
+export const Select = styled.select`
+  padding: 0.5rem 1.8rem 0.5rem 0.8rem;
+  border: 1px solid #D1D1D1;
+  border-radius: 4px;
+  background-color: white;
+  font-size: 0.95rem;
+  cursor: pointer;
+  appearance: none;
+
+  &:focus {
+    outline: none;
+    border-color: #888;
+  }
+`;
