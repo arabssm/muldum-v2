@@ -6,6 +6,7 @@ import { BtnPrimary, BtnSecondary } from "@/shared/ui/button";
 import { FormInput } from "./FormInput";
 import { useItemForm } from "@/shared/hooks/items";
 import type { ItemFormProps } from "@/shared/types/group";
+import { useState } from "react";
 
 export default function ItemForm({ handleSubmit }: ItemFormProps) {
   const {
@@ -17,13 +18,36 @@ export default function ItemForm({ handleSubmit }: ItemFormProps) {
     errors, internalSubmit, handleSecondary
   } = useItemForm(handleSubmit);
 
+  const [club, setClub] = useState("");
+
   const quantityIcons = [
     { onClick: increase, src: "/assets/Up.svg", alt: "Up" },
     { onClick: decrease, src: "/assets/Drop.svg", alt: "Down" },
   ];
 
+  const clubOptions = [
+    "나의 동아리",
+    "반짝반짝빛나는밤"
+  ];
+
   return (
     <>
+      <_.SelectGroup>
+        <_.SelectWrapper>
+          <_.Select id="club" value={club} onChange={(e) => setClub(e.target.value)}>
+            <option value="">동아리 선택</option>
+            {clubOptions.map((option) => (
+              <option key={option} value={option}>
+                {option}
+              </option>
+            ))}
+          </_.Select>
+          <Image src="/assets/toggle.svg" alt="토글" width={20} height={20}
+            style={{ position: "absolute", right: "0.5rem", top: "50%", transform: "translateY(-50%) rotate(90deg)" }}
+          />
+        </_.SelectWrapper>
+      </_.SelectGroup>
+
       <_.Group>
         <FormInput label="구입할 물품" value={item} setValue={setItem} placeholder="구입할 물품을 입력하세요" width="40rem" error={errors.item} />
         <FormInput label="가격" value={price} setValue={setPrice} placeholder="가격을 입력하세요" width="10rem" error={errors.price} />
@@ -41,6 +65,7 @@ export default function ItemForm({ handleSubmit }: ItemFormProps) {
           </_.Number>
         </_.Wrapper>
       </_.Group>
+
       <FormInput label="물품링크" value={link} setValue={setLink} placeholder="링크를 입력하세요" width="62rem" error={errors.link} />
       <FormInput label="신청사유" value={reason} setValue={setReason} placeholder="신청 사유를 10자 이상 입력해주세요" width="100%" height="20vh" error={errors.reason} />
       <_.BtnGroup>
