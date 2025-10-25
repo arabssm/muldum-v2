@@ -1,4 +1,5 @@
 import styled from "@emotion/styled";
+import type { Bar } from "@/shared/types";
 
 export const Container = styled.div`
     display: flex;
@@ -22,21 +23,24 @@ export const Text = styled.div`
 
 export const Group = styled.div`
     display: flex;
-    gap: 1.25rem;
     width: 100%;
-    flex-wrap: nowrap;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     padding-bottom: 0.5rem;
+`;
+
+export const BoxGroup = styled.div`
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.25rem;
+    width: 100%;
 `;
 
 export const Box = styled.div`
     display: flex;
     flex-direction: column;
     gap: 0.8rem;
-    width: 25%;
     padding: 2rem 1.8rem;
-    flex: 0 0 auto;
     background-color: #FAFAFA;
     border-radius: 4px;
     cursor: pointer;
@@ -50,6 +54,22 @@ export const Name = styled.div`
 
 export const Member = styled.div`
     display: flex;
+    flex-wrap: wrap;
     font-size: 1rem;
     color: #909090;
+`;
+
+export const ClassText = styled.div<Bar>`
+  display: flex;
+  padding: 0.75rem;
+  font-size: 1.125rem;
+  font-weight: ${({ isActive }) => (isActive ? 500 : 400)};
+  cursor: pointer;
+  color: ${({ isActive }) => (isActive ? "#4B4B4B" : "#B2B2B2")};
+  border-bottom: 2.5px solid ${({ isActive }) => (isActive ? "#4B4B4B" : "#B2B2B2")};
+
+  &:hover {
+    background-color: ${({ isActive }) =>
+      isActive ? "transparent" : "#f5f5f5b6"};
+  }
 `;
