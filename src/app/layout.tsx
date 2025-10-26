@@ -1,8 +1,8 @@
-"use client"
+'use client';
 
-import GlobalStyle from "@/styles/GlobalStyle";
-import styled from "@emotion/styled";
-import TopAppBar from "@/shared/ui/topAppBar";
+import GlobalStyle from '@/styles/GlobalStyle';
+import styled from '@emotion/styled';
+import TopAppBar from '@/shared/ui/topAppBar';
 
 export default function RootLayout({
   children,
@@ -10,13 +10,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="ko">
       <body>
         <GlobalStyle />
         <TopAppBar />
-        <Container>
-          {children}
-        </Container>
+        <Container>{children}</Container>
+        <div id="modal-root"></div>
       </body>
     </html>
   );
@@ -31,7 +30,7 @@ const Container = styled.div`
   padding: 2.5rem 3rem;
   margin: 0 auto;
 
-  @media screen and (max-width: 1620px){
+  @media screen and (max-width: 1620px) {
     width: 1620px;
   }
 `;
