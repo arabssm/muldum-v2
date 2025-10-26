@@ -47,6 +47,7 @@ export const ChatMessage = styled.div`
 
 export const Chat = styled.div`
   font-size: 1rem;
+  font-weight: 400;
 `;
 
 export const Name = styled.div`
@@ -54,7 +55,7 @@ export const Name = styled.div`
   align-items: center;
   gap: 0.6rem;
   font-size: 1.1rem;
-  font-weight: 500;
+  font-weight: 600;
 `;
 
 export const ChatInput = styled.input`
