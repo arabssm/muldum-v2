@@ -21,3 +21,13 @@ export interface BlockNoteEditorProps {
     initialContent: string;
     onChange: (content: string) => void;
 }
+
+export interface ModalPortalProps {
+  children: React.ReactNode;
+}
+
+export interface ModalProps {
+  isOpen: boolean;
+  closeModal: () => void;
+  children: React.ReactNode;
+}
