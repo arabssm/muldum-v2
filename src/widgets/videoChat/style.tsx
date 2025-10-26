@@ -2,9 +2,17 @@ import styled from "@emotion/styled";
 
 export const Container = styled.div`
   display: flex;
-  padding: 0.8rem;
   width: 100%;
   height: 70vh;
+`;
+
+export const TopContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  gap: 3.5rem;
+  cursor: pointer;
 `;
 
 export const ChatWrapper = styled.div`
@@ -128,4 +136,9 @@ export const InputWrapper = styled.div`
   padding: 0 0.5rem;
   background-color: #fafafa;
   border-radius: 0 0 4px 4px;
+`;
+
+export const IconWrapper = styled.div`
+    display: flex;
+    gap: 3.5rem;
 `;
