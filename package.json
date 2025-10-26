@@ -20,6 +20,7 @@
     "@tiptap/extension-gapcursor": "^3.7.2",
     "@tiptap/pm": "^3.7.2",
     "@tiptap/starter-kit": "^3.7.2",
+    "framer-motion": "^12.23.24",
     "next": "^16.0.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
