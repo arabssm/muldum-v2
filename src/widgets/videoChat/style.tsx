@@ -5,14 +5,13 @@ export const Container = styled.div`
   padding: 0.8rem;
   width: 100%;
   height: 70vh;
-  background: #7f8796;
 `;
 
 export const ChatWrapper = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  height: 65vh;
+  height: 70vh;
   background: #FAFAFA;
   border-radius: 4px;
   position: relative;
@@ -86,7 +85,7 @@ export const ParticipantPanel = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  height: 65vh;
+  height: 70vh;
   width: 18rem;
   background: #fafafa;
   border-radius: 4px;
