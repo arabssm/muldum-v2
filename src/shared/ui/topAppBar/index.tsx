@@ -48,7 +48,7 @@ export default function TopAppBar() {
       </_.BtnGroup>
 
       <Modal>
-        <LoginModal closeModal={closeModal} />
+        <LoginModal />
       </Modal>
     </_.Container>
   );
