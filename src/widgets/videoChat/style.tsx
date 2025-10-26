@@ -19,7 +19,6 @@ export const ChatWrapper = styled.div`
 `;
 
 export const ResizeHandle = styled.div`
-  width: 8px;
   cursor: ew-resize;
   position: absolute;
   top: 0;
