@@ -112,6 +112,21 @@ export const CloseButton = styled.button`
 
 export const Drag = styled.div`
   display: flex;
-  justify-content: flex-end;
-  padding-left: 0.5rem;
+  position: absolute;
+  justify-content: center;
+  align-items: center;
+  top: 0;
+  right: 0;
+  height: 100%;
+  cursor: ew-resize;
+`;
+
+
+export const InputWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  border-top: 1px solid #eee;
+  padding: 0 0.5rem;
+  background-color: #fafafa;
+  border-radius: 0 0 4px 4px;
 `;
