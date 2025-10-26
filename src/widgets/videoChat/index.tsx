@@ -40,6 +40,14 @@ export default function VideoChat() {
                         </div>
                     </_.ChatMessage>
                 </_.ChatScroll>
+                <_.Drag>
+                    <Image
+                        src="/assets/drag.svg"
+                        alt="참가자 아이콘"
+                        width={24}
+                        height={24}
+                    />
+                </_.Drag>
                 <_.ChatInput placeholder="메시지를 입력하세요..." />
                 <_.ResizeHandle onMouseDown={handleResize} />
             </_.ChatWrapper>

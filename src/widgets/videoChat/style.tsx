@@ -109,3 +109,9 @@ export const CloseButton = styled.button`
   font-size: 1.25rem;
   cursor: pointer;
 `;
+
+export const Drag = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  padding-left: 0.5rem;
+`;
