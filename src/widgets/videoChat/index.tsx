@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import * as _ from "./style";
 
 export default function VideoChat() {
@@ -9,6 +9,13 @@ export default function VideoChat() {
     const [chatWidth, setChatWidth] = useState(320);
     const [message, setMessage] = useState("");
     const [messages, setMessages] = useState<{ name: string; text: string }[]>([]);
+    const chatScrollRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        if (chatScrollRef.current) {
+            chatScrollRef.current.scrollTop = chatScrollRef.current.scrollHeight;
+        }
+    }, [messages]);
 
     const handleResize = (e: React.MouseEvent) => {
         const startX = e.clientX;
@@ -39,14 +46,14 @@ export default function VideoChat() {
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === "Enter") {
             e.preventDefault();
-            handleSendMessage();
+            setTimeout(() => handleSendMessage(), 0);
         }
     };
 
     return (
         <_.Container>
             <_.ChatWrapper style={{ width: chatWidth }}>
-                <_.ChatScroll>
+                <_.ChatScroll ref={chatScrollRef}>
                     {messages.map((msg, idx) => (
                         <_.ChatMessage key={idx}>
                             <_.Circle />
@@ -57,20 +64,21 @@ export default function VideoChat() {
                         </_.ChatMessage>
                     ))}
                 </_.ChatScroll>
-                <_.Drag onMouseDown={handleResize}>
-                    <Image
-                        src="/assets/drag.svg"
-                        alt="참가자 아이콘"
-                        width={24}
-                        height={24}
-                    />
-                </_.Drag>
                 <_.ChatInput
+                    type="text"
                     placeholder="메시지를 입력하세요..."
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
                     onKeyDown={handleKeyDown}
                 />
+                <_.Drag onMouseDown={handleResize}>
+                    <Image
+                        src="/assets/drag.svg"
+                        alt="드래그 아이콘"
+                        width={24}
+                        height={24}
+                    />
+                </_.Drag>
                 <_.ResizeHandle onMouseDown={handleResize} />
             </_.ChatWrapper>
             <_.VideoArea />
