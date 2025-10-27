@@ -1,0 +1,90 @@
+name: Deploy Next.js (Yarn, remote build)
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    env:
+      NODE_ENV: production
+
+    steps:
+      # 1️⃣ 소스 가져오기
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      # 2️⃣ Node 환경 세팅
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'yarn'
+
+      # 3️⃣ 의존성 설치
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      # 4️⃣ 빌드
+      - name: Build Next.js (standalone)
+        run: |
+          yarn build
+          mkdir -p deploy
+          cp -r .next/standalone deploy/
+          cp -r .next/static deploy/.next/static
+          cp -r public deploy/public || true
+          tar -czf build.tgz -C deploy .
+
+      # 5️⃣ EC2로 빌드 결과물 전송
+      - name: Upload build artifact to EC2
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          source: "build.tgz"
+          target: "/home/ubuntu/muldum-v2/tmp"
+
+      # 6️⃣ EC2에서 배포 및 PM2 reload
+      - name: Deploy and reload on EC2
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script_stop: true
+          script: |
+            set -e
+            APP_DIR="/home/ubuntu/muldum-v2"
+            RELEASES="$APP_DIR/releases"
+            CURRENT="$APP_DIR/current"
+            SHARED="$APP_DIR/shared"
+            TMP="$APP_DIR/tmp"
+            TS=$(date +%Y%m%d%H%M%S)
+            NEW="$RELEASES/$TS"
+
+            echo "📦 Extracting new release to $NEW"
+            mkdir -p "$NEW"
+            tar -xzf "$TMP/build.tgz" -C "$NEW"
+
+            echo "🔗 Switching symlink..."
+            ln -sfn "$NEW" "$CURRENT"
+
+            echo "🚀 Restarting app with PM2..."
+            cd "$CURRENT"
+            if pm2 describe muldum-v2 > /dev/null; then
+              pm2 reload muldum-v2
+            else
+              pm2 start "$SHARED/ecosystem.config.cjs"
+            fi
+            pm2 save
+
+            echo "🧹 Cleaning old releases..."
+            ls -1dt $RELEASES/* | tail -n +6 | xargs -r rm -rf || true
+            rm -f "$TMP/build.tgz"
+
+            echo "✅ Deployment completed successfully!"
