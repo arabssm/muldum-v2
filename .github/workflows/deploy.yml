@@ -1,91 +1,29 @@
-name: Deploy Next.js (Yarn, remote build)
+# main 브랜치 push 시 SSH로 원격 서버에 접속해 배포 스크립트 실행
+name: Deploy via SSH
 
 on:
   push:
-    branches: [ main ]
-  workflow_dispatch:
-
+    branches:
+      - main
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
-    env:
-      NODE_ENV: production
-
     steps:
-      - name: Checkout source
-        uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Set up SSH key
+        uses: webfactory/ssh-agent@v0.8.0
         with:
-          node-version: 20
-          cache: 'yarn'
+          ssh-private-key: ${{ secrets.SSH_KEY }}
 
-      - name: Install dependencies
-        run: yarn install --frozen-lockfile --production=false
+      # - name: Add remote host to known_hosts
+      #   run: |
+      #     ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
 
-      - name: Build Next.js (standalone)
+      - name: Deploy via SSH
+        env:
+          USERNAME: ${{ secrets.SSH_USER }}
+          HOST: ${{ secrets.SSH_HOST }}
         run: |
-          yarn build
-          mkdir -p deploy/.next
-          cp -r .next/standalone deploy/
-          cp -r .next/static deploy/.next/static
-          cp -r public deploy/public || true
-          tar -czf build.tgz -C deploy .
-
-      - name: Upload build artifact to EC2
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_KEY }}
-          port: ${{ secrets.SSH_PORT }}
-          source: "build.tgz"
-          target: "/home/ubuntu/muldum-v2/tmp"
-
-      - name: Deploy and reload on EC2
-        uses: appleboy/ssh-action@v1.2.0
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_KEY }}
-          port: ${{ secrets.SSH_PORT }}
-          script_stop: true
-          script: |
-            export PATH=$PATH:/usr/local/bin
-            set -e
-            APP_DIR="/home/ubuntu/muldum-v2"
-            RELEASES="$APP_DIR/releases"
-            CURRENT="$APP_DIR/current"
-            SHARED="$APP_DIR/shared"
-            TMP="$APP_DIR/tmp"
-            TS=$(date +%Y%m%d%H%M%S)
-            NEW="$RELEASES/$TS"
-
-            echo "📦 Extracting new release to $NEW"
-            mkdir -p "$NEW"
-            tar -xzf "$TMP/build.tgz" -C "$NEW"
-
-            echo "🔗 Switching symlink..."
-            ln -sfn "$NEW" "$CURRENT"
-
-            echo "🚀 Restarting app with PM2..."
-            cd "$CURRENT"
-
-            if ! pm2 list | grep -q "muldum-v2"; then
-              echo "🆕 First deployment — starting app for the first time..."
-              mkdir -p "$SHARED"
-              echo "module.exports = { apps: [{ name: 'muldum-v2', script: 'standalone/server.js', cwd: '/home/ubuntu/muldum-v2/current', instances: 1, exec_mode: 'fork', env: { NODE_ENV: 'production', PORT: 3000 } }] };" > "$SHARED/ecosystem.config.cjs"
-              pm2 start "$SHARED/ecosystem.config.cjs"
-              pm2 save
-            else
-              echo "♻️ Existing app detected — reloading..."
-              pm2 reload muldum-v2
-              pm2 save
-            fi
-
-            echo "🧹 Cleaning old releases..."
-            ls -1dt $RELEASES/* | tail -n +6 | xargs -r rm -rf || true
-            rm -f "$TMP/build.tgz"
-
-            echo "✅ Deployment completed successfully!"
+          ssh $USERNAME@$HOST 'cd /home/ubuntu/muldum-v2 && bash ./deploy.sh'
