@@ -2,19 +2,33 @@
 
 import styled from '@emotion/styled';
 import Image from 'next/image';
+import { useSearchParams } from 'next/navigation';
+import { useEffect } from 'react';
+import useGoogleLogin from '@/shared/hooks/useGoogleLogin';
 
 export default function LoginModal() {
+  const searchParams = useSearchParams();
+  const { startGoogleLogin, handleGoogleCallback } = useGoogleLogin();
+
+  useEffect(() => {
+    const code = searchParams.get('code');
+    if (code) {
+      handleGoogleCallback(code)
+        .then(() => window.location.replace('/'))
+    }
+  }, [searchParams, handleGoogleCallback]);
+
   return (
     <Container>
       <Wrapper>
         <Title>로그인</Title>
-        <SubText>구글 로그인 시 정보는 자동 저장 됩니다</SubText>
+        <SubText>구글 로그인 시 정보는 자동 저장됩니다</SubText>
       </Wrapper>
       <ButtonGroup>
-        <Button>
+        <Button onClick={startGoogleLogin}>
           <Image
             src="/assets/google.svg"
-            alt='구글 아이콘'
+            alt="구글 아이콘"
             width={32}
             height={32}
           />
@@ -23,7 +37,7 @@ export default function LoginModal() {
         <Button>
           <Image
             src="/assets/guest.svg"
-            alt='게스트 아이콘'
+            alt="게스트 아이콘"
             width={32}
             height={32}
           />
@@ -58,7 +72,7 @@ const Title = styled.div`
 
 const SubText = styled.div`
   font-size: 1rem;
-  color: #B2B2B2;
+  color: #b2b2b2;
 `;
 
 const ButtonGroup = styled.div`
