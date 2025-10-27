@@ -1,4 +1,4 @@
-name: Deploy Next.js (Yarn, remote build)
+name: Deploy Next.js (Yarn + PM2)
 
 on:
   push:
@@ -48,7 +48,7 @@ jobs:
           source: "build.tgz"
           target: "/home/ubuntu/muldum-v2/tmp"
 
-      # 6️⃣ EC2에서 배포 및 PM2 reload
+      # 6️⃣ EC2에서 배포 및 PM2 재시작
       - name: Deploy and reload on EC2
         uses: appleboy/ssh-action@v1.2.0
         with:
