@@ -4,7 +4,11 @@ import * as _ from './style';
 import Image from 'next/image';
 import { useRouter } from "next/navigation";
 
-export default function MoticeDetail() {
+interface NoticeDetailProps {
+    id: string
+}
+
+export default function NoticeDetail({id}: NoticeDetailProps) {
     const router = useRouter();
 
     return (
