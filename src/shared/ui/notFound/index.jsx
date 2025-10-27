@@ -1,4 +1,3 @@
-/** @jsxImportSource @emotion/react */
 'use client'
 
 import React, { useState, useEffect, useCallback, useRef } from 'react'
@@ -13,10 +12,11 @@ const GAME_CONFIG = {
   ACCELERATION: 0.001,
   CLOUD_FREQUENCY: 0.5,
   MAX_CLOUDS: 6,
-  TREX_WIDTH: 44,
-  TREX_HEIGHT: 47,
-  OBSTACLE_WIDTH: 20,
-  OBSTACLE_HEIGHT: 40,
+  TREX_WIDTH: 60, 
+  TREX_HEIGHT: 50,
+  OBSTACLE_WIDTH: 60,
+  OBSTACLE_HEIGHT: 80, 
+  OBSTACLE_HEIGHT: 80,
   GROUND_HEIGHT: 12,
   CANVAS_WIDTH: 600,
   CANVAS_HEIGHT: 150,
