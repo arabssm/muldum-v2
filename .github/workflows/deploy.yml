@@ -21,10 +21,16 @@ jobs:
           node-version: 20
           cache: 'yarn'
 
+      - name: Restore .env file from secrets
+        run: |
+          echo "${{ secrets.ENV_FILE }}" > .env
+          echo "✅ Restored .env file:"
+          cat .env
+
       - name: Install dependencies
         run: yarn install --frozen-lockfile --production=false
 
-      - name: Build static export
+      - name: Build static export with .env
         run: |
           yarn build
           yarn export
@@ -53,7 +59,6 @@ jobs:
             APP_DIR="/home/ubuntu/muldum-v2"
             TMP="$APP_DIR/tmp"
             WWW="/var/www/muldum-v2"
-            TS=$(date +%Y%m%d%H%M%S)
 
             echo "📦 Extracting static files to $WWW"
             sudo mkdir -p "$WWW"
@@ -61,6 +66,5 @@ jobs:
             sudo rm -f "$TMP/out.tgz"
 
             echo "✅ Deployed static site to Nginx root: $WWW"
-
             echo "🔁 Reloading Nginx..."
             sudo systemctl reload nginx
