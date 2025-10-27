@@ -1,29 +1,41 @@
-# main 브랜치 push 시 SSH로 원격 서버에 접속해 배포 스크립트 실행
 name: Deploy via SSH
 
 on:
   push:
     branches:
       - main
+  workflow_dispatch:
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      # 1️⃣ 저장소 Checkout
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - name: Set up SSH key
-        uses: webfactory/ssh-agent@v0.8.0
+      # 2️⃣ SSH로 원격 배포 실행
+      - name: Deploy to EC2 via SSH
+        uses: appleboy/ssh-action@v1.2.0
         with:
-          ssh-private-key: ${{ secrets.SSH_KEY }}
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script_stop: true
+          script: |
+            set -e
+            echo "🚀 Deploying to EC2..."
 
-      # - name: Add remote host to known_hosts
-      #   run: |
-      #     ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
+            cd /home/ubuntu/muldum-v2
 
-      - name: Deploy via SSH
-        env:
-          USERNAME: ${{ secrets.SSH_USER }}
-          HOST: ${{ secrets.SSH_HOST }}
-        run: |
-          ssh $USERNAME@$HOST 'cd /home/ubuntu/muldum-v2 && bash ./deploy.sh'
+            if [ -f ./deploy.sh ]; then
+              echo "🔧 Running deploy.sh..."
+              bash ./deploy.sh
+            else
+              echo "❌ deploy.sh not found!"
+              exit 1
+            fi
+
+            echo "✅ Deployment completed successfully!"
