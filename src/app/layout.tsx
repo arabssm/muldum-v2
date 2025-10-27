@@ -1,8 +1,12 @@
 'use client';
 
+import { CacheProvider } from '@emotion/react';
+import createEmotionCache from '@/shared/lib/emotionCache';
 import GlobalStyle from '@/styles/GlobalStyle';
 import styled from '@emotion/styled';
 import TopAppBar from '@/shared/ui/topAppBar';
+
+const clientSideEmotionCache = createEmotionCache();
 
 export default function RootLayout({
   children,
@@ -12,10 +16,12 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body>
-        <GlobalStyle />
-        <TopAppBar />
-        <Container>{children}</Container>
-        <div id="modal-root"></div>
+        <CacheProvider value={clientSideEmotionCache}>
+          <GlobalStyle />
+          <TopAppBar />
+          <Container>{children}</Container>
+          <div id="modal-root"></div>
+        </CacheProvider>
       </body>
     </html>
   );
