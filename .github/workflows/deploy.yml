@@ -1,4 +1,4 @@
-name: Deploy Next.js (Yarn + PM2, no Docker scp)
+name: Deploy Next.js (Yarn, remote build)
 
 on:
   push:
@@ -12,22 +12,18 @@ jobs:
       NODE_ENV: production
 
     steps:
-      # 1️⃣ 소스 가져오기
       - name: Checkout source
         uses: actions/checkout@v4
 
-      # 2️⃣ Node 환경 세팅
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: 'yarn'
 
-      # 3️⃣ 의존성 설치
       - name: Install dependencies
         run: yarn install --frozen-lockfile --production=false
 
-      # 4️⃣ 빌드
       - name: Build Next.js (standalone)
         run: |
           yarn build
@@ -37,20 +33,17 @@ jobs:
           cp -r public deploy/public || true
           tar -czf build.tgz -C deploy .
 
-      # 5️⃣ SSH 키 파일 준비
-      - name: Prepare SSH key
-        run: |
-          echo "${{ secrets.SSH_KEY }}" > key.pem
-          chmod 600 key.pem
+      - name: Upload build artifact to EC2
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          source: "build.tgz"
+          target: "/home/ubuntu/muldum-v2/tmp"
 
-      # 6️⃣ EC2로 빌드 결과 전송 (Docker 없음)
-      - name: Upload build.tgz via native scp
-        run: |
-          scp -i key.pem -P ${{ secrets.SSH_PORT }} -o StrictHostKeyChecking=no \
-            build.tgz ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/ubuntu/muldum-v2/tmp/
-
-      # 7️⃣ EC2에서 배포 및 PM2 reload
-      - name: Deploy & reload app via SSH
+      - name: Deploy and reload on EC2
         uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ secrets.SSH_HOST }}
@@ -59,6 +52,7 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           script_stop: true
           script: |
+            export PATH=$PATH:/usr/local/bin
             set -e
             APP_DIR="/home/ubuntu/muldum-v2"
             RELEASES="$APP_DIR/releases"
@@ -77,12 +71,34 @@ jobs:
 
             echo "🚀 Restarting app with PM2..."
             cd "$CURRENT"
-            if pm2 describe muldum-v2 > /dev/null; then
-              pm2 reload muldum-v2
-            else
+
+            if ! pm2 list | grep -q "muldum-v2"; then
+              echo "🆕 First deployment — starting app for the first time..."
+              mkdir -p "$SHARED"
+              cat > "$SHARED/ecosystem.config.cjs" <<'EOF'
+              module.exports = {
+                apps: [
+                  {
+                    name: "muldum-v2",
+                    script: ".next/standalone/server.js",
+                    cwd: "/home/ubuntu/muldum-v2/current",
+                    instances: 1,
+                    exec_mode: "fork",
+                    env: {
+                      NODE_ENV: "production",
+                      PORT: 3000
+                    }
+                  }
+                ]
+              };
+EOF
               pm2 start "$SHARED/ecosystem.config.cjs"
+              pm2 save
+            else
+              echo "♻️ Existing app detected — reloading..."
+              pm2 reload muldum-v2
+              pm2 save
             fi
-            pm2 save
 
             echo "🧹 Cleaning old releases..."
             ls -1dt $RELEASES/* | tail -n +6 | xargs -r rm -rf || true
