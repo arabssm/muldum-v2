@@ -18,7 +18,8 @@ export const Item = styled.div`
     flex-direction: column;
     row-gap: 0.8rem;
     background-color: #FAFAFA;
-    cursor: pointer;
+    cursor: auto;
+    /* cursor: pointer; */
 
     &:hover{
         background-color: #F1F1F1;

@@ -15,14 +15,16 @@ export default function Team() {
     const [activeClass, setActiveClass] = useState<ClassType>("전체");
 
     const clubs =
-        activeGroup === "전공동아리" ? majorClubs :
-            activeGroup === "자율동아리" ? freeClubs :
-                majorClubs;
+        activeGroup === "전공동아리"
+            ? majorClubs
+            : activeGroup === "자율동아리"
+                ? freeClubs
+                : majorClubs;
 
     const filteredClubs =
         activeClass === "전체"
             ? clubs
-            : clubs.filter(club => club.class === activeClass);
+            : clubs.filter((club) => club.class === activeClass);
 
     return (
         <_.Container>
@@ -53,14 +55,17 @@ export default function Team() {
 
             <_.BoxGroup>
                 {filteredClubs.map((club, index) => (
-                    <_.Box key={club.id ?? index} onClick={() => router.push(`/team/${club.id ?? index}`)}>
+                    <_.Box
+                        key={club.id ?? index}
+                        onClick={() => router.push(`/team/${club.id ?? index}`)}
+                    >
                         <_.Name>{club.name}</_.Name>
                         <_.Member>
                             {club.members.map((member, i) => (
-                                <div key={`${member}-${i}`}>
+                                <>
                                     {member}
-                                    {i % 2 === 1 ? <br /> : ' '}
-                                </div>
+                                    {(i + 1) % 3 === 0 ? <br /> : " "}
+                                </>
                             ))}
                         </_.Member>
                     </_.Box>

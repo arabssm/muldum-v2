@@ -1,6 +1,6 @@
 import styled from "@emotion/styled";
 
-export const Containet = styled.div`
+export const Container = styled.div`
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -92,4 +92,30 @@ export const BtnGroup = styled.div`
   display: flex;
   justify-content: end;
   gap: 1.25rem;
+`;
+
+export const Select = styled.select`
+  padding: 0.5rem 1.8rem 0.5rem 0.8rem;
+  border: 1px solid #D1D1D1;
+  border-radius: 4px;
+  background-color: white;
+  font-size: 0.95rem;
+  cursor: pointer;
+  appearance: none;
+
+  &:focus {
+    outline: none;
+    border-color: #888;
+  }
+`;
+
+export const SelectGroup = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+`;
+
+export const SelectWrapper = styled.div`
+  position: relative;
+  display: inline-block;
 `;

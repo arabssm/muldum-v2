@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 
 export default function Clubs() {
   const router = useRouter();
-  
+
   const handleClick = (idx: number) => {
     router.push(`/clubs/${idx}`);
   }
@@ -15,7 +15,8 @@ export default function Clubs() {
   return (
     <_.Container>
       {clubs.map((club) => (
-        <_.Item key={club.idx} onClick={() => handleClick(club.idx)}>
+        <_.Item>
+          {/* <_.Item key={club.idx} onClick={() => handleClick(club.idx)}> */}
           <_.Title>{club.name}</_.Title>
           <_.PointGroup>
             <_.Point>
