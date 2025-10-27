@@ -75,7 +75,7 @@ jobs:
             if ! pm2 list | grep -q "muldum-v2"; then
               echo "🆕 First deployment — starting app for the first time..."
               mkdir -p "$SHARED"
-              echo "module.exports = { apps: [{ name: 'muldum-v2', script: '.next/standalone/server.js', cwd: '/home/ubuntu/muldum-v2/current', instances: 1, exec_mode: 'fork', env: { NODE_ENV: 'production', PORT: 3000 } }] };" > "$SHARED/ecosystem.config.cjs"
+              echo "module.exports = { apps: [{ name: 'muldum-v2', script: 'standalone/server.js', cwd: '/home/ubuntu/muldum-v2/current', instances: 1, exec_mode: 'fork', env: { NODE_ENV: 'production', PORT: 3000 } }] };" > "$SHARED/ecosystem.config.cjs"
               pm2 start "$SHARED/ecosystem.config.cjs"
               pm2 save
             else
