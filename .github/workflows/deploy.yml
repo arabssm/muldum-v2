@@ -31,7 +31,7 @@ jobs:
       - name: Build Next.js (standalone)
         run: |
           yarn build
-          mkdir -p deploy
+          mkdir -p deploy/.next
           cp -r .next/standalone deploy/
           cp -r .next/static deploy/.next/static
           cp -r public deploy/public || true
