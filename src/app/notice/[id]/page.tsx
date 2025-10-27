@@ -1,11 +1,12 @@
-"use client"
-export const dynamic = "force-static";
-export async function generateStaticParams() {
-  return [];
-}
-
 import NoticeDetail from '@/widgets/noticeDetail';
 
-export default function NoticeDetailPage() {
-  return <NoticeDetail />
+interface NoticeDetailPageProps {
+  params: {
+    id: string;
+  };
+}
+
+export default function NoticeDetailPage({params}: NoticeDetailPageProps) {
+  const { id } = params;
+  return <NoticeDetail id={id} />
 }
