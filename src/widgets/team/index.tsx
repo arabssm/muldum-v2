@@ -62,10 +62,10 @@ export default function Team() {
                         <_.Name>{club.name}</_.Name>
                         <_.Member>
                             {club.members.map((member, i) => (
-                                <>
+                                <_.Member key={i}>
                                     {member}
                                     {(i + 1) % 3 === 0 ? <br /> : " "}
-                                </>
+                                </_.Member>
                             ))}
                         </_.Member>
                     </_.Box>
