@@ -25,7 +25,7 @@ jobs:
 
       # 3️⃣ 의존성 설치
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: yarn install --frozen-lockfile --production=false
 
       # 4️⃣ 빌드
       - name: Build Next.js (standalone)
