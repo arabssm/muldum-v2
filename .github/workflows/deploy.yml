@@ -1,4 +1,4 @@
-name: Deploy Next.js (Yarn, static export)
+name: Deploy Next.js SSR (build in CI)
 
 on:
   push:
@@ -19,22 +19,26 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'yarn'
+          cache: yarn
 
-      - name: Restore .env file from secrets
+      - name: Restore .env file
         run: |
           echo "${{ secrets.ENV_FILE }}" > .env
-          echo "✅ Restored .env file:"
-          cat .env
 
       - name: Install dependencies
-        run: yarn install --frozen-lockfile --production=false
+        run: yarn install --frozen-lockfile
 
-      - name: Build static export with .env
+      - name: Build Next.js (SSR)
+        run: yarn build
+
+      # ✅ 빌드 결과 압축 (.next + dependencies)
+      - name: Package build artifacts
         run: |
-          yarn build
-          yarn export
-          tar -czf out.tgz -C out .
+          mkdir -p deploy
+          cp -r .next package.json yarn.lock .env deploy/
+          yarn workspaces focus --production || yarn install --production
+          cp -r node_modules deploy/
+          cd deploy && tar -czf ../build.tgz .
 
       - name: Upload build artifact to EC2
         uses: appleboy/scp-action@v0.1.7
@@ -43,10 +47,10 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
-          source: "out.tgz"
+          source: "build.tgz"
           target: "/home/ubuntu/muldum-v2/tmp"
 
-      - name: Deploy static site to EC2 (Nginx)
+      - name: Deploy on EC2
         uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ secrets.SSH_HOST }}
@@ -58,13 +62,15 @@ jobs:
             set -e
             APP_DIR="/home/ubuntu/muldum-v2"
             TMP="$APP_DIR/tmp"
-            WWW="/var/www/muldum-v2"
+            DEPLOY="$APP_DIR/deploy"
 
-            echo "📦 Extracting static files to $WWW"
-            sudo mkdir -p "$WWW"
-            sudo tar -xzf "$TMP/out.tgz" -C "$WWW"
-            sudo rm -f "$TMP/out.tgz"
+            echo "📦 Extracting build.tgz..."
+            mkdir -p "$DEPLOY"
+            tar -xzf "$TMP/build.tgz" -C "$DEPLOY"
+            rm -f "$TMP/build.tgz"
 
-            echo "✅ Deployed static site to Nginx root: $WWW"
-            echo "🔁 Reloading Nginx..."
-            sudo systemctl reload nginx
+            cd "$DEPLOY"
+            pm2 delete muldum-v2 || true
+            pm2 start "yarn start" --name muldum-v2
+            pm2 save
+            echo "✅ SSR server deployed successfully."
