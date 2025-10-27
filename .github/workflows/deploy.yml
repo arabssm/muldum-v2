@@ -1,22 +1,46 @@
-name: Deploy via SSH
+name: Deploy Next.js (Yarn, static export)
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
   workflow_dispatch:
 
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
+    env:
+      NODE_ENV: production
 
     steps:
-      # 1️⃣ 저장소 Checkout
-      - name: Checkout repository
+      - name: Checkout source
         uses: actions/checkout@v4
 
-      # 2️⃣ SSH로 원격 배포 실행
-      - name: Deploy to EC2 via SSH
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile --production=false
+
+      - name: Build static export
+        run: |
+          yarn build
+          yarn export
+          tar -czf out.tgz -C out .
+
+      - name: Upload build artifact to EC2
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          source: "out.tgz"
+          target: "/home/ubuntu/muldum-v2/tmp"
+
+      - name: Deploy static site to EC2 (Nginx)
         uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ secrets.SSH_HOST }}
@@ -26,16 +50,17 @@ jobs:
           script_stop: true
           script: |
             set -e
-            echo "🚀 Deploying to EC2..."
+            APP_DIR="/home/ubuntu/muldum-v2"
+            TMP="$APP_DIR/tmp"
+            WWW="/var/www/muldum-v2"
+            TS=$(date +%Y%m%d%H%M%S)
 
-            cd /home/ubuntu/muldum-v2
+            echo "📦 Extracting static files to $WWW"
+            sudo mkdir -p "$WWW"
+            sudo tar -xzf "$TMP/out.tgz" -C "$WWW"
+            sudo rm -f "$TMP/out.tgz"
 
-            if [ -f ./deploy.sh ]; then
-              echo "🔧 Running deploy.sh..."
-              bash ./deploy.sh
-            else
-              echo "❌ deploy.sh not found!"
-              exit 1
-            fi
+            echo "✅ Deployed static site to Nginx root: $WWW"
 
-            echo "✅ Deployment completed successfully!"
+            echo "🔁 Reloading Nginx..."
+            sudo systemctl reload nginx
