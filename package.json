@@ -9,6 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "axios": "^1.7.7", 
     "@blocknote/core": "^0.41.1",
     "@blocknote/mantine": "^0.41.1",
     "@blocknote/react": "^0.41.1",
