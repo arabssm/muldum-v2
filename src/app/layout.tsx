@@ -5,6 +5,7 @@ import createEmotionCache from '@/shared/lib/emotionCache';
 import GlobalStyle from '@/styles/GlobalStyle';
 import styled from '@emotion/styled';
 import TopAppBar from '@/shared/ui/topAppBar';
+import { LoadingProvider } from '@/shared/context/LoadingContext';
 
 const clientSideEmotionCache = createEmotionCache();
 
@@ -17,10 +18,12 @@ export default function RootLayout({
     <html lang="ko">
       <body>
         <CacheProvider value={clientSideEmotionCache}>
-          <GlobalStyle />
-          <TopAppBar />
-          <Container>{children}</Container>
-          <div id="modal-root"></div>
+          <LoadingProvider>
+            <GlobalStyle />
+            <TopAppBar />
+            <Container>{children}</Container>
+            <div id="modal-root"></div>
+          </LoadingProvider>
         </CacheProvider>
       </body>
     </html>

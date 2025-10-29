@@ -1,11 +1,20 @@
+"use client";
+
 import Image from "next/image";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import * as _ from "./style";
 import sliderSettings from "./Setting";
 import Data from "./data";
+import { useLoading } from "@/shared/hooks/useLoading";
+import SliderSkeleton from "./skeleton";
 
 export default function SliderComponent() {
+  const { isLoading } = useLoading({ minLoadingTime: 400 });
+
+  if (isLoading) {
+    return <SliderSkeleton />;
+  }
   return (
     <_.Container>
       <_.StyledSlider {...sliderSettings}>

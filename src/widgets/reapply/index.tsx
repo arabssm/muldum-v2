@@ -3,8 +3,15 @@
 import * as _ from "./style";
 import ItemForm from "@/components/itemForm";
 import { data } from "./data";
+import { useLoading } from "@/shared/hooks/useLoading";
+import ReapplySkeleton from "./skeleton";
 
 export default function Main() {
+  const { isLoading } = useLoading({ minLoadingTime: 600 });
+
+  if (isLoading) {
+    return <ReapplySkeleton />;
+  }
   return (
     <_.Container>
       <_.Title>물품 재신청</_.Title>

@@ -1,7 +1,11 @@
+"use client";
+
 import * as _ from './style';
 import { majorClubs, freeClubs } from './data';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useLoading } from "@/shared/hooks/useLoading";
+import TeamSkeleton from "./skeleton";
 
 type GroupType = "전공동아리" | "네트워크" | "자율동아리" | "졸업작품";
 type ClassType = "전체" | "1반" | "2반" | "3반" | "4반";
@@ -13,6 +17,11 @@ export default function Team() {
     const router = useRouter();
     const [activeGroup, setActiveGroup] = useState<GroupType>("전공동아리");
     const [activeClass, setActiveClass] = useState<ClassType>("전체");
+    const { isLoading } = useLoading({ minLoadingTime: 600 });
+
+    if (isLoading) {
+        return <TeamSkeleton />;
+    }
 
     const clubs =
         activeGroup === "전공동아리"

@@ -5,6 +5,8 @@ import Image from "next/image";
 import { useState } from "react";
 import Group from "@/components/group/items";
 import ItemForm from "@/components/itemForm";
+import { useLoading } from "@/shared/hooks/useLoading";
+import ItemsSkeleton from "./skeleton";
 
 const LockedGroups = ["자율동아리", "졸업작품"] as const;
 type GroupType = "전공동아리" | "네트워크" | "자율동아리" | "졸업작품";
@@ -12,6 +14,11 @@ type GroupType = "전공동아리" | "네트워크" | "자율동아리" | "졸�
 export default function Items() {
   const [active, setActive] = useState<GroupType | null>(null);
   const [lockedMessage, setLockedMessage] = useState<string>("");
+  const { isLoading } = useLoading({ minLoadingTime: 500 });
+
+  if (isLoading) {
+    return <ItemsSkeleton />;
+  }
 
   return (
     <_.Container>

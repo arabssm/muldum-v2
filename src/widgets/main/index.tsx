@@ -5,9 +5,16 @@ import Link from "next/link";
 import { Menu, NoticeData } from "./data";
 import { useRouter } from "next/navigation"; 
 import Slider from "@/shared/ui/slider";
+import { useLoading } from "@/shared/hooks/useLoading";
+import MainSkeleton from "./skeleton";
 
 export default function Main() {
     const router = useRouter();
+    const { isLoading } = useLoading({ minLoadingTime: 800 });
+
+    if (isLoading) {
+        return <MainSkeleton />;
+    }
 
     return (
         <_.Container>

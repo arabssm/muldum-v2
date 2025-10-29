@@ -5,11 +5,18 @@ import Image from "next/image";
 import Link from "next/link";
 import Pagination from "@/components/pagination";
 import { NoticeData } from "@/widgets/main/data";
+import { useLoading } from "@/shared/hooks/useLoading";
+import NoticeSkeleton from "./skeleton";
 
 export default function Notice() {
     const page = 1;
     const totalPages = 5;
     const handlePageChange = (newPage: number) => { };
+    const { isLoading } = useLoading({ minLoadingTime: 700 });
+
+    if (isLoading) {
+        return <NoticeSkeleton />;
+    }
 
     return (
         <_.Container>

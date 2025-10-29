@@ -6,6 +6,8 @@ import Image from 'next/image';
 import * as _ from './style';
 import { useModal } from '@/components/modal/useModal';
 import LoginModal from '@/shared/ui/modal/loginModal';
+import { useLoading } from "@/shared/hooks/useLoading";
+import TopAppBarSkeleton from "./skeleton";
 
 const Menu: { label: string; path: string }[] = [
   { label: '홈화면', path: '/' },
@@ -17,8 +19,12 @@ const Menu: { label: string; path: string }[] = [
 
 export default function TopAppBar() {
   const pathname = usePathname();
-
   const { Modal, openModal, closeModal } = useModal();
+  const { isLoading } = useLoading({ minLoadingTime: 300 });
+
+  if (isLoading) {
+    return <TopAppBarSkeleton />;
+  }
 
   return (
     <_.Container>
