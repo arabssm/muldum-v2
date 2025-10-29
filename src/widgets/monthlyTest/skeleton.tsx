@@ -25,7 +25,6 @@ export default function MonthlyTestSkeleton() {
           <Skeleton width="100%" height="120px" borderRadius="8px" />
         </div>
       ))}
-      
       <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
         <Skeleton width="200px" height="48px" borderRadius="8px" />
         <Skeleton width="100px" height="48px" borderRadius="8px" />
