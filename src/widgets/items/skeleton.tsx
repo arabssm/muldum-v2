@@ -10,10 +10,6 @@ export default function ItemsSkeleton() {
           <Skeleton key={index} width="120px" height="40px" borderRadius="8px" />
         ))}
       </div>
-<<<<<<< Updated upstream
-
-=======
->>>>>>> Stashed changes
       <div style={{ 
         display: 'flex', 
         flexDirection: 'column', 
