@@ -7,6 +7,8 @@ import { useRouter } from "next/navigation";
 import Slider from "@/shared/ui/slider";
 import { useLoading } from "@/shared/hooks/useLoading";
 import MainSkeleton from "./skeleton";
+import Toast from "@/shared/ui/toast";
+
 
 export default function Main() {
     const router = useRouter();
@@ -18,6 +20,7 @@ export default function Main() {
 
     return (
         <_.Container>
+            <Toast />
             <Slider />
             <_.Info>
                 <_.Wrapper>

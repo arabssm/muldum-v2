@@ -1,7 +1,12 @@
-"use client"
-
 import TeamDetail from '@/widgets/TeamDetail';
 
-export default function TeamDetailPage() {
+interface TeamDetailPageProps {
+  params: {
+    id: string;
+  }
+}
+
+export default function TeamDetailPage({params}: TeamDetailPageProps) {
+  const {id} = params;
   return <TeamDetail />
 }
