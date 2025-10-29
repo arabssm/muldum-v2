@@ -5,9 +5,29 @@ import Link from "next/link";
 import { Menu, NoticeData } from "./data";
 import { useRouter } from "next/navigation"; 
 import Slider from "@/shared/ui/slider";
+import { useState, useEffect } from "react";
+import MainSkeleton from "./skeleton";
 
 export default function Main() {
     const router = useRouter();
+    const [isLoading, setIsLoading] = useState(false);
+    const [isMounted, setIsMounted] = useState(false);
+
+    useEffect(() => {
+        setIsMounted(true);
+        setIsLoading(true);
+        
+        // 데이터 로딩 시뮬레이션
+        const timer = setTimeout(() => {
+            setIsLoading(false);
+        }, 2000);
+
+        return () => clearTimeout(timer);
+    }, []);
+
+    if (!isMounted || isLoading) {
+        return <MainSkeleton />;
+    }
 
     return (
         <_.Container>
