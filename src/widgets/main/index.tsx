@@ -5,12 +5,14 @@ import Link from "next/link";
 import { Menu, NoticeData } from "./data";
 import { useRouter } from "next/navigation"; 
 import Slider from "@/shared/ui/slider";
+import Toast from "@/shared/ui/toast";
 
 export default function Main() {
     const router = useRouter();
 
     return (
         <_.Container>
+            <Toast />
             <Slider />
             <_.Info>
                 <_.Wrapper>
