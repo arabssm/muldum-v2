@@ -8,7 +8,7 @@ const clubs = [
     {
         idx: 2,
         level: "최우수상",
-        name: "하링",
+        name: "하링(HARING)",
         explanation: "디지털 트윈과 인공지능을 결합한 로봇 제어",
     },
     {
@@ -20,7 +20,7 @@ const clubs = [
     {
         idx: 4,
         level: "우수상",
-        name: "인서트",
+        name: "인서트(INSERT)",
         explanation: "온라인 코딩 알고리즘 배틀",
     },
     {
@@ -56,7 +56,7 @@ const clubs = [
     {
         idx: 10,
         level: "동아리",
-        name: "페코",
+        name: "페코(PECO)",
         explanation: "자율주행을 이용한 교내 소개 로봇",
     },
     {
