@@ -1,7 +1,8 @@
 'use client';
 
 import { useCallback } from 'react';
-import customAxios from '@/shared/lib/customAxios';
+import axiosInstance from '@/shared/lib/axiosInstance';
+import { setCookie } from '@/shared/lib/cookieUtils';
 import { GoogleLoginResponse, ErrorResponse } from '@/shared/types/auth'
 
 export default function useGoogleLogin() {
@@ -21,14 +22,14 @@ export default function useGoogleLogin() {
     const handleGoogleCallback = useCallback(
         async (authorizationCode: string): Promise<GoogleLoginResponse> => {
             try {
-                const { data } = await customAxios.post<GoogleLoginResponse>(
+                const { data } = await axiosInstance.post<GoogleLoginResponse>(
                     '/ara/auth/login/google',
                     { authorizationCode }
                 );
 
                 if (data.accessToken && data.refreshToken) {
-                    localStorage.setItem('token', data.accessToken);
-                    localStorage.setItem('refreshToken', data.refreshToken);
+                    setCookie('access_token', data.accessToken);
+                    setCookie('refresh_token', data.refreshToken);
                     localStorage.setItem(
                         'user',
                         JSON.stringify({
