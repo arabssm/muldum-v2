@@ -2,21 +2,10 @@
 
 import styled from '@emotion/styled';
 import Image from 'next/image';
-import { useSearchParams } from 'next/navigation';
-import { useEffect } from 'react';
 import useGoogleLogin from '@/shared/hooks/useGoogleLogin';
 
 export default function LoginModal() {
-  const searchParams = useSearchParams();
-  const { startGoogleLogin, handleGoogleCallback } = useGoogleLogin();
-
-  useEffect(() => {
-    const code = searchParams.get('code');
-    if (code) {
-      handleGoogleCallback(code)
-        .then(() => window.location.replace('/'))
-    }
-  }, [searchParams, handleGoogleCallback]);
+  const { startGoogleLogin } = useGoogleLogin();
 
   return (
     <Container>

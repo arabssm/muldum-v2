@@ -3,19 +3,26 @@
 import { useCallback } from 'react';
 import axiosInstance from '@/shared/lib/axiosInstance';
 import { setCookie } from '@/shared/lib/cookieUtils';
-import { GoogleLoginResponse, ErrorResponse } from '@/shared/types/auth'
+import { GoogleLoginResponse, ErrorResponse } from '@/shared/types/auth';
 
 export default function useGoogleLogin() {
     const startGoogleLogin = useCallback((): void => {
-        const redirectUri = process.env.NEXT_REDIRECT_URI || window.location.origin;
         const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+        const redirectUri = process.env.NEXT_PUBLIC_REDIRECT_URI;
 
-        if (!clientId) {
-            console.error('Google Client ID가 설정되지 않았습니다.');
+        if (!clientId || !redirectUri) {
+            console.error('Google OAuth 설정이 누락되었습니다.');
             return;
         }
 
-        const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=email profile openid`;
+        const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
+            `client_id=${clientId}&` +
+            `redirect_uri=${encodeURIComponent(redirectUri)}&` +
+            `response_type=code&` +
+            `scope=${encodeURIComponent('email profile')}&` +
+            `access_type=offline&` +
+            `prompt=consent`;
+
         window.location.href = googleAuthUrl;
     }, []);
 
@@ -27,15 +34,17 @@ export default function useGoogleLogin() {
                     { authorizationCode }
                 );
 
-                if (data.accessToken && data.refreshToken) {
+                if (data.accessToken) {
                     setCookie('access_token', data.accessToken);
-                    setCookie('refresh_token', data.refreshToken);
+                    if (data.refreshToken) {
+                        setCookie('refresh_token', data.refreshToken);
+                    }
                     localStorage.setItem(
                         'user',
                         JSON.stringify({
                             userId: data.userId,
                             name: data.name,
-                            userType: data.userType,
+                            userType: data.role,
                             role: data.role,
                             teamId: data.teamId ?? null,
                         })

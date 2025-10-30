@@ -3,9 +3,9 @@ export interface GoogleLoginResponse {
     userId: number;
     name: string;
     teamId?: number;
-    role: 'student' | 'teacher';
+    role: 'STUDENT' | 'TEACHER';
     accessToken: string;
-    refreshToken: string;
+    refreshToken?: string; // Make optional since your backend might not return it initially
 }
 
 export interface ErrorResponse {
