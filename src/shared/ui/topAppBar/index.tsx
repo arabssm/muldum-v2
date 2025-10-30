@@ -6,6 +6,7 @@ import Image from 'next/image';
 import * as _ from './style';
 import { useModal } from '@/components/modal/useModal';
 import LoginModal from '@/shared/ui/modal/loginModal';
+import { handlenoaccess } from '../toast/index'
 
 const Menu: { label: string; path: string }[] = [
   { label: '홈화면', path: '/' },
@@ -19,6 +20,7 @@ export default function TopAppBar() {
   const pathname = usePathname();
 
   const { Modal, openModal, closeModal } = useModal();
+
 
   return (
     <_.Container>
@@ -44,7 +46,7 @@ export default function TopAppBar() {
 
       <_.BtnGroup>
         <_.LoginBtn onClick={openModal}>로그인</_.LoginBtn>
-        <_.MyInfo>내 정보</_.MyInfo>
+        <_.MyInfo onClick={handlenoaccess}>내 정보</_.MyInfo>
       </_.BtnGroup>
 
       <Modal>

@@ -4,6 +4,7 @@ import EmotionRegistry from '@/shared/lib/emotionRegistry';
 import GlobalStyle from '@/styles/GlobalStyle';
 import styled from '@emotion/styled';
 import TopAppBar from '@/shared/ui/topAppBar';
+import Toast from '@/shared/ui/toast';
 
 interface ProvidersProps {
   children: React.ReactNode;
@@ -16,6 +17,7 @@ export default function Providers({ children }: ProvidersProps) {
       <TopAppBar />
       <Container>{children}</Container>
       <div id="modal-root"></div>
+      <Toast />
     </EmotionRegistry>
   );
 }
