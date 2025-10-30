@@ -5,11 +5,14 @@ import Image from "next/image";
 import Link from "next/link";
 import Pagination from "@/components/pagination";
 import { NoticeData } from "@/widgets/main/data";
+import { useState } from "react";
 
 export default function Notice() {
-    const page = 1;
-    const totalPages = 5;
-    const handlePageChange = (newPage: number) => { };
+    const [page, setPage] = useState(1);
+    const totalPages = Math.ceil(NoticeData.length / 10);
+    const handlePageChange = (newPage: number) => {
+        setPage(newPage);
+    };
 
     return (
         <_.Container>
