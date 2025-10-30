@@ -34,7 +34,8 @@ export default function Clubs() {
   return (
     <_.Container>
       {clubs.map((club) => (
-        <_.Item key={club.idx} onClick={() => handleClick(club.idx)}>
+        <_.Item key={club.idx} >
+        {/* <_.Item key={club.idx} onClick={() => handleClick(club.idx)}> */}
           <_.Title>{club.name}</_.Title>
           <_.PointGroup>
             <_.Point>
