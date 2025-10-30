@@ -17,7 +17,6 @@ export default function Main() {
         setIsMounted(true);
         setIsLoading(true);
         
-        // 데이터 로딩 시뮬레이션
         const timer = setTimeout(() => {
             setIsLoading(false);
         }, 2000);

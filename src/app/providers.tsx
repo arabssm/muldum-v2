@@ -25,10 +25,10 @@ const Container = styled.div`
   flex-direction: column;
   width: 90%;
   max-width: 90%;
-  min-height: 100vh;
+  min-height: calc(100vh - 5rem);
   padding: 2.5rem 3rem;
   margin: 0 auto;
-
+  box-sizing: border-box;
   @media screen and (max-width: 1620px) {
     width: 1620px;
   }

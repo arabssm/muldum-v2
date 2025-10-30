@@ -4,7 +4,6 @@ import React, { useState } from 'react';
 import { useServerInsertedHTML } from 'next/navigation';
 import { CacheProvider } from '@emotion/react';
 import createCache from '@emotion/cache';
-import { EmotionCache } from '@emotion/cache';
 
 export default function EmotionRegistry({
   options,
