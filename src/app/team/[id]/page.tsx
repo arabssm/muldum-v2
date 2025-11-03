@@ -1,4 +1,4 @@
-import TeamDetail from '@/widgets/TeamDetail';
+import TeamDetail from '@/widgets/student/TeamDetail';
 
 interface TeamDetailPageProps {
   params: Promise<{

@@ -1,4 +1,4 @@
-import NoticeDetail from '@/widgets/noticeDetail';
+import NoticeDetail from '@/widgets/student/noticeDetail';
 
 interface NoticeDetailPageProps {
   params: {
