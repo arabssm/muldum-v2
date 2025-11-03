@@ -1,28 +1,136 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import * as _ from "./style";
 import { useVideoChat } from "@/shared/hooks/useVideoChat";
 
 export default function VideoChat() {
-    const { showParticipants, setShowParticipants, chatWidth, chatScrollRef,
-        videoRef, message, setMessage, messages, handleResize, handleKeyDown } = useVideoChat();
+    const {
+        showParticipants, setShowParticipants, chatWidth, chatScrollRef,
+        videoRef, message, setMessage, messages, participants, remoteStreams,
+        selectedParticipant, setSelectedParticipant, roomId, isConnected,
+        connectionStatus, isScreenSharing, handleResize, handleKeyDown,
+        createRoom, joinRoom, leaveRoom, toggleCamera, toggleMicrophone,
+        startScreenShare, stopScreenShare
+    } = useVideoChat();
 
     const [camOn, setCamOn] = useState(true);
     const [micOn, setMicOn] = useState(true);
     const [headsetOn, setHeadsetOn] = useState(true);
-    const [shareOn, setShareOn] = useState(false);
+    const [roomTitle, setRoomTitle] = useState("My Video Room");
+    const [inputRoomId, setInputRoomId] = useState("");
+    
+    const remoteVideoRef = useRef<HTMLVideoElement>(null);
+
+    // Update remote video when participant is selected
+    useEffect(() => {
+        if (selectedParticipant && remoteStreams[selectedParticipant] && remoteVideoRef.current) {
+            remoteVideoRef.current.srcObject = remoteStreams[selectedParticipant];
+        } else if (remoteVideoRef.current) {
+            remoteVideoRef.current.srcObject = null;
+        }
+    }, [selectedParticipant, remoteStreams]);
+
+    const handleCreateRoom = async () => {
+        try {
+            const newRoomId = await createRoom(roomTitle);
+            setInputRoomId(newRoomId);
+        } catch (error) {
+            console.error('Failed to create room:', error);
+        }
+    };
+
+    const handleJoinRoom = () => {
+        if (inputRoomId.trim()) {
+            joinRoom(inputRoomId.trim());
+        }
+    };
+
+    const handleCameraToggle = () => {
+        toggleCamera();
+        setCamOn(!camOn);
+    };
+
+    const handleMicToggle = () => {
+        toggleMicrophone();
+        setMicOn(!micOn);
+    };
+
+    const handleScreenShare = async () => {
+        try {
+            if (isScreenSharing) {
+                await stopScreenShare();
+            } else {
+                await startScreenShare();
+            }
+        } catch (error) {
+            console.error('Screen share error:', error);
+        }
+    };
 
     const icons = [
-        { on: "/assets/videoChat/cam.svg", off: "/assets/videoChat/noncam.svg", state: camOn, setState: setCamOn, alt: "캠" },
-        { on: "/assets/videoChat/mic.svg", off: "/assets/videoChat/nonmic.svg", state: micOn, setState: setMicOn, alt: "마이크" },
-        { on: "/assets/videoChat/headset.svg", off: "/assets/videoChat/nonheadset.svg", state: headsetOn, setState: setHeadsetOn, alt: "헤드셋" },
-        { on: "/assets/videoChat/share.svg", off: null, state: shareOn, setState: setShareOn, alt: "공유" }, // off=null
+        { on: "/assets/videoChat/cam.svg", off: "/assets/videoChat/noncam.svg", state: camOn, handler: handleCameraToggle, alt: "캠" },
+        { on: "/assets/videoChat/mic.svg", off: "/assets/videoChat/nonmic.svg", state: micOn, handler: handleMicToggle, alt: "마이크" },
+        { on: "/assets/videoChat/headset.svg", off: "/assets/videoChat/nonheadset.svg", state: headsetOn, handler: () => setHeadsetOn(!headsetOn), alt: "헤드셋" },
+        { on: "/assets/videoChat/share.svg", off: null, state: isScreenSharing, handler: handleScreenShare, alt: "공유" },
     ];
 
     return (
         <_.TopContainer>
+            <div style={{ padding: "1rem", background: "#f8f9fa", borderBottom: "1px solid #dee2e6" }}>
+                <div style={{ display: "flex", gap: "1rem", alignItems: "center", marginBottom: "0.5rem" }}>
+                    <input
+                        type="text"
+                        placeholder="방 제목"
+                        value={roomTitle}
+                        onChange={(e) => setRoomTitle(e.target.value)}
+                        style={{ padding: "0.5rem", border: "1px solid #ccc", borderRadius: "4px" }}
+                    />
+                    <button
+                        onClick={handleCreateRoom}
+                        style={{ padding: "0.5rem 1rem", background: "#28a745", color: "white", border: "none", borderRadius: "4px", cursor: "pointer" }}
+                    >
+                        방 생성
+                    </button>
+                </div>
+                <div style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
+                    <input
+                        type="text"
+                        placeholder="방 ID 입력"
+                        value={inputRoomId}
+                        onChange={(e) => setInputRoomId(e.target.value)}
+                        style={{ padding: "0.5rem", border: "1px solid #ccc", borderRadius: "4px" }}
+                    />
+                    <button
+                        onClick={handleJoinRoom}
+                        disabled={!inputRoomId.trim() || isConnected}
+                        style={{
+                            padding: "0.5rem 1rem",
+                            background: isConnected ? "#6c757d" : "#007bff",
+                            color: "white",
+                            border: "none",
+                            borderRadius: "4px",
+                            cursor: isConnected ? "not-allowed" : "pointer"
+                        }}
+                    >
+                        {isConnected ? "연결됨" : "방 참가"}
+                    </button>
+                    {isConnected && (
+                        <button
+                            onClick={leaveRoom}
+                            style={{ padding: "0.5rem 1rem", background: "#dc3545", color: "white", border: "none", borderRadius: "4px", cursor: "pointer" }}
+                        >
+                            방 나가기
+                        </button>
+                    )}
+                </div>
+                <div style={{ marginTop: "0.5rem", fontSize: "0.9rem", color: "#6c757d" }}>
+                    상태: {connectionStatus}
+                    {roomId && <span> | 방 ID: {roomId}</span>}
+                </div>
+            </div>
+
             <_.Container>
                 <_.ChatWrapper
                     style={{
@@ -54,19 +162,75 @@ export default function VideoChat() {
                     </_.Drag>
                     <_.ResizeHandle onMouseDown={handleResize} />
                 </_.ChatWrapper>
-                <video
-                    ref={videoRef}
-                    autoPlay
-                    muted
-                    playsInline
-                    style={{
-                        width: "100%",
-                        height: "70vh",
-                        objectFit: "cover",
-                        zIndex: 0,
-                        justifyContent: "center",
-                    }}
-                />
+                <div style={{ position: "relative", width: "100%", height: "70vh" }}>
+                    {/* Main video (remote or local) */}
+                    {selectedParticipant && remoteStreams[selectedParticipant] ? (
+                        <video
+                            ref={remoteVideoRef}
+                            autoPlay
+                            playsInline
+                            style={{
+                                width: "100%",
+                                height: "100%",
+                                objectFit: "cover",
+                                backgroundColor: "#000",
+                            }}
+                        />
+                    ) : (
+                        <video
+                            ref={videoRef}
+                            autoPlay
+                            muted
+                            playsInline
+                            style={{
+                                width: "100%",
+                                height: "100%",
+                                objectFit: "cover",
+                                backgroundColor: "#000",
+                            }}
+                        />
+                    )}
+                    
+                    {/* Picture-in-picture local video when showing remote */}
+                    {selectedParticipant && remoteStreams[selectedParticipant] && (
+                        <video
+                            ref={videoRef}
+                            autoPlay
+                            muted
+                            playsInline
+                            style={{
+                                position: "absolute",
+                                top: "10px",
+                                right: "10px",
+                                width: "200px",
+                                height: "150px",
+                                objectFit: "cover",
+                                border: "2px solid white",
+                                borderRadius: "8px",
+                                zIndex: 10,
+                                backgroundColor: "#000",
+                            }}
+                        />
+                    )}
+                    
+                    {/* Video info overlay */}
+                    <div style={{
+                        position: "absolute",
+                        bottom: "10px",
+                        left: "10px",
+                        background: "rgba(0,0,0,0.7)",
+                        color: "white",
+                        padding: "5px 10px",
+                        borderRadius: "4px",
+                        fontSize: "14px",
+                        zIndex: 10,
+                    }}>
+                        {selectedParticipant 
+                            ? `${participants.find(p => p.id === selectedParticipant)?.name || 'Unknown'}`
+                            : "나 (로컬)"
+                        }
+                    </div>
+                </div>
                 {!showParticipants && (
                     <Image
                         src="/assets/videoChat/Participant.svg"
@@ -85,8 +249,45 @@ export default function VideoChat() {
                     <_.ParticipantPanel style={{ zIndex: 1 }}>
                         <_.CloseButton onClick={() => setShowParticipants(false)}>×</_.CloseButton>
                         <_.ParticipantList>
-                            <_.Name><_.Circle /> 참가팀원1</_.Name>
-                            <_.Name><_.Circle /> 참가팀원2</_.Name>
+                            {/* Local user */}
+                            <_.Name 
+                                onClick={() => setSelectedParticipant(null)}
+                                style={{ 
+                                    cursor: "pointer", 
+                                    backgroundColor: selectedParticipant === null ? "#e3f2fd" : "transparent",
+                                    padding: "5px",
+                                    borderRadius: "4px",
+                                    margin: "2px 0"
+                                }}
+                            >
+                                <_.Circle /> 나 (로컬)
+                            </_.Name>
+                            
+                            {/* Remote participants */}
+                            {participants.map((participant) => (
+                                <_.Name 
+                                    key={participant.id}
+                                    onClick={() => setSelectedParticipant(participant.id)}
+                                    style={{ 
+                                        cursor: "pointer", 
+                                        backgroundColor: selectedParticipant === participant.id ? "#e3f2fd" : "transparent",
+                                        padding: "5px",
+                                        borderRadius: "4px",
+                                        margin: "2px 0"
+                                    }}
+                                >
+                                    <_.Circle /> {participant.name}
+                                    {remoteStreams[participant.id] && (
+                                        <span style={{ marginLeft: "5px", color: "#4caf50", fontSize: "12px" }}>
+                                            ● 연결됨
+                                        </span>
+                                    )}
+                                </_.Name>
+                            ))}
+                            
+                            {participants.length === 0 && (
+                                <_.Name><_.Circle /> 다른 참가자가 없습니다</_.Name>
+                            )}
                         </_.ParticipantList>
                     </_.ParticipantPanel>
                 )}
@@ -100,13 +301,8 @@ export default function VideoChat() {
                             alt={`${icon.alt} 아이콘`}
                             width={50}
                             height={50}
-                            onClick={() => {
-                                if (icon.alt === "공유") {
-                                    icon.setState(true);
-                                } else {
-                                    icon.setState(prev => !prev);
-                                }
-                            }}
+                            onClick={icon.handler}
+                            style={{ cursor: "pointer" }}
                         />
                     ))}
                 </_.IconWrapper>

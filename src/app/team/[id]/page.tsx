@@ -1,12 +1,12 @@
 import TeamDetail from '@/widgets/TeamDetail';
 
 interface TeamDetailPageProps {
-  params: {
+  params: Promise<{
     id: string;
-  }
+  }>
 }
 
-export default function TeamDetailPage({params}: TeamDetailPageProps) {
-  const {id} = params;
+export default async function TeamDetailPage({params}: TeamDetailPageProps) {
+  const {id} = await params;
   return <TeamDetail />
 }

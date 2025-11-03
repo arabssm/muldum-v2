@@ -10,10 +10,10 @@ export default function ItemsSkeleton() {
           <Skeleton key={index} width="120px" height="40px" borderRadius="8px" />
         ))}
       </div>
-      <div style={{ 
-        display: 'flex', 
-        flexDirection: 'column', 
-        alignItems: 'center', 
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
         justifyContent: 'center',
         gap: '1rem',
         minHeight: '300px'
