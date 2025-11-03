@@ -9,10 +9,10 @@ export default function VideoChat() {
     const {
         showParticipants, setShowParticipants, chatWidth, chatScrollRef,
         videoRef, message, setMessage, messages, participants, remoteStreams,
-        selectedParticipant, setSelectedParticipant, roomId, isConnected,
-        connectionStatus, isScreenSharing, handleResize, handleKeyDown,
-        createRoom, joinRoom, leaveRoom, toggleCamera, toggleMicrophone,
-        startScreenShare, stopScreenShare
+        selectedParticipant, setSelectedParticipant, localStream, roomId, 
+        isConnected, connectionStatus, isScreenSharing, handleResize, 
+        handleKeyDown, createRoom, joinRoom, leaveRoom, toggleCamera, 
+        toggleMicrophone, startScreenShare, stopScreenShare
     } = useVideoChat();
 
     const [camOn, setCamOn] = useState(true);
@@ -22,6 +22,7 @@ export default function VideoChat() {
     const [inputRoomId, setInputRoomId] = useState("");
     
     const remoteVideoRef = useRef<HTMLVideoElement>(null);
+    const localPipVideoRef = useRef<HTMLVideoElement>(null);
 
     // Update remote video when participant is selected
     useEffect(() => {
@@ -31,6 +32,13 @@ export default function VideoChat() {
             remoteVideoRef.current.srcObject = null;
         }
     }, [selectedParticipant, remoteStreams]);
+
+    // Update local PIP video when showing remote video
+    useEffect(() => {
+        if (selectedParticipant && localStream && localPipVideoRef.current) {
+            localPipVideoRef.current.srcObject = localStream;
+        }
+    }, [selectedParticipant, localStream]);
 
     const handleCreateRoom = async () => {
         try {
@@ -193,24 +201,53 @@ export default function VideoChat() {
                     
                     {/* Picture-in-picture local video when showing remote */}
                     {selectedParticipant && remoteStreams[selectedParticipant] && (
-                        <video
-                            ref={videoRef}
-                            autoPlay
-                            muted
-                            playsInline
+                        <div
                             style={{
                                 position: "absolute",
                                 top: "10px",
                                 right: "10px",
                                 width: "200px",
                                 height: "150px",
-                                objectFit: "cover",
-                                border: "2px solid white",
-                                borderRadius: "8px",
                                 zIndex: 10,
-                                backgroundColor: "#000",
                             }}
-                        />
+                        >
+                            <video
+                                ref={localPipVideoRef}
+                                autoPlay
+                                muted
+                                playsInline
+                                onClick={() => setSelectedParticipant(null)}
+                                style={{
+                                    width: "100%",
+                                    height: "100%",
+                                    objectFit: "cover",
+                                    border: "2px solid white",
+                                    borderRadius: "8px",
+                                    backgroundColor: "#000",
+                                    cursor: "pointer",
+                                    transition: "transform 0.2s ease",
+                                }}
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.style.transform = "scale(1.05)";
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.transform = "scale(1)";
+                                }}
+                            />
+                            <div style={{
+                                position: "absolute",
+                                bottom: "5px",
+                                left: "5px",
+                                background: "rgba(0,0,0,0.7)",
+                                color: "white",
+                                padding: "2px 6px",
+                                borderRadius: "3px",
+                                fontSize: "12px",
+                                pointerEvents: "none",
+                            }}>
+                                나
+                            </div>
+                        </div>
                     )}
                     
                     {/* Video info overlay */}
