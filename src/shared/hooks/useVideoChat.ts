@@ -404,6 +404,7 @@ export function useVideoChat() {
         remoteStreams,
         selectedParticipant,
         setSelectedParticipant,
+        localStream: localStreamRef.current,
         roomId,
         isConnected,
         connectionStatus,
