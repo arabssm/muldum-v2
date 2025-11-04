@@ -52,7 +52,7 @@ const LeftSection = styled.div`
 const LogoWrapper = styled.div`
   display: flex;
   align-items: center;
-  margin-left: 2.5rem;
+  margin-left: 6rem;
   gap: 0.5rem;
 `;
 
@@ -65,13 +65,14 @@ const Title = styled.span`
 const Description = styled.span`
   color: #8c8c8c;
   font-size: 0.95rem;
-  margin-left: 2.5rem;
+  margin-left: 6rem;
 `;
 
 const RightSection = styled.div`
   display: flex;
   gap: 1.2rem;
   margin-top: 4rem;
+  margin-right: 5rem;
 `;
 
 const Icon = styled.div`
