@@ -4,7 +4,7 @@ import * as _ from "./style";
 import Image from "next/image";
 import Link from "next/link";
 import Pagination from "@/components/pagination";
-import { NoticeData } from "@/widgets/main/data";
+import { NoticeData } from "@/widgets/student/main/data";
 import { useState } from "react";
 
 export default function Notice() {

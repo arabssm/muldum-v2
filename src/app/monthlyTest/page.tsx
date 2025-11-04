@@ -1,6 +1,6 @@
 "use client"
 
-import MonthlyTest from '@/widgets/monthlyTest';
+import MonthlyTest from '@/widgets/student/monthlyTest';
 
 export default function MonthlyTestPage() {
   return <MonthlyTest />

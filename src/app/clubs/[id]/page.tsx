@@ -1,4 +1,4 @@
-import ClubsDetail from "@/widgets/clubsDetail";
+import ClubsDetail from "@/widgets/student/clubsDetail";
 
 export async function generateStaticParams() {
   // 빌드 시점에 생성할 id 목록을 반환해야 합니다.

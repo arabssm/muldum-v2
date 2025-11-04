@@ -19,7 +19,7 @@ const Menu: { label: string; path: string }[] = [
 export default function TopAppBar() {
   const pathname = usePathname();
 
-  const { Modal, openModal, closeModal } = useModal();
+  const { Modal, openModal } = useModal();
 
 
   return (

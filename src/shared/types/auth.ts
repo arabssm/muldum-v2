@@ -13,3 +13,8 @@ export interface ErrorResponse {
     message?: string;
     statusCode?: number;
 }
+
+export interface RoleProps {
+    roles: Array<'STUDENT' | 'TEACHER' | string>;
+    fallback?: React.ReactNode;
+}
