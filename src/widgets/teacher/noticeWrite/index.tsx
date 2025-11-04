@@ -1,55 +1,12 @@
 import * as _ from "./style";
 import { BtnPrimary, BtnSecondary } from "@/shared/ui/button";
 import BlockNoteEditor from '@/shared/ui/tag';
-import { useCallback, useEffect, useRef, useState } from 'react';
-
-type Preview = { file: File; url: string };
+import useFilePreviews from '@/shared/hooks/useFilePreviews';
+import useBlockNoteEditor from '@/shared/hooks/useBlockNoteEditor';
 
 export default function noticeWrite() {
-    const [files, setFiles] = useState<Preview[]>([]);
-    const [content, setContent] = useState<string>('');
-    const fileInputRef = useRef<HTMLInputElement | null>(null);
-
-    const handleFiles = useCallback((incoming: File[]) => {
-        const previews = incoming.map((f) => ({ file: f, url: URL.createObjectURL(f) }));
-        setFiles((prev) => [...prev, ...previews]);
-    }, []);
-
-    const onDrop = useCallback((e: React.DragEvent) => {
-        e.preventDefault();
-        const dropped = Array.from(e.dataTransfer.files || []);
-        if (dropped.length === 0) return;
-        handleFiles(dropped);
-    }, [handleFiles]);
-
-    const onDragOver = useCallback((e: React.DragEvent) => {
-        e.preventDefault();
-    }, []);
-
-    const onClickDrop = () => {
-        fileInputRef.current?.click();
-    };
-
-    const onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const chosen = Array.from(e.target.files || []);
-        if (chosen.length === 0) return;
-        handleFiles(chosen);
-        e.currentTarget.value = '';
-    };
-
-    const removeAt = (idx: number) => {
-        setFiles((prev) => {
-            const toRevoke = prev[idx];
-            if (toRevoke) URL.revokeObjectURL(toRevoke.url);
-            return prev.filter((_, i) => i !== idx);
-        });
-    };
-
-    useEffect(() => {
-        return () => {
-            files.forEach((p) => URL.revokeObjectURL(p.url));
-        };
-    }, [files]);
+    const { files, fileInputRef, onDrop, onDragOver, onClickDrop, onInputChange, removeAt } = useFilePreviews();
+    const { editor, insertImage } = useBlockNoteEditor();
 
     return (
         <_.Container>
@@ -66,7 +23,7 @@ export default function noticeWrite() {
                 <_.Wrapper>
                     <_.SubTitle>내용</_.SubTitle>
                     <_.detail>
-                        <BlockNoteEditor initialContent={content} onChange={setContent} />
+                        <BlockNoteEditor initialContent={''} onChange={() => { }} />
                     </_.detail>
                 </_.Wrapper>
                 <_.Wrapper>
@@ -82,7 +39,7 @@ export default function noticeWrite() {
                                         <_.FileItem key={p.url}>
                                             <_.ThumbnailWrapper>
                                                 <_.Thumbnail src={p.url} alt={p.file.name} />
-                                                <_.RemoveBtn onClick={() => removeAt(idx)}>✕</_.RemoveBtn>
+                                                <_.RemoveBtn onClick={async () => { const ok = insertImage(p.url); if (!ok) { try { await navigator.clipboard.writeText(p.url); } catch { } } removeAt(idx); }}>✕</_.RemoveBtn>
                                             </_.ThumbnailWrapper>
                                             <_.FileName>{p.file.name}</_.FileName>
                                         </_.FileItem>
