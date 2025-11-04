@@ -6,10 +6,7 @@ import styled from '@emotion/styled';
 import TopAppBar from '@/shared/ui/topAppBar';
 import Footer from '@/shared/ui/footer';
 import Toast from '@/shared/ui/toast';
-
-interface ProvidersProps {
-  children: React.ReactNode;
-}
+import type { ProvidersProps } from '@/shared/types';
 
 export default function Providers({ children }: ProvidersProps) {
   return (
