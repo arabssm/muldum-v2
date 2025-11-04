@@ -11,7 +11,7 @@ export default function noticeWrite() {
                     <_.Input type="text" placeholder="공지사항 제목을 입력해주세요." />
                 </_.Wrapper>
                 <_.Wrapper>
-                    <_.SubTitle>기한</_.SubTitle>
+                    <_.SubTitle>마감기한</_.SubTitle>
                     <_.DateInput type="date" />
                 </_.Wrapper>
                 <_.Wrapper>
