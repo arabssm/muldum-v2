@@ -2,6 +2,14 @@ import styled from '@emotion/styled';
 import Image from 'next/image';
 
 export default function Footer() {
+    const handleEmailClick = () => {
+        window.location.href = 'mailto:bssmara2025@gmail.com';
+    };
+
+    const handleInstagramClick = () => {
+        window.open('https://www.instagram.com/arabssm/', '_blank');
+    };
+
     return (
         <Container>
             <LeftSection>
@@ -14,11 +22,11 @@ export default function Footer() {
                 </Description>
             </LeftSection>
             <RightSection>
-                <Icon>
-                    <Image src="/assets/footer/email.svg" alt="Logo" width={32} height={32} />
+                <Icon onClick={handleEmailClick}>
+                    <Image src="/assets/footer/email.svg" alt="Email" width={32} height={32} />
                 </Icon>
-                <Icon>
-                    <Image src="/assets/footer/instar.svg" alt="Logo" width={32} height={32} />
+                <Icon onClick={handleInstagramClick}>
+                    <Image src="/assets/footer/instar.svg" alt="Instagram" width={32} height={32} />
                 </Icon>
             </RightSection>
         </Container>
