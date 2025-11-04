@@ -31,3 +31,7 @@ export interface ModalProps {
   closeModal: () => void;
   children: React.ReactNode;
 }
+
+export interface ProvidersProps {
+  children: React.ReactNode;
+}
