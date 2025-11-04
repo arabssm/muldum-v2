@@ -39,7 +39,19 @@ export default function noticeWrite() {
                                         <_.FileItem key={p.url}>
                                             <_.ThumbnailWrapper>
                                                 <_.Thumbnail src={p.url} alt={p.file.name} />
-                                                <_.RemoveBtn onClick={async () => { const ok = insertImage(p.url); if (!ok) { try { await navigator.clipboard.writeText(p.url); } catch { } } removeAt(idx); }}>✕</_.RemoveBtn>
+                                                <_.RemoveBtn
+                                                    onClick={async (e) => {
+                                                        e.stopPropagation();
+                                                        const ok = insertImage(p.url);
+                                                        if (!ok) {
+                                                            try {
+                                                                await navigator.clipboard.writeText(p.url);
+                                                            } catch { }
+                                                        }
+                                                        removeAt(idx);
+                                                    }}
+                                                > ✕
+                                                </_.RemoveBtn>
                                             </_.ThumbnailWrapper>
                                             <_.FileName>{p.file.name}</_.FileName>
                                         </_.FileItem>
