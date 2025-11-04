@@ -3,11 +3,13 @@
 import * as _ from "./style";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import Pagination from "@/components/pagination";
 import { NoticeData } from "@/widgets/student/main/data";
 import { useState } from "react";
 
 export default function Tnotice() {
+    const router = useRouter();
     const [page, setPage] = useState(1);
     const totalPages = Math.ceil(NoticeData.length / 10);
     const handlePageChange = (newPage: number) => {
@@ -24,7 +26,7 @@ export default function Tnotice() {
                         <input type="text" placeholder="공지사항 검색" />
                     </_.SearchWrapper>
                 </_.Group>
-                <_.Btn>공지등록</_.Btn>
+                <_.Btn onClick={() => router.push('/noticeWrite')}>공지등록</_.Btn>
             </_.TitleGroup>
             <_.NoticeContainer>
                 {NoticeData.map((item) => (
