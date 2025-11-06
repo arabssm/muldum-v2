@@ -2,21 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { videoChatAPI } from "../api/videoChat";
-
-interface Participant {
-    id: string;
-    name: string;
-}
-
-interface WebRTCMessage {
-    type: 'existing_users' | 'new_user' | 'offer' | 'answer' | 'candidate' | 'user_left' | 'error';
-    from?: string;
-    to?: string;
-    data?: any;
-    sdp?: RTCSessionDescriptionInit;
-    candidate?: RTCIceCandidateInit;
-    message?: string;
-}
+import type { Participant, WebRTCMessage } from "@/shared/types/video";
 
 const API_BASE_URL = 'http://localhost:8001';
 const MOCK_USER_ID = '1';
@@ -117,7 +103,6 @@ export function useVideoChat() {
     }, [sendWebSocketMessage]);
 
     const addRemoteVideo = (userId: string, stream: MediaStream) => {
-        // Add participant to list
         setParticipants(prev => {
             if (!prev.find(p => p.id === userId)) {
                 return [...prev, { id: userId, name: `User ${userId.substring(0, 8)}` }];
@@ -125,7 +110,6 @@ export function useVideoChat() {
             return prev;
         });
 
-        // Store remote stream for video display
         setRemoteStreams(prev => ({
             ...prev,
             [userId]: stream
@@ -140,17 +124,14 @@ export function useVideoChat() {
             delete peerConnectionsRef.current[userId];
         }
 
-        // Remove participant
         setParticipants(prev => prev.filter(p => p.id !== userId));
 
-        // Remove remote stream
         setRemoteStreams(prev => {
             const newStreams = { ...prev };
             delete newStreams[userId];
             return newStreams;
         });
 
-        // Clear selection if this participant was selected
         setSelectedParticipant(prev => prev === userId ? null : prev);
 
         if (remoteVideosRef.current[userId]) {
@@ -162,7 +143,6 @@ export function useVideoChat() {
         try {
             setConnectionStatus(`Connecting to room ${roomId}...`);
 
-            // Start local media first
             await startLocalMedia();
 
             const wsUrl = `ws://localhost:8001/ws/signal?roomId=${roomId}`;
@@ -279,7 +259,6 @@ export function useVideoChat() {
             videoRef.current.srcObject = null;
         }
 
-        // Close all peer connections
         Object.keys(peerConnectionsRef.current).forEach(userId => {
             closePeerConnection(userId);
         });
@@ -338,7 +317,6 @@ export function useVideoChat() {
 
         const cameraTrack = localStreamRef.current.getVideoTracks()[0];
 
-        // Replace screen track back to camera in all peer connections
         for (const userId in peerConnectionsRef.current) {
             const pc = peerConnectionsRef.current[userId];
             const videoSender = pc.getSenders().find(sender => sender.track?.kind === 'video');
@@ -384,7 +362,6 @@ export function useVideoChat() {
         }
     };
 
-    // Cleanup on unmount
     useEffect(() => {
         return () => {
             leaveRoom();
