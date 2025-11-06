@@ -35,4 +35,5 @@ export interface FormSectionProps {
   title: string;
   placeholders: string[];
   isTextarea?: boolean;
+  must?: boolean; 
 }

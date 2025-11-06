@@ -60,3 +60,8 @@ export const Textarea = styled.textarea<{ isError?: boolean }>`
     outline: none;
   }
 `;
+
+export const TitleWrapper = styled.div`
+  display: flex;
+  gap: 4px;
+`;

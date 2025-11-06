@@ -2,35 +2,27 @@ import styled from '@emotion/styled';
 import Image from 'next/image';
 
 export default function Footer() {
-    const handleEmailClick = () => {
-        window.location.href = 'mailto:bssmara2025@gmail.com';
-    };
-
-    const handleInstagramClick = () => {
-        window.open('https://www.instagram.com/arabssm/', '_blank');
-    };
-
-    return (
-        <Container>
-            <LeftSection>
-                <LogoWrapper>
-                    <Image src="/assets/araLogo.svg" alt="Logo" width={35} height={34} />
-                    <Title>muldum</Title>
-                </LogoWrapper>
-                <Description>
-                    교사와 학생 모두에게 불편한 점을 분석하고 <br /> 개선하였습니다
-                </Description>
-            </LeftSection>
-            <RightSection>
-                <Icon onClick={handleEmailClick}>
-                    <Image src="/assets/footer/email.svg" alt="Email" width={32} height={32} />
-                </Icon>
-                <Icon onClick={handleInstagramClick}>
-                    <Image src="/assets/footer/instar.svg" alt="Instagram" width={32} height={32} />
-                </Icon>
-            </RightSection>
-        </Container>
-    );
+  return (
+    <Container>
+      <LeftSection>
+        <LogoWrapper>
+          <Image src="/assets/araLogo.svg" alt="Logo" width={35} height={34} />
+          <Title>muldum</Title>
+        </LogoWrapper>
+        <Description>
+          교사와 학생 모두에게 불편한 점을 분석하고 <br /> 개선하였습니다
+        </Description>
+      </LeftSection>
+      <RightSection>
+        <Icon onClick={() => (window.location.href = 'mailto:bssmara2025@gmail.com')}>
+          <Image src="/assets/footer/email.svg" alt="Email" width={32} height={32} />
+        </Icon>
+        <Icon onClick={() => window.open('https://www.instagram.com/arabssm/', '_blank')}>
+          <Image src="/assets/footer/instar.svg" alt="Instagram" width={32} height={32} />
+        </Icon>
+      </RightSection>
+    </Container>
+  );
 }
 
 const Container = styled.footer`

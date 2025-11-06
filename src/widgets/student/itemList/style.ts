@@ -77,7 +77,7 @@ export const Group = styled.div`
   
   & > div {
     display: flex;
-    gap: 5rem;
+    gap: 7rem;
   }
 
   & > div::before {
