@@ -34,13 +34,8 @@ export default function LoginModal() {
           />
           구글로 로그인하기
         </Button>
-        <Button>
-          <Image
-            src="/assets/guest.svg"
-            alt="게스트 아이콘"
-            width={32}
-            height={32}
-          />
+        <Button onClick={() => window.location.replace('/')}>
+          <Image src="/assets/guest.svg" alt="게스트 아이콘" width={32} height={32} />
           게스트로 둘러보기
         </Button>
       </ButtonGroup>
