@@ -9,9 +9,9 @@ export default function VideoChat() {
     const {
         showParticipants, setShowParticipants, chatWidth, chatScrollRef,
         videoRef, message, setMessage, messages, participants, remoteStreams,
-        selectedParticipant, setSelectedParticipant, localStream, roomId, 
-        isConnected, connectionStatus, isScreenSharing, handleResize, 
-        handleKeyDown, createRoom, joinRoom, leaveRoom, toggleCamera, 
+        selectedParticipant, setSelectedParticipant, localStream, roomId,
+        isConnected, connectionStatus, isScreenSharing, handleResize,
+        handleKeyDown, createRoom, joinRoom, leaveRoom, toggleCamera,
         toggleMicrophone, startScreenShare, stopScreenShare
     } = useVideoChat();
 
@@ -20,11 +20,10 @@ export default function VideoChat() {
     const [headsetOn, setHeadsetOn] = useState(true);
     const [roomTitle, setRoomTitle] = useState("My Video Room");
     const [inputRoomId, setInputRoomId] = useState("");
-    
+
     const remoteVideoRef = useRef<HTMLVideoElement>(null);
     const localPipVideoRef = useRef<HTMLVideoElement>(null);
 
-    // Update remote video when participant is selected
     useEffect(() => {
         if (selectedParticipant && remoteStreams[selectedParticipant] && remoteVideoRef.current) {
             remoteVideoRef.current.srcObject = remoteStreams[selectedParticipant];
@@ -33,7 +32,6 @@ export default function VideoChat() {
         }
     }, [selectedParticipant, remoteStreams]);
 
-    // Update local PIP video when showing remote video
     useEffect(() => {
         if (selectedParticipant && localStream && localPipVideoRef.current) {
             localPipVideoRef.current.srcObject = localStream;
@@ -87,7 +85,7 @@ export default function VideoChat() {
     return (
         <_.TopContainer>
             <div style={{ padding: "1rem", background: "#f8f9fa", borderBottom: "1px solid #dee2e6" }}>
-                <div style={{ display: "flex", gap: "1rem", alignItems: "center", marginBottom: "0.5rem" }}>
+                <div style={{ display: "flex", gap: "1rem", marginBottom: "0.5rem" }}>
                     <input
                         type="text"
                         placeholder="방 제목"
@@ -171,7 +169,6 @@ export default function VideoChat() {
                     <_.ResizeHandle onMouseDown={handleResize} />
                 </_.ChatWrapper>
                 <div style={{ position: "relative", width: "100%", height: "70vh" }}>
-                    {/* Main video (remote or local) */}
                     {selectedParticipant && remoteStreams[selectedParticipant] ? (
                         <video
                             ref={remoteVideoRef}
@@ -198,8 +195,6 @@ export default function VideoChat() {
                             }}
                         />
                     )}
-                    
-                    {/* Picture-in-picture local video when showing remote */}
                     {selectedParticipant && remoteStreams[selectedParticipant] && (
                         <div
                             style={{
@@ -249,8 +244,6 @@ export default function VideoChat() {
                             </div>
                         </div>
                     )}
-                    
-                    {/* Video info overlay */}
                     <div style={{
                         position: "absolute",
                         bottom: "10px",
@@ -262,7 +255,7 @@ export default function VideoChat() {
                         fontSize: "14px",
                         zIndex: 10,
                     }}>
-                        {selectedParticipant 
+                        {selectedParticipant
                             ? `${participants.find(p => p.id === selectedParticipant)?.name || 'Unknown'}`
                             : "나 (로컬)"
                         }
@@ -286,11 +279,10 @@ export default function VideoChat() {
                     <_.ParticipantPanel style={{ zIndex: 1 }}>
                         <_.CloseButton onClick={() => setShowParticipants(false)}>×</_.CloseButton>
                         <_.ParticipantList>
-                            {/* Local user */}
-                            <_.Name 
+                            <_.Name
                                 onClick={() => setSelectedParticipant(null)}
-                                style={{ 
-                                    cursor: "pointer", 
+                                style={{
+                                    cursor: "pointer",
                                     backgroundColor: selectedParticipant === null ? "#e3f2fd" : "transparent",
                                     padding: "5px",
                                     borderRadius: "4px",
@@ -299,14 +291,12 @@ export default function VideoChat() {
                             >
                                 <_.Circle /> 나 (로컬)
                             </_.Name>
-                            
-                            {/* Remote participants */}
                             {participants.map((participant) => (
-                                <_.Name 
+                                <_.Name
                                     key={participant.id}
                                     onClick={() => setSelectedParticipant(participant.id)}
-                                    style={{ 
-                                        cursor: "pointer", 
+                                    style={{
+                                        cursor: "pointer",
                                         backgroundColor: selectedParticipant === participant.id ? "#e3f2fd" : "transparent",
                                         padding: "5px",
                                         borderRadius: "4px",
@@ -321,7 +311,6 @@ export default function VideoChat() {
                                     )}
                                 </_.Name>
                             ))}
-                            
                             {participants.length === 0 && (
                                 <_.Name><_.Circle /> 다른 참가자가 없습니다</_.Name>
                             )}
