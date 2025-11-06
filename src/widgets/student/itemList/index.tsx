@@ -102,9 +102,7 @@ export default function ItemList() {
                     ))}
                 </_.InfoContainer>
                 <_.BtnGroup>
-                    <BtnSecondary onClick={() => router.back()}>
-                        물품 더 신청하기
-                    </BtnSecondary>
+                    <BtnSecondary>삭제</BtnSecondary>
                     <BtnPrimary onClick={() => router.back()}>돌아가기</BtnPrimary>
                 </_.BtnGroup>
             </_.BtnWrapper>
