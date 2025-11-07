@@ -5,14 +5,32 @@ import Image from "next/image";
 import Link from "next/link";
 import Pagination from "@/components/pagination";
 import { NoticeData } from "@/widgets/student/main/data";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import NoticeSkeleton from "./skeleton";
 
 export default function Notice() {
     const [page, setPage] = useState(1);
+    const [isLoading, setIsLoading] = useState(true);
+    const [isMounted, setIsMounted] = useState(false);
+
     const totalPages = Math.ceil(NoticeData.length / 10);
     const handlePageChange = (newPage: number) => {
         setPage(newPage);
     };
+
+    useEffect(() => {
+        setIsMounted(true);
+
+        const timer = setTimeout(() => {
+            setIsLoading(false);
+        }, 1500);
+
+        return () => clearTimeout(timer);
+    }, []);
+
+    if (!isMounted) {
+        return null;
+    }
 
     return (
         <_.Container>
@@ -23,28 +41,34 @@ export default function Notice() {
                     <input type="text" placeholder="공지사항 검색" />
                 </_.SearchWrapper>
             </_.Group>
-            <_.NoticeContainer>
-                {NoticeData.map((item) => (
-                    <Link key={item.path} href={item.path}>
-                        <_.NoticeGroup>
-                            <_.NoticeWrapper>
-                                {item.type === "new" ? (
-                                    <_.Badge bgColor="#FF9B62">{item.badge}</_.Badge>
-                                ) : (
-                                    <_.Badge bgColor="#D1D1D1">{item.badge}</_.Badge>
-                                )}
-                                <_.Notice>{item.notice}</_.Notice>
-                            </_.NoticeWrapper>
-                            <_.Date>{item.date}</_.Date>
-                        </_.NoticeGroup>
-                    </Link>
-                ))}
-            </_.NoticeContainer>
-            <Pagination
-                currentPage={page}
-                totalPages={totalPages}
-                onPageChange={handlePageChange}
-            />
+            {isLoading ? (
+                <NoticeSkeleton />
+            ) : (
+                <>
+                    <_.NoticeContainer>
+                        {NoticeData.map((item) => (
+                            <Link key={item.path} href={item.path}>
+                                <_.NoticeGroup>
+                                    <_.NoticeWrapper>
+                                        {item.type === "new" ? (
+                                            <_.Badge bgColor="#FF9B62">{item.badge}</_.Badge>
+                                        ) : (
+                                            <_.Badge bgColor="#D1D1D1">{item.badge}</_.Badge>
+                                        )}
+                                        <_.Notice>{item.notice}</_.Notice>
+                                    </_.NoticeWrapper>
+                                    <_.Date>{item.date}</_.Date>
+                                </_.NoticeGroup>
+                            </Link>
+                        ))}
+                    </_.NoticeContainer>
+                    <Pagination
+                        currentPage={page}
+                        totalPages={totalPages}
+                        onPageChange={handlePageChange}
+                    />
+                </>
+            )}
         </_.Container>
     );
 }
