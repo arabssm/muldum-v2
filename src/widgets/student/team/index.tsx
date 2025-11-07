@@ -1,7 +1,10 @@
+"use client";
+
 import * as _ from './style';
 import { majorClubs, freeClubs } from './data';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import TeamSkeleton from './skeleton';
 
 type GroupType = "전공동아리" | "네트워크" | "자율동아리" | "졸업작품";
 type ClassType = "전체" | "1반" | "2반" | "3반" | "4반";
@@ -13,6 +16,18 @@ export default function Team() {
     const router = useRouter();
     const [activeGroup, setActiveGroup] = useState<GroupType>("전공동아리");
     const [activeClass, setActiveClass] = useState<ClassType>("전체");
+    const [isLoading, setIsLoading] = useState(true);
+    const [isMounted, setIsMounted] = useState(false);
+
+    useEffect(() => {
+        setIsMounted(true);
+
+        const timer = setTimeout(() => {
+            setIsLoading(false);
+        }, 1500);
+
+        return () => clearTimeout(timer);
+    }, []);
 
     const clubs =
         activeGroup === "전공동아리"
@@ -25,6 +40,10 @@ export default function Team() {
         activeClass === "전체"
             ? clubs
             : clubs.filter((club) => club.class === activeClass);
+
+    if (!isMounted) {
+        return null;
+    }
 
     return (
         <_.Container>
@@ -53,24 +72,28 @@ export default function Team() {
                 </_.Group>
             </_.Wrapper>
 
-            <_.BoxGroup>
-                {filteredClubs.map((club, index) => (
-                    <_.Box
-                        key={club.id ?? index}
-                        onClick={() => router.push(`/team/${club.id ?? index}`)}
-                    >
-                        <_.Name>{club.name}</_.Name>
-                        <_.Member>
-                            {club.members.map((member, i) => (
-                                <_.Member key={i}>
-                                    {member}&nbsp;
-                                    {(i + 1) % 3 === 0 ? <br /> : " "}
-                                </_.Member>
-                            ))}
-                        </_.Member>
-                    </_.Box>
-                ))}
-            </_.BoxGroup>
+            {isLoading ? (
+                <TeamSkeleton />
+            ) : (
+                <_.BoxGroup>
+                    {filteredClubs.map((club, index) => (
+                        <_.Box
+                            key={club.id ?? index}
+                            onClick={() => router.push(`/team/${club.id ?? index}`)}
+                        >
+                            <_.Name>{club.name}</_.Name>
+                            <_.Member>
+                                {club.members.map((member, i) => (
+                                    <_.Member key={i}>
+                                        {member}&nbsp;
+                                        {(i + 1) % 3 === 0 ? <br /> : " "}
+                                    </_.Member>
+                                ))}
+                            </_.Member>
+                        </_.Box>
+                    ))}
+                </_.BoxGroup>
+            )}
         </_.Container>
     );
 }

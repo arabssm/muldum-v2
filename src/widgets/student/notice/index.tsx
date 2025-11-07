@@ -5,14 +5,42 @@ import Image from "next/image";
 import Link from "next/link";
 import Pagination from "@/components/pagination";
 import { NoticeData } from "@/widgets/student/main/data";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import NoticeSkeleton from "./skeleton";
 
 export default function Notice() {
     const [page, setPage] = useState(1);
-    const totalPages = Math.ceil(NoticeData.length / 10);
+    const [isLoading, setIsLoading] = useState(true);
+    const [isMounted, setIsMounted] = useState(false);
+    const [searchQuery, setSearchQuery] = useState("");
+
+    const filteredNotices = NoticeData.filter((item) =>
+        item.notice.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
+    const totalPages = Math.ceil(filteredNotices.length / 10);
     const handlePageChange = (newPage: number) => {
         setPage(newPage);
     };
+
+    const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchQuery(e.target.value);
+        setPage(1);
+    };
+
+    useEffect(() => {
+        setIsMounted(true);
+
+        const timer = setTimeout(() => {
+            setIsLoading(false);
+        }, 1500);
+
+        return () => clearTimeout(timer);
+    }, []);
+
+    if (!isMounted) {
+        return null;
+    }
 
     return (
         <_.Container>
@@ -20,31 +48,57 @@ export default function Notice() {
                 <_.Title>공지사항</_.Title>
                 <_.SearchWrapper>
                     <Image src="/assets/search.svg" alt="search" width={18} height={18} />
-                    <input type="text" placeholder="공지사항 검색" />
+                    <input
+                        type="text"
+                        placeholder="공지사항 검색"
+                        value={searchQuery}
+                        onChange={handleSearchChange}
+                    />
                 </_.SearchWrapper>
             </_.Group>
-            <_.NoticeContainer>
-                {NoticeData.map((item) => (
-                    <Link key={item.path} href={item.path}>
-                        <_.NoticeGroup>
-                            <_.NoticeWrapper>
-                                {item.type === "new" ? (
-                                    <_.Badge bgColor="#FF9B62">{item.badge}</_.Badge>
-                                ) : (
-                                    <_.Badge bgColor="#D1D1D1">{item.badge}</_.Badge>
-                                )}
-                                <_.Notice>{item.notice}</_.Notice>
-                            </_.NoticeWrapper>
-                            <_.Date>{item.date}</_.Date>
-                        </_.NoticeGroup>
-                    </Link>
-                ))}
-            </_.NoticeContainer>
-            <Pagination
-                currentPage={page}
-                totalPages={totalPages}
-                onPageChange={handlePageChange}
-            />
+            {isLoading ? (
+                <NoticeSkeleton />
+            ) : (
+                <>
+                    <_.NoticeContainer>
+                        {filteredNotices.length > 0 ? (
+                            filteredNotices.map((item) => (
+                                <Link key={item.path} href={item.path}>
+                                    <_.NoticeGroup>
+                                        <_.NoticeWrapper>
+                                            {item.type === "new" ? (
+                                                <_.Badge bgColor="#FF9B62">{item.badge}</_.Badge>
+                                            ) : (
+                                                <_.Badge bgColor="#D1D1D1">{item.badge}</_.Badge>
+                                            )}
+                                            <_.Notice>{item.notice}</_.Notice>
+                                        </_.NoticeWrapper>
+                                        <_.Date>{item.date}</_.Date>
+                                    </_.NoticeGroup>
+                                </Link>
+                            ))
+                        ) : (
+                            <div style={{
+                                display: 'flex',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                                padding: '4rem',
+                                fontSize: '1.2rem',
+                                color: '#B2B2B2'
+                            }}>
+                                검색 결과가 없습니다.
+                            </div>
+                        )}
+                    </_.NoticeContainer>
+                    {filteredNotices.length > 0 && (
+                        <Pagination
+                            currentPage={page}
+                            totalPages={totalPages}
+                            onPageChange={handlePageChange}
+                        />
+                    )}
+                </>
+            )}
         </_.Container>
     );
 }
