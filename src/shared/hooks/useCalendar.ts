@@ -8,7 +8,6 @@ export function useCalendarDrag(dates: number[]) {
     const [modalRange, setModalRange] = useState<{ from: number; to: number } | null>(null);
 
     const onCellMouseDown = (index: number) => (e: React.MouseEvent) => {
-        e.preventDefault();
         setIsDragging(true);
         setDragStart(index);
         setDragEnd(index);

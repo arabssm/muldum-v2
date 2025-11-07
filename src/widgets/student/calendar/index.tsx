@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo, useRef, useState } from 'react';
+import { useMemo, useRef, useState, useEffect } from 'react';
 import * as _ from './style';
 import { Modal } from '@/components/modal/modal';
 import Image from 'next/image';
@@ -27,13 +27,18 @@ export default function Calendar() {
         if (modalRange) setIsOpen(true);
     };
 
+    useEffect(() => {
+        const handleMouseUp = () => {
+            onMouseUp();
+            openModal();
+        };
+        window.addEventListener('mouseup', handleMouseUp);
+        return () => window.removeEventListener('mouseup', handleMouseUp);
+    }, [onMouseUp, openModal]);
+
     return (
         <_.Container
             ref={containerRef}
-            onMouseUp={() => {
-                onMouseUp();
-                openModal();
-            }}
             onMouseLeave={() => {
                 if (isDragging) reset();
             }}
@@ -44,14 +49,14 @@ export default function Calendar() {
                         <_.HeaderCell key={day}>{day}</_.HeaderCell>
                     ))}
                 </_.HeaderRow>
+
                 <_.Body>
                     {dates.map((date, idx) => (
                         <_.CellHighlighted
                             key={date}
                             isHighlighted={highlightSet.has(idx)}
                             onMouseDown={onCellMouseDown(idx)}
-                            onMouseEnter={onCellMouseEnter(idx)}
-                            role="button"
+                            onMouseOver={onCellMouseEnter(idx)}
                             aria-pressed={highlightSet.has(idx)}
                         >
                             <span>{date}</span>
@@ -59,6 +64,7 @@ export default function Calendar() {
                     ))}
                 </_.Body>
             </_.CalendarWrapper>
+
             <Modal isOpen={isOpen} closeModal={() => setIsOpen(false)}>
                 <_.ModalInner>
                     <Image src="/assets/calendar.svg" alt="캘린더 아이콘" width={48} height={48} />
