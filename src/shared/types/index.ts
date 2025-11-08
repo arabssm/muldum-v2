@@ -35,3 +35,10 @@ export interface ModalProps {
 export interface ProvidersProps {
   children: React.ReactNode;
 }
+
+export interface Event {
+    title: string;
+    from: number;
+    to: number;
+    color: string;
+}

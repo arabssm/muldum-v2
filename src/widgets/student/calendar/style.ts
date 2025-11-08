@@ -37,15 +37,8 @@ export const Body = styled.div`
   display: grid;
   flex: 1;
   grid-template-columns: repeat(7, 1fr);
-`;
-
-export const Cell = styled.div`
-  display: flex;
-  justify-content: flex-start;
-  align-items: flex-start;
-  padding: 1rem;
-  font-size: 0.95rem;
-  border: 1px solid #E7E8EA;
+  grid-template-rows: repeat(5, 1fr);
+  position: relative;
 `;
 
 export const CellHighlighted = styled.div<{ isHighlighted?: boolean }>`
@@ -56,6 +49,7 @@ export const CellHighlighted = styled.div<{ isHighlighted?: boolean }>`
   font-size: 0.95rem;
   border: 1px solid #E7E8EA;
   background: ${({ isHighlighted }) => (isHighlighted ? 'rgba(255,155,98,0.12)' : 'white')};
+  position: relative;
 `;
 
 export const ModalInner = styled.div`
@@ -107,4 +101,28 @@ export const SaveBtn = styled.button`
   &:hover {
     background: #ff8640;
   }
+`;
+
+export const EventBarAbsolute = styled.div<{
+  color: string;
+  left: string;
+  top: string;
+  width: string;
+}>`
+  position: absolute;
+  height: 1.6rem;
+  background: ${({ color }) => color};
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  margin-top: 3rem;
+  padding-left: 0.6rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  left: ${({ left }) => left};
+  top: ${({ top }) => top};
+  width: ${({ width }) => width};
+  transition: all 0.2s ease-in-out;
+  z-index: 2;
 `;
