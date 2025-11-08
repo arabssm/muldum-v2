@@ -20,8 +20,8 @@ export const HeaderRow = styled.div`
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   flex-shrink: 0;
-  background-color: #FAFAFA;
-  border: 1px solid #E7E8EA;
+  background-color: #fafafa;
+  border: 1px solid #e7e8ea;
   height: 8%;
 `;
 
@@ -47,8 +47,9 @@ export const CellHighlighted = styled.div<{ isHighlighted?: boolean }>`
   align-items: flex-start;
   padding: 1rem;
   font-size: 0.95rem;
-  border: 1px solid #E7E8EA;
-  background: ${({ isHighlighted }) => (isHighlighted ? 'rgba(255,155,98,0.12)' : 'white')};
+  border: 1px solid #e7e8ea;
+  background: ${({ isHighlighted }) =>
+    isHighlighted ? "rgba(255,155,98,0.12)" : "white"};
   position: relative;
 `;
 
@@ -67,14 +68,14 @@ export const ModalTitle = styled.h4`
 export const ModalInput = styled.input`
   width: 100%;
   padding: 0.75rem 1rem;
-  border: 1px solid #E7E8EA;
+  border: 1px solid #e7e8ea;
   border-radius: 4px;
   outline: none;
   font-size: 1rem;
   color: #333;
 
   ::placeholder {
-    color: #B2B2B2;
+    color: #b2b2b2;
   }
 `;
 
@@ -86,18 +87,17 @@ export const Row = styled.div`
 `;
 
 export const SmallText = styled.div`
-  color: #B2B2B2;
+  color: #b2b2b2;
   font-size: 0.9rem;
 `;
 
 export const SaveBtn = styled.button`
   padding: 0.6rem 1.25rem;
-  background: #FF9B62;
+  background: #ff9b62;
   color: #fff;
   border: none;
   border-radius: 8px;
   cursor: pointer;
-  
   &:hover {
     background: #ff8640;
   }
