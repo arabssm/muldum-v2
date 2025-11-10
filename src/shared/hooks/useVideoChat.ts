@@ -29,6 +29,15 @@ export function useVideoChat() {
     const remoteVideosRef = useRef<{ [userId: string]: HTMLVideoElement }>({});
 
     const [isScreenSharing, setIsScreenSharing] = useState(false);
+    const [isRecording, setIsRecording] = useState(false);
+    const [transcription, setTranscription] = useState("");
+    const [uploadProgress, setUploadProgress] = useState(0);
+    const [transcriptionResult, setTranscriptionResult] = useState<any>(null);
+    const [selectedProvider, setSelectedProvider] = useState<'google' | 'aws' | 'azure' | 'whisper'>('whisper');
+
+    const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+    const audioChunksRef = useRef<Blob[]>([]);
+    const recognitionRef = useRef<any>(null);
 
     const pc_config = { "iceServers": [{ "urls": "stun:stun.l.google.com:19302" }] };
 
@@ -362,8 +371,113 @@ export function useVideoChat() {
         }
     };
 
+    const startRecording = async () => {
+        try {
+            if (!localStreamRef.current) {
+                await startLocalMedia();
+            }
+
+            if (!localStreamRef.current) return;
+
+            const audioStream = new MediaStream(
+                localStreamRef.current.getAudioTracks()
+            );
+
+            const mediaRecorder = new MediaRecorder(audioStream);
+            audioChunksRef.current = [];
+
+            mediaRecorder.ondataavailable = (event) => {
+                if (event.data.size > 0) {
+                    audioChunksRef.current.push(event.data);
+                }
+            };
+
+            mediaRecorder.onstop = async () => {
+                const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+                
+                try {
+                    setConnectionStatus('오디오 처리 중...');
+                    const result = await videoChatAPI.transcribeAndSummarize(
+                        audioBlob,
+                        selectedProvider,
+                        (progress) => {
+                            setUploadProgress(progress);
+                            setConnectionStatus(`업로드 중: ${Math.round(progress)}%`);
+                        }
+                    );
+                    
+                    setTranscriptionResult(result);
+                    setConnectionStatus('처리 완료');
+                    console.log('Transcription result:', result);
+                } catch (error) {
+                    console.error('Failed to transcribe audio:', error);
+                    setConnectionStatus('처리 실패');
+                }
+            };
+
+            mediaRecorder.start(1000);
+            mediaRecorderRef.current = mediaRecorder;
+            setIsRecording(true);
+            setTranscription("녹음 중...");
+        } catch (error) {
+            console.error('Failed to start recording:', error);
+        }
+    };
+
+    const stopRecording = () => {
+        if (recognitionRef.current) {
+            recognitionRef.current.stop();
+            recognitionRef.current = null;
+        }
+
+        if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+            mediaRecorderRef.current.stop();
+            mediaRecorderRef.current = null;
+        }
+
+        setIsRecording(false);
+        setTranscription("");
+    };
+
+    const summarizeText = async (text: string) => {
+        try {
+            setConnectionStatus('텍스트 요약 중...');
+            const result = await videoChatAPI.summarize({ text });
+            setTranscriptionResult(result);
+            setConnectionStatus('요약 완료');
+            return result;
+        } catch (error) {
+            console.error('Failed to summarize text:', error);
+            setConnectionStatus('요약 실패');
+            throw error;
+        }
+    };
+
+    const summarizeSegments = async (segments: Array<{ speaker: string; text: string }>) => {
+        try {
+            setConnectionStatus('세그먼트 요약 중...');
+            const result = await videoChatAPI.summarize({ segments });
+            setTranscriptionResult(result);
+            setConnectionStatus('요약 완료');
+            return result;
+        } catch (error) {
+            console.error('Failed to summarize segments:', error);
+            setConnectionStatus('요약 실패');
+            throw error;
+        }
+    };
+
+    const toggleRecording = () => {
+        if (isRecording) {
+            stopRecording();
+        } else {
+            startRecording();
+        }
+    };
+
     useEffect(() => {
         return () => {
+            stopRecording();
             leaveRoom();
         };
     }, []);
@@ -386,6 +500,12 @@ export function useVideoChat() {
         isConnected,
         connectionStatus,
         isScreenSharing,
+        isRecording,
+        transcription,
+        uploadProgress,
+        transcriptionResult,
+        selectedProvider,
+        setSelectedProvider,
         handleResize,
         handleSendMessage,
         handleKeyDown,
@@ -397,5 +517,8 @@ export function useVideoChat() {
         toggleMicrophone,
         startScreenShare,
         stopScreenShare,
+        toggleRecording,
+        summarizeText,
+        summarizeSegments,
     };
 }

@@ -17,6 +17,24 @@ export interface CreateRoomRequest {
     maxParticipants?: number;
 }
 
+export interface TranscriptionSegment {
+    speaker: string;
+    text: string;
+}
+
+export interface SummarizeRequest {
+    text?: string;
+    segments?: TranscriptionSegment[];
+}
+
+export interface TranscribeResponse {
+    provider: string;
+    segments: TranscriptionSegment[];
+    summary: string;
+}
+
+export type STTProvider = 'google' | 'aws' | 'azure' | 'whisper';
+
 export const videoChatAPI = {
     async createRoom(data: CreateRoomRequest): Promise<Room> {
         const response = await fetch(`${API_BASE_URL}/rooms`, {
@@ -82,5 +100,67 @@ export const videoChatAPI = {
         if (!response.ok) {
             throw new Error(`Failed to delete all rooms: ${response.statusText}`);
         }
+    },
+
+    // 1) POST /summarize - 텍스트 또는 화자별 세그먼트 요약
+    async summarize(data: SummarizeRequest): Promise<any> {
+        const response = await fetch('/api/summarize', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+        });
+
+        if (!response.ok) {
+            throw new Error(`Failed to summarize: ${response.statusText}`);
+        }
+
+        return response.json();
+    },
+
+    // 2) POST /transcribe-and-summarize - 오디오 파일 업로드 및 STT + 요약
+    async transcribeAndSummarize(
+        audioBlob: Blob,
+        provider: STTProvider,
+        onProgress?: (progress: number) => void
+    ): Promise<TranscribeResponse> {
+        const formData = new FormData();
+        formData.append('provider', provider);
+        formData.append('audio', audioBlob, 'recording.webm');
+
+        return new Promise((resolve, reject) => {
+            const xhr = new XMLHttpRequest();
+
+            // 업로드 진행 상태 추적
+            if (onProgress) {
+                xhr.upload.addEventListener('progress', (e) => {
+                    if (e.lengthComputable) {
+                        const progress = (e.loaded / e.total) * 100;
+                        onProgress(progress);
+                    }
+                });
+            }
+
+            xhr.addEventListener('load', () => {
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    try {
+                        const response = JSON.parse(xhr.responseText);
+                        resolve(response);
+                    } catch (error) {
+                        reject(new Error('Failed to parse response'));
+                    }
+                } else {
+                    reject(new Error(`Upload failed: ${xhr.statusText}`));
+                }
+            });
+
+            xhr.addEventListener('error', () => {
+                reject(new Error('Network error during upload'));
+            });
+
+            xhr.open('POST', '/api/transcribe');
+            xhr.send(formData);
+        });
     }
 };

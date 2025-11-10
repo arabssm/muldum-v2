@@ -10,9 +10,11 @@ export default function VideoChat() {
         showParticipants, setShowParticipants, chatWidth, chatScrollRef,
         videoRef, message, setMessage, messages, participants, remoteStreams,
         selectedParticipant, setSelectedParticipant, localStream, roomId,
-        isConnected, connectionStatus, isScreenSharing, handleResize,
-        handleKeyDown, createRoom, joinRoom, leaveRoom, toggleCamera,
-        toggleMicrophone, startScreenShare, stopScreenShare
+        isConnected, connectionStatus, isScreenSharing, isRecording, transcription,
+        uploadProgress, transcriptionResult, selectedProvider, setSelectedProvider,
+        handleResize, handleKeyDown, createRoom, joinRoom, leaveRoom, toggleCamera,
+        toggleMicrophone, startScreenShare, stopScreenShare, toggleRecording,
+        summarizeText, summarizeSegments
     } = useVideoChat();
 
     const [camOn, setCamOn] = useState(true);
@@ -20,6 +22,8 @@ export default function VideoChat() {
     const [headsetOn, setHeadsetOn] = useState(true);
     const [roomTitle, setRoomTitle] = useState("My Video Room");
     const [inputRoomId, setInputRoomId] = useState("");
+    const [showTranscriptionPanel, setShowTranscriptionPanel] = useState(false);
+    const [manualText, setManualText] = useState("");
 
     const remoteVideoRef = useRef<HTMLVideoElement>(null);
     const localPipVideoRef = useRef<HTMLVideoElement>(null);
@@ -81,6 +85,10 @@ export default function VideoChat() {
         { on: "/assets/videoChat/headset.svg", off: "/assets/videoChat/nonheadset.svg", state: headsetOn, handler: () => setHeadsetOn(!headsetOn), alt: "헤드셋" },
         { on: "/assets/videoChat/share.svg", off: null, state: isScreenSharing, handler: handleScreenShare, alt: "공유" },
     ];
+
+    const handleRecordToggle = () => {
+        toggleRecording();
+    };
 
     return (
         <_.TopContainer>
@@ -331,8 +339,235 @@ export default function VideoChat() {
                             style={{ cursor: "pointer" }}
                         />
                     ))}
+                    <button
+                        onClick={handleRecordToggle}
+                        style={{
+                            padding: "10px 20px",
+                            background: isRecording ? "#dc3545" : "#28a745",
+                            color: "white",
+                            border: "none",
+                            borderRadius: "8px",
+                            cursor: "pointer",
+                            fontSize: "14px",
+                            fontWeight: "bold",
+                            marginLeft: "10px"
+                        }}
+                    >
+                        {isRecording ? "🔴 녹음 중지" : "🎤 녹음 시작"}
+                    </button>
+                    <button
+                        onClick={() => setShowTranscriptionPanel(true)}
+                        style={{
+                            padding: "10px 20px",
+                            background: "#6c757d",
+                            color: "white",
+                            border: "none",
+                            borderRadius: "8px",
+                            cursor: "pointer",
+                            fontSize: "14px",
+                            fontWeight: "bold",
+                            marginLeft: "10px"
+                        }}
+                    >
+                        📝 음성인식 설정
+                    </button>
                 </_.IconWrapper>
             </_.IconWrapper>
+            {transcription && (
+                <div style={{
+                    position: "fixed",
+                    bottom: "100px",
+                    left: "50%",
+                    transform: "translateX(-50%)",
+                    background: "rgba(0, 0, 0, 0.8)",
+                    color: "white",
+                    padding: "15px 25px",
+                    borderRadius: "8px",
+                    maxWidth: "80%",
+                    zIndex: 1000,
+                }}>
+                    <div style={{ fontSize: "12px", color: "#aaa", marginBottom: "5px" }}>
+                        {isRecording ? "녹음 중..." : "처리 중..."}
+                    </div>
+                    <div style={{ fontSize: "16px" }}>{transcription}</div>
+                    {uploadProgress > 0 && uploadProgress < 100 && (
+                        <div style={{ marginTop: "10px", background: "#333", borderRadius: "4px", overflow: "hidden" }}>
+                            <div style={{
+                                width: `${uploadProgress}%`,
+                                height: "4px",
+                                background: "#4caf50",
+                                transition: "width 0.3s"
+                            }} />
+                        </div>
+                    )}
+                </div>
+            )}
+
+            {/* 음성 인식 결과 패널 */}
+            {showTranscriptionPanel && (
+                <div style={{
+                    position: "fixed",
+                    top: "50%",
+                    left: "50%",
+                    transform: "translate(-50%, -50%)",
+                    background: "white",
+                    padding: "30px",
+                    borderRadius: "12px",
+                    boxShadow: "0 4px 20px rgba(0,0,0,0.3)",
+                    maxWidth: "600px",
+                    maxHeight: "80vh",
+                    overflow: "auto",
+                    zIndex: 2000,
+                }}>
+                    <button
+                        onClick={() => setShowTranscriptionPanel(false)}
+                        style={{
+                            position: "absolute",
+                            top: "10px",
+                            right: "10px",
+                            background: "transparent",
+                            border: "none",
+                            fontSize: "24px",
+                            cursor: "pointer",
+                            color: "#666"
+                        }}
+                    >
+                        ×
+                    </button>
+
+                    <h2 style={{ marginTop: 0, marginBottom: "20px", color: "#333" }}>음성 인식 & 요약</h2>
+
+                    {/* Provider 선택 */}
+                    <div style={{ marginBottom: "20px" }}>
+                        <label style={{ display: "block", marginBottom: "8px", fontWeight: "bold", color: "#555" }}>
+                            STT Provider 선택:
+                        </label>
+                        <select
+                            value={selectedProvider}
+                            onChange={(e) => setSelectedProvider(e.target.value as any)}
+                            style={{
+                                width: "100%",
+                                padding: "10px",
+                                border: "1px solid #ddd",
+                                borderRadius: "6px",
+                                fontSize: "14px"
+                            }}
+                        >
+                            <option value="whisper">Whisper (오픈소스)</option>
+                            <option value="google">Google Cloud Speech-to-Text</option>
+                            <option value="aws">AWS Transcribe</option>
+                            <option value="azure">Azure Speech Service</option>
+                        </select>
+                    </div>
+
+                    {/* 수동 텍스트 입력 */}
+                    <div style={{ marginBottom: "20px" }}>
+                        <label style={{ display: "block", marginBottom: "8px", fontWeight: "bold", color: "#555" }}>
+                            또는 텍스트 직접 입력:
+                        </label>
+                        <textarea
+                            value={manualText}
+                            onChange={(e) => setManualText(e.target.value)}
+                            placeholder="회의 내용을 입력하세요..."
+                            style={{
+                                width: "100%",
+                                minHeight: "100px",
+                                padding: "10px",
+                                border: "1px solid #ddd",
+                                borderRadius: "6px",
+                                fontSize: "14px",
+                                resize: "vertical"
+                            }}
+                        />
+                        <button
+                            onClick={async () => {
+                                if (manualText.trim()) {
+                                    await summarizeText(manualText);
+                                }
+                            }}
+                            disabled={!manualText.trim()}
+                            style={{
+                                marginTop: "10px",
+                                padding: "10px 20px",
+                                background: manualText.trim() ? "#007bff" : "#ccc",
+                                color: "white",
+                                border: "none",
+                                borderRadius: "6px",
+                                cursor: manualText.trim() ? "pointer" : "not-allowed",
+                                fontSize: "14px"
+                            }}
+                        >
+                            텍스트 요약하기
+                        </button>
+                    </div>
+
+                    {/* 결과 표시 */}
+                    {transcriptionResult && (
+                        <div style={{ marginTop: "30px", padding: "20px", background: "#f8f9fa", borderRadius: "8px" }}>
+                            <h3 style={{ marginTop: 0, color: "#333" }}>처리 결과</h3>
+                            
+                            {transcriptionResult.provider && (
+                                <div style={{ marginBottom: "15px" }}>
+                                    <strong>Provider:</strong> {transcriptionResult.provider}
+                                </div>
+                            )}
+
+                            {transcriptionResult.summary && (
+                                <div style={{ marginBottom: "15px" }}>
+                                    <strong>요약:</strong>
+                                    <div style={{ 
+                                        marginTop: "8px", 
+                                        padding: "12px", 
+                                        background: "white", 
+                                        borderRadius: "6px",
+                                        whiteSpace: "pre-wrap"
+                                    }}>
+                                        {transcriptionResult.summary}
+                                    </div>
+                                </div>
+                            )}
+
+                            {transcriptionResult.segments && transcriptionResult.segments.length > 0 && (
+                                <div>
+                                    <strong>화자별 내용:</strong>
+                                    <div style={{ marginTop: "8px" }}>
+                                        {transcriptionResult.segments.map((seg: any, idx: number) => (
+                                            <div key={idx} style={{
+                                                marginBottom: "10px",
+                                                padding: "12px",
+                                                background: "white",
+                                                borderRadius: "6px",
+                                                borderLeft: "3px solid #007bff"
+                                            }}>
+                                                <div style={{ fontWeight: "bold", color: "#007bff", marginBottom: "5px" }}>
+                                                    {seg.speaker}
+                                                </div>
+                                                <div style={{ color: "#333" }}>{seg.text}</div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    )}
+                </div>
+            )}
+
+            {/* 반투명 배경 */}
+            {showTranscriptionPanel && (
+                <div
+                    onClick={() => setShowTranscriptionPanel(false)}
+                    style={{
+                        position: "fixed",
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        background: "rgba(0, 0, 0, 0.5)",
+                        zIndex: 1999,
+                    }}
+                />
+            )}
         </_.TopContainer>
     );
 }
