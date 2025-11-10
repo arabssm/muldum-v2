@@ -20,9 +20,14 @@ export default function VideoChat() {
     const [headsetOn, setHeadsetOn] = useState(true);
     const [roomTitle, setRoomTitle] = useState("My Video Room");
     const [inputRoomId, setInputRoomId] = useState("");
+    const [isCallActive, setIsCallActive] = useState(false);
 
     const remoteVideoRef = useRef<HTMLVideoElement>(null);
     const localPipVideoRef = useRef<HTMLVideoElement>(null);
+
+    const handleToggleCall = () => {
+        setIsCallActive((prev) => !prev);
+    };
 
     useEffect(() => {
         if (selectedParticipant && remoteStreams[selectedParticipant] && remoteVideoRef.current) {
@@ -136,7 +141,15 @@ export default function VideoChat() {
                     {roomId && <span> | 방 ID: {roomId}</span>}
                 </div>
             </div>
-
+            <_.IconGroup onClick={handleToggleCall} style={{ cursor: "pointer" }}>
+                <Image
+                    src={isCallActive ? "/assets/nonopen.svg" : "/assets/open.svg"}
+                    alt="화상통화 아이콘"
+                    width={24}
+                    height={24}
+                />
+                <_.Sub>{isCallActive ? "화상통화 종료" : "화상통화 시작"}</_.Sub>
+            </_.IconGroup>
             <_.Container>
                 <_.ChatWrapper
                     style={{
