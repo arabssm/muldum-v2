@@ -7,10 +7,29 @@ import TopAppBar from '@/shared/ui/topAppBar';
 import Footer from '@/shared/ui/footer';
 import Toast from '@/shared/ui/toast';
 import type { ProvidersProps } from '@/shared/types';
+import Head from 'next/head';
 
 export default function Providers({ children }: ProvidersProps) {
   return (
     <EmotionRegistry options={{ key: 'css' }}>
+      <Head>
+        <title>물듬</title>
+        <meta charSet="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="icon" type="image/svg+xml" href="/muldum.svg" />
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-647YRBZSPE"></script>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-647YRBZSPE');
+            `,
+          }}
+        />
+      </Head>
+
       <GlobalStyle />
       <TopAppBar />
       <Container>{children}</Container>
