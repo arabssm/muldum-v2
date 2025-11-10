@@ -12,7 +12,7 @@ export default function Feedback() {
                 <Input placeholder="피드백 내용을 작성해주세요." />
             </Wrapper>
             <BtnGroup>
-                <BtnSecondary onClick={() => router.push('/monthWatch')}>취소</BtnSecondary>
+                <BtnSecondary onClick={() => router.push('/monthCheck')}>취소</BtnSecondary>
                 <BtnPrimary onClick={() => router.push('/monthCheck')}>반려</BtnPrimary>
             </BtnGroup>
         </Container>
