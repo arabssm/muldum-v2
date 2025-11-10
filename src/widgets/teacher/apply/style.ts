@@ -6,7 +6,7 @@ export const Container = styled.div`
     flex-direction: column;
     width: 100%;
     padding: 1rem 0;
-    gap: 3rem;
+    gap: 2.5rem;
 `;
 
 export const Wrapper = styled.div`
