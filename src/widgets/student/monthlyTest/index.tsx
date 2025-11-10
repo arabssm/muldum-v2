@@ -23,7 +23,7 @@ function ActionButtons() {
     return (
       <_.BtnGroup>
         <BtnSecondary onClick={() => router.push('/Feedback')}>피드백 후 반려</BtnSecondary>
-        <BtnPrimary>승인</BtnPrimary>
+        <BtnPrimary onClick={() => router.push('/monthCheck')}>승인</BtnPrimary>
       </_.BtnGroup>
     );
   }
