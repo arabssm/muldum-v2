@@ -1,0 +1,9 @@
+import styled from "@emotion/styled";
+
+const Container = styled.div`
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    padding: 1rem 0;
+    gap: 3rem;
+`;
