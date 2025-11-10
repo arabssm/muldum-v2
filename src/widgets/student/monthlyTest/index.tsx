@@ -22,7 +22,7 @@ function ActionButtons() {
   if (pathname === "/monthWatch") {
     return (
       <_.BtnGroup>
-        <BtnSecondary onClick={() => router.push('/MonthlyList')}>피드백 후 반려</BtnSecondary>
+        <BtnSecondary onClick={() => router.push('/Feedback')}>피드백 후 반려</BtnSecondary>
         <BtnPrimary>승인</BtnPrimary>
       </_.BtnGroup>
     );
