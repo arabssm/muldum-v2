@@ -4,13 +4,35 @@ import Slider from 'react-slick';
 export const Container = styled.div`
     display: flex;
     position: relative;
-    z-index: -5;
     overflow: hidden;
+    border-radius: 1rem;
 `;
 
 export const StyledSlider = styled(Slider)`
     display: flex;
     width: 100%;
+    border-radius: 1rem;
+    overflow: hidden;
+    
+    .slick-list {
+        border-radius: 1rem;
+        overflow: hidden;
+    }
+    
+    .slick-track {
+        display: flex;
+    }
+
+    .slick-slide {
+        transition: all 0.8s cubic-bezier(0.65, 0, 0.35, 1);
+        transform: scale(0.95);
+        opacity: 0.5;
+    }
+
+    .slick-active {
+        transform: scale(1);
+        opacity: 1;
+    }
 `;
 
 export const CalendarContainer = styled.div`
@@ -21,7 +43,7 @@ export const CalendarContainer = styled.div`
 export const SlideWrapper = styled.div`
     display: flex;
     position: relative;
-    border-radius: 0.2rem;
+    border-radius: 1rem;
     height: 24vh;
     overflow: hidden;
     color: #fff;
@@ -84,4 +106,32 @@ export const Index = styled.div`
     left: 97%;
     top: 85%;
     color: #D1D1D1;
+`;
+
+export const ArrowButton = styled.button`
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+    background: transparent;
+    border: none;
+    color: #D1D1D1;
+    font-size: 2rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+
+    &:hover {
+        opacity: 0.7;
+    }
+
+    &.prev-arrow {
+        left: 1rem;
+    }
+
+    &.next-arrow {
+        right: 1rem;
+    }
 `;
