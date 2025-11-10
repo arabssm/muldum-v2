@@ -8,6 +8,7 @@ import Footer from '@/shared/ui/footer';
 import Toast from '@/shared/ui/toast';
 import type { ProvidersProps } from '@/shared/types';
 import Head from 'next/head';
+import Sentry from "./sentry";
 
 export default function Providers({ children }: ProvidersProps) {
   return (
