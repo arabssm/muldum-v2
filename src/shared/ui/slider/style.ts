@@ -47,6 +47,7 @@ export const SlideWrapper = styled.div`
     height: 24vh;
     overflow: hidden;
     color: #fff;
+    cursor: pointer;
 `;
 
 export const Overlay = styled.div`
