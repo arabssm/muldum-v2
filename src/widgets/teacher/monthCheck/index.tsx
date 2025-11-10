@@ -3,9 +3,11 @@
 import { useState } from "react";
 import * as _ from "./style";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { BtnPrimary, BtnSecondary } from "@/shared/ui/button";
 
 export default function MonthCheck() {
+    const router = useRouter();
     const [club, setClub] = useState("");
     const clubOptions = ["3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"];
 
@@ -80,7 +82,10 @@ export default function MonthCheck() {
                             height={20}
                             style={{ marginRight: "0.5rem" }}
                         />
-                        <span>{month} 월말평가</span>
+                        <span
+                            onClick={() => router.push('/monthWatch')}
+                            style={{ cursor: "pointer" }}
+                        >{month} 월말평가</span>
                     </div>
                 ))}
             </_.Wrapper>
