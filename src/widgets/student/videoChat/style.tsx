@@ -142,3 +142,20 @@ export const IconWrapper = styled.div`
     display: flex;
     gap: 3.5rem;
 `;
+
+export const IconGroup = styled.div`
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.4rem;
+`;
+
+export const Sub = styled.button`
+  display: flex;
+  color: #909090;
+  background-color: transparent;
+  border: none;
+  font-size: 1.15rem;
+  cursor: pointer;
+`;
