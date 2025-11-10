@@ -75,3 +75,9 @@ export const Wrapper = styled.div`
     flex-direction: column;
     gap: 1rem;
 `;
+
+export const BtnGroup = styled.div`
+    display: flex;
+    justify-content: end;
+    gap: 1.25rem;
+`;

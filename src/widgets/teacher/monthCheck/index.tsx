@@ -3,6 +3,7 @@
 import { useState } from "react";
 import * as _ from "./style";
 import Image from "next/image";
+import { BtnPrimary, BtnSecondary } from "@/shared/ui/button";
 
 export default function MonthCheck() {
     const [club, setClub] = useState("");
@@ -83,6 +84,10 @@ export default function MonthCheck() {
                     </div>
                 ))}
             </_.Wrapper>
+            <_.BtnGroup>
+                <BtnSecondary>거절</BtnSecondary>
+                <BtnPrimary>승인</BtnPrimary>
+            </_.BtnGroup>
         </_.Container>
     );
 }
