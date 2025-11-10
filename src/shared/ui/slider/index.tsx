@@ -4,6 +4,7 @@ import "slick-carousel/slick/slick-theme.css";
 import * as _ from "./style";
 import sliderSettings from "./Setting";
 import Data from "./data";
+import Link from "next/link";
 
 const NextArrow = (props: any) => {
   const { onClick } = props;
@@ -34,23 +35,25 @@ export default function SliderComponent() {
     <_.Container>
       <_.StyledSlider {...settings}>
         {Data.map((item, index) => (
-          <_.SlideWrapper key={index}>
-            <Image
-              src={"/assets/basicBG.svg"}
-              alt={item.title}
-              width={1700}
-              height={320}
-              style={{ objectFit: "cover", borderRadius: "1rem" }}
-            />
-            <_.Overlay />
-            <_.Title>{item.title}</_.Title>
-            <_.Date>{item.date}</_.Date>
-            <_.SubTitle>{item.subtitle}</_.SubTitle>
-            <_.Ddate>{item.dDay}</_.Ddate>
-            <_.Index>
-              {index + 1}/{Data.length}
-            </_.Index>
-          </_.SlideWrapper>
+          <Link key={index} href={`/notice/${index+1}`}>
+            <_.SlideWrapper>
+              <Image
+                src={"/assets/basicBG.svg"}
+                alt={item.title}
+                width={1700}
+                height={320}
+                style={{ objectFit: "cover", borderRadius: "1rem" }}
+              />
+              <_.Overlay />
+              <_.Title>{item.title}</_.Title>
+              <_.Date>{item.date}</_.Date>
+              <_.SubTitle>{item.subtitle}</_.SubTitle>
+              <_.Ddate>{item.dDay}</_.Ddate>
+              <_.Index>
+                {index + 1}/{Data.length}
+              </_.Index>
+            </_.SlideWrapper>
+          </Link>
         ))}
       </_.StyledSlider>
     </_.Container>
