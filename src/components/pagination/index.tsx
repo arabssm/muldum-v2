@@ -1,11 +1,13 @@
 import styled from '@emotion/styled';
+import Image from "next/image";
+
 import { PaginationProps } from '@/shared/types';
 
 export default function Pagination({ currentPage, totalPages, onPageChange }: PaginationProps) {
     return (
         <PaginationWrapper>
             <PageButton onClick={() => onPageChange(currentPage - 1)} disabled={currentPage === 1}>
-                {'<'}
+                 <Image src="/assets/arrow.svg" alt="Next" width={14} height={14}  style={{ opacity: 0.5, filter: "invert(1) brightness(100%)" }} />
             </PageButton>
             {Array.from({ length: totalPages }, (_, i) => (
                 <PageButton
@@ -17,7 +19,7 @@ export default function Pagination({ currentPage, totalPages, onPageChange }: Pa
                 </PageButton>
             ))}
             <PageButton onClick={() => onPageChange(currentPage + 1)} disabled={currentPage === totalPages}>
-                {'>'}
+                 <Image src="/assets/arrow.svg" alt="Next" width={14} height={14}  style={{ transform: "rotate(180deg)", opacity: 0.5, filter: "invert(1) brightness(100%)" }} />
             </PageButton>
         </PaginationWrapper>
     );
