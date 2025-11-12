@@ -3,6 +3,9 @@ export interface ItemData {
     color: string;
     name: string;
     link: string;
+    export: string;
+    price: string;
+    money: string;
     quantity: number;
     reason: string;
 }

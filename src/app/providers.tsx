@@ -30,7 +30,6 @@ export default function Providers({ children }: ProvidersProps) {
           }}
         />
       </Head>
-
       <GlobalStyle />
       <TopAppBar />
       <Container>{children}</Container>
@@ -46,10 +45,12 @@ const Container = styled.div`
   flex-direction: column;
   width: 90%;
   max-width: 90%;
-  min-height: calc(100vh - 5rem);
+  min-height: 100vh;
   padding: 2.5rem 3rem;
   margin: 0 auto;
+  margin-bottom: 4rem;
   box-sizing: border-box;
+
   @media screen and (max-width: 1620px) {
     width: 1620px;
   }

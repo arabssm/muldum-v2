@@ -28,5 +28,5 @@ export interface FormInputProps {
   error?: string;
 }
 export interface ItemFormProps {
-  handleSubmit?: (data: { item: string; price: string; link: string; reason: string; quantity: number }) => void;
+  handleSubmit?: (data: { item: string; price: string; link: string; reason: string; quantity: number; drivePrice: string; expectDrive: string }) => void;
 }

@@ -80,10 +80,10 @@ export default function Notice() {
                         ) : (
                             <div style={{
                                 display: 'flex',
+                                height: '65vh',
                                 justifyContent: 'center',
                                 alignItems: 'center',
-                                padding: '4rem',
-                                fontSize: '1.2rem',
+                                fontSize: '1rem',
                                 color: '#B2B2B2'
                             }}>
                                 검색 결과가 없습니다.

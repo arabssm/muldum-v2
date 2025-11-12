@@ -6,7 +6,7 @@ export const Container = styled.div`
     flex-direction: column;
     width: 100%;
     padding: 1rem 0;
-    gap: 2.5rem;
+    gap: 3rem;
 `;
 
 export const Wrapper = styled.div`
@@ -19,12 +19,11 @@ export const Group = styled.div`
     display: flex;
     width: 100%;
     overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    padding-bottom: 0.5rem;
 `;
 
 export const BtnGroup = styled.div`
     display: flex;
+    align-items: center;
     gap: 1rem;
 `;
 
@@ -113,14 +112,93 @@ export const InfoGroup = styled.div`
   }
 `;
 
+export const GrayBtn = styled.button`
+  padding: 0;
+  width: 10rem;
+  color: #909090;
+  font-size: 0.95rem;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+
+  :hover {
+    color: #3F3F3F;
+  }
+`;
+
 export const Content = styled.div`
   display: block;
   font-size: 1rem;
   line-height: 1.4;
 `;
 
+export const UnContent = styled.div`
+  display: block;
+  font-size: 1rem;
+  line-height: 1.4;
+  text-decoration: underline;
+  text-underline-offset: 1px;
+  color: #3300FF;
+`;
+
 export const BtnWrapper = styled.div`
   display: flex;
   justify-content: end;
   gap: 1rem;
+`;
+
+export const TopWrapper = styled.div`
+  display: flex;
+  justify-content: space-between;
+`;
+
+export const ModalInner = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  width: 100%;
+`;
+
+export const ModalTitle = styled.h4`
+  font-size: 1.25rem;
+  line-height: 1.4;
+`;
+
+export const ModalInput = styled.input`
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid #e7e8ea;
+  border-radius: 4px;
+  outline: none;
+  font-size: 1rem;
+  color: #333;
+
+  ::placeholder {
+    color: #b2b2b2;
+  }
+`;
+
+export const Row = styled.div`
+  display: flex;
+  justify-content: end;
+  align-items: center;
+  width: 100%;
+`;
+
+export const SmallText = styled.div`
+  color: #b2b2b2;
+  font-size: 0.9rem;
+`;
+
+export const SaveBtn = styled.button`
+  padding: 0.6rem 1.25rem;
+  background: #ff9b62;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  
+  &:hover {
+    background: #ff8640;
+  }
 `;

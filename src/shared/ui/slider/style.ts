@@ -5,17 +5,17 @@ export const Container = styled.div`
     display: flex;
     position: relative;
     overflow: hidden;
-    border-radius: 1rem;
+    border-radius: 4px;
 `;
 
 export const StyledSlider = styled(Slider)`
     display: flex;
     width: 100%;
-    border-radius: 1rem;
+    border-radius: 4px;
     overflow: hidden;
     
     .slick-list {
-        border-radius: 1rem;
+        border-radius: 4px;
         overflow: hidden;
     }
     
@@ -43,7 +43,7 @@ export const CalendarContainer = styled.div`
 export const SlideWrapper = styled.div`
     display: flex;
     position: relative;
-    border-radius: 1rem;
+    border-radius: 4px;
     height: 24vh;
     overflow: hidden;
     color: #fff;
@@ -54,6 +54,7 @@ export const Overlay = styled.div`
     position: absolute;
     inset: 0;
     background: rgba(70, 70, 70, 0.4);
+    border-radius: 4px;
 `;
 
 export const Legendimg = styled.img`
