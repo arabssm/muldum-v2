@@ -50,7 +50,6 @@ export default function Apply() {
                         </_.ClassText>
                     ))}
                 </_.Group>
-
                 <_.TopWrapper>
                     <_.Group>
                         {Classes.map((label) => (
