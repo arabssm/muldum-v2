@@ -83,8 +83,11 @@ export default function Apply() {
                         {openIndex === index && (
                             <_.InfoGroup>
                                 <_.Content>{item.link}</_.Content>
+                                <_.Content>가격 : {item.price}원</_.Content>
                                 <_.Content>{item.quantity}개</_.Content>
                                 <_.Content>{item.reason}</_.Content>
+                                <_.Content>{item.export} 도착예정</_.Content>
+                                <_.Content>배송비 : {item.money}원</_.Content>
                             </_.InfoGroup>
                         )}
                     </_.InfoWrapper>
