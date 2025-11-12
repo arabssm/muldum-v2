@@ -119,6 +119,15 @@ export const Content = styled.div`
   line-height: 1.4;
 `;
 
+export const UnContent = styled.div`
+  display: block;
+  font-size: 1rem;
+  line-height: 1.4;
+  text-decoration: underline;
+  text-underline-offset: 1px;
+  color: #3300FF;
+`;
+
 export const BtnWrapper = styled.div`
   display: flex;
   justify-content: end;

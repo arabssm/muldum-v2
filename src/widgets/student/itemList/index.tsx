@@ -89,7 +89,7 @@ export default function ItemList() {
                             {openIndex === index && (
                                 <_.Group>
                                     <_.Content>{item.link}</_.Content>
-                                    <_.Content>가격 : {item.price}원</_.Content>
+                                    <_.UnContent>가격 : {item.price}원</_.UnContent>
                                     <_.Content>{item.quantity}개</_.Content>
                                     <_.Content>{item.reason}</_.Content>
                                     <_.Content>{item.export} 도착예정</_.Content>

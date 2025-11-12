@@ -82,7 +82,7 @@ export default function Apply() {
 
                         {openIndex === index && (
                             <_.InfoGroup>
-                                <_.Content>{item.link}</_.Content>
+                                <_.UnContent>{item.link}</_.UnContent>
                                 <_.Content>가격 : {item.price}원</_.Content>
                                 <_.Content>{item.quantity}개</_.Content>
                                 <_.Content>{item.reason}</_.Content>

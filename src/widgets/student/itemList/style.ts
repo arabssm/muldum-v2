@@ -119,3 +119,12 @@ export const SelectWrapper = styled.div`
   position: relative;
   display: inline-block;
 `;
+
+export const UnContent = styled.div`
+  display: block;
+  font-size: 1rem;
+  line-height: 1.4;
+  text-decoration: underline;
+  text-underline-offset: 1px;
+  color: #3300FF;
+`;
