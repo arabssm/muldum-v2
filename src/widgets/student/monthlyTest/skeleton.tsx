@@ -4,30 +4,24 @@ import { Skeleton } from "@/shared/ui/skeleton";
 
 export default function MonthlyTestSkeleton() {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '3.5rem', width: '100%', margin: '0 auto' }}>
       {Array.from({ length: 4 }).map((_, index) => (
         <div key={index} style={{ 
-          marginBottom: '2rem', 
-          padding: '1.5rem', 
-          border: '1px solid #e0e0e0', 
-          borderRadius: '8px',
-          backgroundColor: '#fafafa'
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '1rem'
         }}>
-          <div style={{ marginBottom: '1rem' }}>
-            <Skeleton width="200px" height="24px" />
-          </div>
-          <div style={{ marginBottom: '1rem' }}>
-            <Skeleton width="100%" height="16px" />
-            <div style={{ marginTop: '8px' }}>
-              <Skeleton width="80%" height="16px" />
-            </div>
-          </div>
-          <Skeleton width="100%" height="120px" borderRadius="8px" />
+          <Skeleton width="200px" height="24px" />
+          {index === 3 ? (
+            <Skeleton width="100%" height="20vh" borderRadius="4px" />
+          ) : (
+            <Skeleton width="100%" height="45px" borderRadius="4px" />
+          )}
         </div>
       ))}
-      <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
-        <Skeleton width="200px" height="48px" borderRadius="8px" />
-        <Skeleton width="100px" height="48px" borderRadius="8px" />
+      <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
+        <Skeleton width="280px" height="44px" borderRadius="4px" />
+        <Skeleton width="100px" height="44px" borderRadius="4px" />
       </div>
     </div>
   );

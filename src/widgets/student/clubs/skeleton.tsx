@@ -8,7 +8,7 @@ export default function ClubsSkeleton() {
       display: 'flex', 
       flexWrap: 'wrap', 
       gap: '2rem', 
-      justifyContent: 'flex-start',
+      justifyContent: 'space-between',
       whiteSpace: 'normal',
       rowGap: '2rem'
     }}>
@@ -17,7 +17,7 @@ export default function ClubsSkeleton() {
           key={index} 
           style={{ 
             display: 'flex',
-            flex: '0 0 31.8%',
+            flex: '0 0 31%',
             padding: '3rem', 
             borderRadius: '1rem',
             justifyContent: 'center',
