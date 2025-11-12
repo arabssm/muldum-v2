@@ -16,48 +16,44 @@ export const CalendarWrapper = styled.div`
   overflow: hidden;
   border: 1px solid #e5e5e5;
 
-  /* FullCalendar 커스텀 스타일 */
   .fc {
     background: white;
-    font-family: inherit;
     height: 100%;
   }
 
   .fc-toolbar {
-    background: white !important;
-    padding: 1rem 1rem 0.5rem 1rem;
-    border-bottom: none !important;
+    padding: 1rem;
     margin-bottom: 0 !important;
   }
 
   .fc-toolbar-title {
     font-size: 1.25rem;
-    font-weight: 600;
-    color: #333;
+    font-weight: 500;
   }
 
   .fc-button {
+    display: flex;
     background: white !important;
-    color: #666 !important;
     border: 1px solid #ddd !important;
-    border-radius: 6px !important;
-    padding: 0.4rem 0.8rem !important;
-    font-size: 0.9rem !important;
-    
+    border-radius: 4px !important;
+    padding: 0.4rem 0.6rem !important;
+    font-size: 0.8rem !important;
+
     &:hover {
-      background: #f8f8f8 !important;
-      border-color: #ccc !important;
+      border: 1px solid #ff9b62 !important;
+    }
+    
+    &:focus {
+      background: white !important;
+      border-color: #ddd !important;
+      box-shadow: none !important;
+      outline: none !important;
+      border: 1px solid #ff9b62 !important;
     }
     
     &:disabled {
       opacity: 0.4;
     }
-  }
-
-  .fc-button-primary:not(:disabled):active,
-  .fc-button-primary:not(:disabled).fc-button-active {
-    background: white !important;
-    color: #666 !important;
   }
 
   /* 요일 헤더 */
@@ -66,15 +62,12 @@ export const CalendarWrapper = styled.div`
     border-color: #e5e5e5 !important;
     padding: 1rem 0;
     font-weight: 500;
-    color: #666;
     font-size: 0.9rem;
   }
 
   /* 날짜 셀 */
   .fc-daygrid-day {
-    border-color: #e5e5e5 !important;
     cursor: pointer;
-    min-height: 120px;
     
     &:hover {
       background: #fafafa;
@@ -88,7 +81,6 @@ export const CalendarWrapper = styled.div`
   .fc-daygrid-day-number {
     padding: 0.6rem;
     font-size: 0.95rem;
-    color: #333;
     font-weight: 500;
   }
 
@@ -109,10 +101,6 @@ export const CalendarWrapper = styled.div`
     &:hover {
       opacity: 0.9;
     }
-  }
-
-  .fc-daygrid-event-harness {
-    margin-top: 2px;
   }
 
   /* 선택 영역 스타일 */
@@ -158,8 +146,6 @@ export const CellHighlighted = styled.div<{ isHighlighted?: boolean }>`
   padding: 1rem;
   font-size: 0.95rem;
   border: 1px solid #e7e8ea;
-  background: ${({ isHighlighted }) =>
-    isHighlighted ? "rgba(255,155,98,0.12)" : "white"};
   position: relative;
 `;
 
@@ -208,6 +194,7 @@ export const SaveBtn = styled.button`
   border: none;
   border-radius: 8px;
   cursor: pointer;
+  
   &:hover {
     background: #ff8640;
   }
