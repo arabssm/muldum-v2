@@ -151,3 +151,54 @@ export const TopWrapper = styled.div`
   display: flex;
   justify-content: space-between;
 `;
+
+export const ModalInner = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  width: 100%;
+`;
+
+export const ModalTitle = styled.h4`
+  font-size: 1.25rem;
+  line-height: 1.4;
+`;
+
+export const ModalInput = styled.input`
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid #e7e8ea;
+  border-radius: 4px;
+  outline: none;
+  font-size: 1rem;
+  color: #333;
+
+  ::placeholder {
+    color: #b2b2b2;
+  }
+`;
+
+export const Row = styled.div`
+  display: flex;
+  justify-content: end;
+  align-items: center;
+  width: 100%;
+`;
+
+export const SmallText = styled.div`
+  color: #b2b2b2;
+  font-size: 0.9rem;
+`;
+
+export const SaveBtn = styled.button`
+  padding: 0.6rem 1.25rem;
+  background: #ff9b62;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  
+  &:hover {
+    background: #ff8640;
+  }
+`;
