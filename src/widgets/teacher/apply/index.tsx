@@ -6,14 +6,14 @@ import { items } from "@/widgets/student/itemList/data";
 import { BtnPrimary, BtnSecondary } from "@/shared/ui/button";
 import Image from "next/image";
 
-type GroupType = "전공동아리" | "네트워크" | "자율동아리" | "졸업작품";
-type ClassType = "전체" | "1반" | "2반" | "3반" | "4반";
+type GroupType = "승인 가능 물품 조회" | "승인된 물품 조회" | "거절된 물품 조회";
+type ClassType = "전체" | "전공동아리" | "1반" | "2반" | "3반" | "4반";
 
-const Groups: GroupType[] = ["전공동아리", "네트워크", "자율동아리", "졸업작품"];
-const Classes: ClassType[] = ["전체", "1반", "2반", "3반", "4반"];
+const Groups: GroupType[] = ["승인 가능 물품 조회", "승인된 물품 조회", "거절된 물품 조회"];
+const Classes: ClassType[] = ["전체", "전공동아리", "1반", "2반", "3반", "4반"];
 
 export default function Apply() {
-    const [activeGroup, setActiveGroup] = useState<GroupType>("전공동아리");
+    const [activeGroup, setActiveGroup] = useState<GroupType>("승인 가능 물품 조회");
     const [activeClass, setActiveClass] = useState<ClassType>("전체");
     const [openIndex, setOpenIndex] = useState<number | null>(null);
     const [checked, setChecked] = useState<boolean[]>(() => items.map(() => false));
@@ -39,22 +39,29 @@ export default function Apply() {
                         </_.ClassText>
                     ))}
                 </_.Group>
-                <_.Group>
-                    {Classes.map(label => (
-                        <_.ClassText
-                            key={label}
-                            isActive={activeClass === label}
-                            onClick={() => setActiveClass(label)}
-                        >
-                            {label}
-                        </_.ClassText>
-                    ))}
-                </_.Group>
+                <_.TopWrapper>
+                    <_.Group>
+                        {Classes.map(label => (
+                            <_.ClassText
+                                key={label}
+                                isActive={activeClass === label}
+                                onClick={() => setActiveClass(label)}
+                            >
+                                {label}
+                            </_.ClassText>
+                        ))}
+                    </_.Group>
+                    <_.GrayBtn>n차 물품 열기</_.GrayBtn>
+                    <_.GrayBtn>승인 항목 다운로드</_.GrayBtn>
+                    <_.GrayBtn>전체선택</_.GrayBtn>
+                </_.TopWrapper>
             </_.Wrapper>
             <_.BtnGroup>
+                <Image src="assets/arrow.svg" alt="화살표" width={24} height={24} style={{ cursor: "pointer" }} />
                 <_.Btn>아라</_.Btn>
                 <_.Btn>인서트</_.Btn>
                 <_.Btn>테라</_.Btn>
+                <Image src="assets/arrow.svg" alt="화살표" width={24} height={24} style={{ transform: "rotate(180deg)", cursor: "pointer", display: "block", marginLeft: "auto" }} />
             </_.BtnGroup>
             <_.InfoContainer>
                 {items.map((item, index) => (

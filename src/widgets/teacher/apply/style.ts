@@ -6,7 +6,7 @@ export const Container = styled.div`
     flex-direction: column;
     width: 100%;
     padding: 1rem 0;
-    gap: 2.5rem;
+    gap: 3rem;
 `;
 
 export const Wrapper = styled.div`
@@ -19,12 +19,11 @@ export const Group = styled.div`
     display: flex;
     width: 100%;
     overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    padding-bottom: 0.5rem;
 `;
 
 export const BtnGroup = styled.div`
     display: flex;
+    align-items: center;
     gap: 1rem;
 `;
 
@@ -113,6 +112,20 @@ export const InfoGroup = styled.div`
   }
 `;
 
+export const GrayBtn = styled.button`
+  padding: 0;
+  width: 10rem;
+  color: #909090;
+  font-size: 0.95rem;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+
+  :hover {
+    color: #3F3F3F;
+  }
+`;
+
 export const Content = styled.div`
   display: block;
   font-size: 1rem;
@@ -132,4 +145,9 @@ export const BtnWrapper = styled.div`
   display: flex;
   justify-content: end;
   gap: 1rem;
+`;
+
+export const TopWrapper = styled.div`
+  display: flex;
+  justify-content: space-between;
 `;
