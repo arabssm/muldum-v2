@@ -14,6 +14,8 @@ export default function ItemForm({ handleSubmit }: ItemFormProps) {
     price, setPrice,
     link, setLink,
     reason, setReason,
+    drivePrice, setDrivePrice,
+    expectDrive, setExpectDrive,
     quantity, increase, decrease,
     errors, internalSubmit, handleSecondary
   } = useItemForm(handleSubmit);
@@ -47,10 +49,10 @@ export default function ItemForm({ handleSubmit }: ItemFormProps) {
           />
         </_.SelectWrapper>
       </_.SelectGroup>
-
       <_.Group>
         <FormInput label="구입할 물품" value={item} setValue={setItem} placeholder="구입할 물품을 입력하세요" width="40rem" error={errors.item} />
         <FormInput label="가격" value={price} setValue={setPrice} placeholder="가격을 입력하세요" width="10rem" error={errors.price} />
+        <FormInput label="배송비" value={drivePrice} setValue={setDrivePrice} placeholder="가격을 입력하세요" width="10rem" error={errors.drivePrice} />
         <_.Wrapper>
           <_.Title>수량</_.Title>
           <_.Number>
@@ -65,8 +67,10 @@ export default function ItemForm({ handleSubmit }: ItemFormProps) {
           </_.Number>
         </_.Wrapper>
       </_.Group>
-
-      <FormInput label="물품링크" value={link} setValue={setLink} placeholder="링크를 입력하세요" width="62rem" error={errors.link} />
+      <_.Group>
+        <FormInput label="물품링크" value={link} setValue={setLink} placeholder="링크를 입력하세요" width="62rem" error={errors.link} />
+        <FormInput label="예상 도착 시간" value={expectDrive} setValue={setExpectDrive} placeholder="예상 도착 시간을 입력하세요" width="15rem" error={errors.expectDrive} />
+      </_.Group>
       <FormInput label="신청사유" value={reason} setValue={setReason} placeholder="신청 사유를 10자 이상 입력해주세요" width="100%" height="20vh" error={errors.reason} />
       <_.BtnGroup>
         <BtnSecondary onClick={handleSecondary}>신청내역 보러가기</BtnSecondary>

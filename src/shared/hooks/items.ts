@@ -6,6 +6,8 @@ export function useItemForm(handleSubmit?: ItemFormProps["handleSubmit"]) {
   const router = useRouter();
   const [item, setItem] = useState("");
   const [price, setPrice] = useState("");
+  const [drivePrice, setDrivePrice] = useState(""); 
+  const [expectDrive, setExpectDrive] = useState("");
   const [link, setLink] = useState("");
   const [reason, setReason] = useState("");
   const [quantity, setQuantity] = useState(1);
@@ -18,7 +20,9 @@ export function useItemForm(handleSubmit?: ItemFormProps["handleSubmit"]) {
     const newErrors: { [key: string]: string } = {};
     if (!item) newErrors.item = "물품명을 입력해주세요";
     if (!price) newErrors.price = "가격을 입력해주세요";
+    if (!drivePrice) newErrors.drivePrice = "배송비를 입력해주세요";
     if (!link) newErrors.link = "링크를 입력해주세요";
+    if (!expectDrive) newErrors.expectDrive = "예상 도착 시간을 입력해주세요";
     if (!reason || reason.length < 10) newErrors.reason = "10자 이상 입력해주세요";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -26,8 +30,16 @@ export function useItemForm(handleSubmit?: ItemFormProps["handleSubmit"]) {
 
   const internalSubmit = () => {
     if (!validate()) return;
-    handleSubmit?.({ item, price, link, reason, quantity });
-    alert("신청이 완료되었습니다 ✅");
+    handleSubmit?.({
+      item,
+      price,
+      drivePrice,
+      link,
+      reason,
+      expectDrive,
+      quantity,
+    });
+    alert("신청이 완료되었습니다");
   };
 
   const handleSecondary = () => router.push("/itemList");
@@ -37,10 +49,14 @@ export function useItemForm(handleSubmit?: ItemFormProps["handleSubmit"]) {
     setItem,
     price,
     setPrice,
+    drivePrice,
+    setDrivePrice,
     link,
     setLink,
     reason,
     setReason,
+    expectDrive,
+    setExpectDrive,
     quantity,
     increase,
     decrease,
