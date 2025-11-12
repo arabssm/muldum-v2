@@ -6,7 +6,7 @@ export default function SliderSkeleton() {
   return (
     <div style={{ position: 'relative', width: '100%', height: '24vh' }}>
       <div style={{ position: 'relative', width: '100%', height: '100%' }}>
-        <Skeleton height="24vh" borderRadius="3.2px" />
+        <Skeleton height="24vh" borderRadius="4px" />
         
         <div style={{
           position: 'absolute',
@@ -14,8 +14,8 @@ export default function SliderSkeleton() {
           left: 0,
           right: 0,
           bottom: 0,
-          background: 'linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.7))',
-          borderRadius: '3.2px'
+          background: 'rgba(70, 70, 70, 0.4)',
+          borderRadius: '4px'
         }} />
         
         <div style={{

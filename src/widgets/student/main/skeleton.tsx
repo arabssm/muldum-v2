@@ -6,7 +6,7 @@ export default function MainSkeleton() {
     return (
         <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', rowGap: '2rem' }}>
             <div>
-                <Skeleton height="24vh" borderRadius="3.2px" />
+                <Skeleton height="24vh" borderRadius="4px" />
             </div>
             
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -59,14 +59,11 @@ export default function MainSkeleton() {
                                     alignItems: 'center',
                                     padding: '0.6rem 1.2rem',
                                     borderRadius: '10rem',
-                                    color: '#fff',
-                                    backgroundColor: index === 0 ? '#FF9B62' : '#D1D1D1'
+                                    backgroundColor: '#f0f0f0'
                                 }}>
-                                    <Skeleton width="30px" height="16px" />
+                                    <Skeleton width="30px" height="16px" borderRadius="4px" />
                                 </div>
-                                <div style={{ fontSize: '1.25rem' }}>
-                                    <Skeleton width="200px" height="20px" />
-                                </div>
+                                <Skeleton width="200px" height="20px" borderRadius="4px" />
                             </div>
                         ))}
                     </div>
