@@ -10,7 +10,7 @@ const NextArrow = (props: any) => {
   const { onClick } = props;
   return (
     <_.ArrowButton className="next-arrow" onClick={onClick}>
-      <Image src="/assets/arrow.svg" alt="Next" width={24} height={24}  style={{ transform: "rotate(180deg)", opacity: 0.5, filter: "invert(1) brightness(100%)" }} />
+      <Image src="/assets/Warrow.svg" alt="Next" width={24} height={24}  style={{ transform: "rotate(180deg)", opacity: 0.5 }} />
     </_.ArrowButton>
   );
 };
@@ -19,7 +19,7 @@ const PrevArrow = (props: any) => {
   const { onClick } = props;
   return (
     <_.ArrowButton className="prev-arrow" onClick={onClick}>
-      <Image src="/assets/arrow.svg" alt="Next" width={24} height={24} style={{ opacity: 0.5,  filter: "invert(1) brightness(100%)" }} />
+      <Image src="/assets/Warrow.svg" alt="Next" width={24} height={24} style={{ opacity: 0.5 }} />
     </_.ArrowButton>
   );
 };
