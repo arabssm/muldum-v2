@@ -1,6 +1,6 @@
 import * as _ from './style';
-import Team from '@/widgets/student/team';
 import { useState } from 'react';
+import MonthCheck from '@/widgets/teacher/monthCheck';
 
 type ItemType = "월말평가" | "학생추가";
 
@@ -22,7 +22,7 @@ export default function Tteamspace() {
                 ))}
             </_.TabWrapper>
 
-            {activeGroup === "월말평가" && <Team />}
+            {activeGroup === "월말평가" && <MonthCheck />}
             {activeGroup === "학생추가" && <div>학생 추가 화면 내용</div>}
         </_.Container>
     );
