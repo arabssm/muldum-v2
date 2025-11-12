@@ -87,7 +87,6 @@ export default function Calendar() {
                     dayHeaderFormat={{ weekday: 'long' }}
                     height="70vh"
                     eventDisplay="block"
-                    backgroundColor="white"
                 />
             </_.CalendarWrapper>
 
