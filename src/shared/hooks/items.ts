@@ -22,7 +22,7 @@ export function useItemForm(handleSubmit?: ItemFormProps["handleSubmit"]) {
     if (!price) newErrors.price = "가격을 입력해주세요";
     if (!drivePrice) newErrors.drivePrice = "배송비를 입력해주세요";
     if (!link) newErrors.link = "링크를 입력해주세요";
-    if (!expectDrive) newErrors.expectDrive = "예상 도착 시간을 입력해주세요";
+    if (!expectDrive) newErrors.expectDrive = "예상 도착일을 입력해주세요";
     if (!reason || reason.length < 10) newErrors.reason = "10자 이상 입력해주세요";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
