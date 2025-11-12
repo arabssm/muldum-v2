@@ -4,14 +4,14 @@ export const Container = styled.div`
     display: flex;
     flex-wrap: wrap;
     gap: 2rem;
-    justify-content: flex-start;
+    justify-content: space-between;
     white-space: normal;
     row-gap: 2rem;
 `;
 
 export const Item = styled.div`
     display: flex;
-    flex: 0 0 31.8%;
+    flex: 0 0 31%;
     padding: 3rem;
     border-radius: 1rem;
     justify-content: center;
@@ -19,7 +19,6 @@ export const Item = styled.div`
     row-gap: 0.8rem;
     background-color: #FAFAFA;
     cursor: auto;
-    /* cursor: pointer; */
 
     &:hover{
         background-color: #F1F1F1;

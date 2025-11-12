@@ -45,10 +45,9 @@ export const CalendarWrapper = styled.div`
     
     &:focus {
       background: white !important;
-      border-color: #ddd !important;
+      border-color: #ff9b62 !important;
       box-shadow: none !important;
       outline: none !important;
-      border: 1px solid #ff9b62 !important;
     }
     
     &:disabled {
@@ -59,7 +58,7 @@ export const CalendarWrapper = styled.div`
   /* 요일 헤더 */
   .fc-col-header-cell {
     background: white !important;
-    border-color: #e5e5e5 !important;
+
     padding: 1rem 0;
     font-weight: 500;
     font-size: 0.9rem;
@@ -119,7 +118,6 @@ export const HeaderRow = styled.div`
   grid-template-columns: repeat(7, 1fr);
   flex-shrink: 0;
   background-color: #fafafa;
-  border: 1px solid #e7e8ea;
   height: 8%;
 `;
 
@@ -145,7 +143,6 @@ export const CellHighlighted = styled.div<{ isHighlighted?: boolean }>`
   align-items: flex-start;
   padding: 1rem;
   font-size: 0.95rem;
-  border: 1px solid #e7e8ea;
   position: relative;
 `;
 
