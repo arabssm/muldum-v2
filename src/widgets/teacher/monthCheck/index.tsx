@@ -27,10 +27,6 @@ export default function MonthCheck() {
 
     return (
         <_.Container>
-            <_.Group>
-                <_.Title>월말평가</_.Title>
-                <_.SubTitle>클릭하면 월말평가 채점 페이지로 이동합니다</_.SubTitle>
-            </_.Group>
             <_.BtnWrapper>
                 <_.Btn>전체</_.Btn>
                 <_.Btn>이전 월말평가 조회</_.Btn>
@@ -72,6 +68,7 @@ export default function MonthCheck() {
                             alignItems: "center",
                             marginBottom: "0.5rem",
                             cursor: "pointer",
+                            gap: "0.5rem"
                         }}
                         onClick={(e) => handleCheckboxClick(index, e)}
                     >
@@ -82,10 +79,9 @@ export default function MonthCheck() {
                             height={20}
                             style={{ marginRight: "0.5rem" }}
                         />
-                        <span
-                            onClick={() => router.push('/monthWatch')}
-                            style={{ cursor: "pointer" }}
-                        >{month} 월말평가</span>
+                        <span>{month} 월말평가</span>
+                        <_.Gray onClick={() => router.push('/monthWatch')}
+                            style={{ cursor: "pointer" }}> 클릭하여 보기 </_.Gray>
                     </div>
                 ))}
             </_.Wrapper>

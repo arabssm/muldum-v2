@@ -3,7 +3,7 @@
 import * as _ from './style';
 import { majorClubs, freeClubs } from './data';
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import TeamSkeleton from './skeleton';
 
 type GroupType = "전공동아리" | "네트워크" | "자율동아리" | "졸업작품";
@@ -14,6 +14,7 @@ const Classes: ClassType[] = ["전체", "1반", "2반", "3반", "4반"];
 
 export default function Team() {
     const router = useRouter();
+    const pathname = usePathname();
     const [activeGroup, setActiveGroup] = useState<GroupType>("전공동아리");
     const [activeClass, setActiveClass] = useState<ClassType>("전체");
     const [isLoading, setIsLoading] = useState(true);
@@ -21,11 +22,7 @@ export default function Team() {
 
     useEffect(() => {
         setIsMounted(true);
-
-        const timer = setTimeout(() => {
-            setIsLoading(false);
-        }, 1500);
-
+        const timer = setTimeout(() => setIsLoading(false), 1500);
         return () => clearTimeout(timer);
     }, []);
 
@@ -41,9 +38,7 @@ export default function Team() {
             ? clubs
             : clubs.filter((club) => club.class === activeClass);
 
-    if (!isMounted) {
-        return null;
-    }
+    if (!isMounted) return null;
 
     return (
         <_.Container>
@@ -59,19 +54,20 @@ export default function Team() {
                         </_.ClassText>
                     ))}
                 </_.Group>
-                <_.Group>
-                    {Classes.map((label) => (
-                        <_.ClassText
-                            key={label}
-                            isActive={activeClass === label}
-                            onClick={() => setActiveClass(label)}
-                        >
-                            {label}
-                        </_.ClassText>
-                    ))}
-                </_.Group>
+                {pathname === "/team" && (
+                    <_.Group>
+                        {Classes.map((label) => (
+                            <_.ClassText
+                                key={label}
+                                isActive={activeClass === label}
+                                onClick={() => setActiveClass(label)}
+                            >
+                                {label}
+                            </_.ClassText>
+                        ))}
+                    </_.Group>
+                )}
             </_.Wrapper>
-
             {isLoading ? (
                 <TeamSkeleton />
             ) : (

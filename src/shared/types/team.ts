@@ -37,3 +37,8 @@ export interface FormSectionProps {
   isTextarea?: boolean;
   must?: boolean; 
 }
+
+export type Team = {
+    teamName: string;
+    members: string;
+};

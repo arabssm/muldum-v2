@@ -81,3 +81,8 @@ export const BtnGroup = styled.div`
     justify-content: end;
     gap: 1.25rem;
 `;
+
+export const Gray = styled.div`
+    color: #B2B2B2;
+    margin-left: 0.5rem;
+`;
