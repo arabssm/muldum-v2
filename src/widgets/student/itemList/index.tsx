@@ -89,8 +89,11 @@ export default function ItemList() {
                             {openIndex === index && (
                                 <_.Group>
                                     <_.Content>{item.link}</_.Content>
+                                    <_.Content>가격 : {item.price}원</_.Content>
                                     <_.Content>{item.quantity}개</_.Content>
                                     <_.Content>{item.reason}</_.Content>
+                                    <_.Content>{item.export}</_.Content>
+                                    <_.Content>배송비 : {item.money}원</_.Content>
                                     {item.state === "승인 거부" && (
                                         <_.Reapply onClick={() => router.push("/reapply")}>
                                             재신청하기
