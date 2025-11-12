@@ -10,7 +10,7 @@ function ActionButtons() {
   const router = useRouter();
   const pathname = usePathname();
 
-  if (pathname === "/MonthlyTest") {
+  if (pathname.startsWith("/team/")) {
     return (
       <_.BtnGroup>
         <BtnSecondary onClick={() => router.push('/MonthlyList')}>이때동안 작성한 월말평가 보러가기</BtnSecondary>
