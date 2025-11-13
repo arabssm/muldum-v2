@@ -151,11 +151,18 @@ export const HeaderSection = styled.div`
   padding: 4rem 3rem 2rem 3rem;
 `;
 
-export const Title = styled.div`
+export const Title = styled.input`
   font-size: 1.7rem;
   font-weight: 700;
   outline: none;
+  border: none;
+  background: transparent;
+  margin-top: 0.65rem;
   cursor: text;
+
+  &::placeholder {
+    color: #bbb;
+  }
 `;
 
 export const EditorWrapper = styled.div`

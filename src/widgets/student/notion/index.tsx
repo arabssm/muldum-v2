@@ -61,7 +61,6 @@ export default function Notion() {
                                 </label>
                             </_.CoverPlaceholder>
                         )}
-
                         <input
                             id="cover-upload"
                             type="file"
@@ -117,14 +116,11 @@ export default function Notion() {
                 </_.CoverContainer>
                 <_.HeaderSection>
                     <_.Title
-                        contentEditable
-                        suppressContentEditableWarning
-                        onInput={(e) =>
-                            setTitle(e.currentTarget.textContent || "")
-                        }
-                    >
-                        {title}
-                    </_.Title>
+                        type="text"
+                        value={title}
+                        onChange={(e) => setTitle(e.target.value)}
+                        placeholder="동아리 이름을 입력하세요"
+                    />
                 </_.HeaderSection>
                 <_.EditorWrapper>
                     <BlockNoteEditor
