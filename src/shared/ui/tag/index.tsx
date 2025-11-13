@@ -28,7 +28,50 @@ const BlockNoteEditor = dynamic(
                 return () => unsubscribe();
             }, [editor, onChange]);
 
-            return <BlockNoteView editor={editor} theme="light" />;
+            return (
+                <>
+                    <style jsx global>{`
+            .bn-button[data-selected="true"] {
+              background-color: #d9d9d9 !important;
+            }
+
+            .bn-button[data-selected="true"]:hover {
+              background-color: #e4e4e4 !important;
+            }
+
+            .bn-button:not([data-selected="true"]) {
+              background-color: transparent;
+              color: inherit;
+            }
+
+            .bn-button {
+              border-radius: 6px;
+              transition: background-color 0.2s ease;
+            }
+
+            .bn-code {
+              background-color: #f2f2f2 !important;
+              border: 1px solid #e0e0e0;
+              border-radius: 4px;
+              font-size: 1rem;
+              line-height: 1.6;
+              overflow-x: auto;
+            }
+
+            .bn-code code {
+              background: none !important;
+              color: inherit;
+            }
+
+            .bn-code:focus-within {
+              border-color: #c6c6c6;
+              box-shadow: 0 0 0 1px #c6c6c6;
+            }
+          `}</style>
+
+                    <BlockNoteView editor={editor} theme="light" />
+                </>
+            );
         };
     },
     { ssr: false }
