@@ -37,31 +37,32 @@ export default function Notion() {
     };
 
     const handleSave = () => {
-        alert('저장되었습니다');
+        alert("저장되었습니다");
     };
 
     return (
         <_.Container>
             <_.Page>
-                <_.Cover>
-                    {cover ? (
-                        <img src={cover} alt="cover" />
-                    ) : (
-                        <_.CoverPlaceholder>
-                            <label htmlFor="cover-upload">
-                                <span>커버 추가</span>
-                            </label>
-                            <input
-                                id="cover-upload"
-                                type="file"
-                                accept="image/*"
-                                onChange={handleCoverChange}
-                                hidden
-                            />
-                        </_.CoverPlaceholder>
-                    )}
-                </_.Cover>
-                <_.HeaderSection>
+                <_.CoverContainer>
+                    <_.Cover>
+                        {cover ? (
+                            <img src={cover} alt="cover" />
+                        ) : (
+                            <_.CoverPlaceholder>
+                                <label htmlFor="cover-upload">
+                                    <span>커버 추가</span>
+                                </label>
+                                <input
+                                    id="cover-upload"
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={handleCoverChange}
+                                    hidden
+                                />
+                            </_.CoverPlaceholder>
+                        )}
+                    </_.Cover>
+
                     <_.IconWrapper>
                         {icon.startsWith("data:image") ? (
                             <_.IconImageWrapper>
@@ -106,6 +107,8 @@ export default function Notion() {
                             onChange={handleIconImage}
                         />
                     </_.IconWrapper>
+                </_.CoverContainer>
+                <_.HeaderSection>
                     <_.Title
                         contentEditable
                         suppressContentEditableWarning
