@@ -21,6 +21,12 @@ export default function TopAppBar() {
 
   const { Modal, openModal } = useModal();
 
+  const isActive = (path: string) => {
+    if (path === '/') {
+      return pathname === '/';
+    }
+    return pathname.startsWith(path);
+  };
 
   return (
     <_.Container>
@@ -36,7 +42,7 @@ export default function TopAppBar() {
                 priority
               />
             ) : (
-              <_.Text as="span" isActive={pathname === item.path}>
+              <_.Text as="span" isActive={isActive(item.path)}>
                 {item.label}
               </_.Text>
             )}
