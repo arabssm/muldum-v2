@@ -148,7 +148,7 @@ export const ImageLabel = styled.label`
 export const HeaderSection = styled.div`
   display: flex;
   flex-direction: column;
-  padding: 4rem 3rem 2rem 3rem;
+  padding: 3rem 3rem 1.5rem 3rem;
 `;
 
 export const Title = styled.input`
