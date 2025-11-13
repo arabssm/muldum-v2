@@ -21,7 +21,7 @@ export const CoverContainer = styled.div`
 
 export const Cover = styled.div`
   width: 100%;
-  height: 15vh;
+  height: 20vh;
   background: #fafafa;
   overflow: hidden;
   position: relative;

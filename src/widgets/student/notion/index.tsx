@@ -46,23 +46,30 @@ export default function Notion() {
                 <_.CoverContainer>
                     <_.Cover>
                         {cover ? (
-                            <img src={cover} alt="cover" />
+                            <label htmlFor="cover-upload">
+                                <img
+                                    src={cover}
+                                    alt="cover"
+                                    style={{ cursor: "pointer" }}
+                                    title="클릭하여 커버 변경"
+                                />
+                            </label>
                         ) : (
                             <_.CoverPlaceholder>
                                 <label htmlFor="cover-upload">
                                     <span>커버 추가</span>
                                 </label>
-                                <input
-                                    id="cover-upload"
-                                    type="file"
-                                    accept="image/*"
-                                    onChange={handleCoverChange}
-                                    hidden
-                                />
                             </_.CoverPlaceholder>
                         )}
-                    </_.Cover>
 
+                        <input
+                            id="cover-upload"
+                            type="file"
+                            accept="image/*"
+                            onChange={handleCoverChange}
+                            hidden
+                        />
+                    </_.Cover>
                     <_.IconWrapper>
                         {icon.startsWith("data:image") ? (
                             <_.IconImageWrapper>
