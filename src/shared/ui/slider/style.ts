@@ -36,6 +36,7 @@ export const StyledSlider = styled(Slider)`
 `;
 
 export const CalendarContainer = styled.div`
+  display: flex;
   width: 100%;
   margin-left: auto;
 `;
@@ -51,6 +52,7 @@ export const SlideWrapper = styled.div`
 `;
 
 export const Overlay = styled.div`
+    display: flex;
     position: absolute;
     inset: 0;
     background: rgba(70, 70, 70, 0.4);
@@ -58,6 +60,7 @@ export const Overlay = styled.div`
 `;
 
 export const Legendimg = styled.img`
+    display: flex;
     position: absolute;
     inset: 0;
     width: 100%;
@@ -66,6 +69,7 @@ export const Legendimg = styled.img`
 `;
 
 export const Title = styled.div`
+    display: flex;
     position: absolute;
     font-size: 2.5rem;
     font-weight: 500;
@@ -76,6 +80,7 @@ export const Title = styled.div`
 `;
 
 export const SubTitle = styled.div`
+    display: flex;
     font-size: 1.5rem;
     position: absolute;
     font-weight: 400;
@@ -95,6 +100,7 @@ export const Date = styled.div`
 `;
 
 export const Ddate = styled.div`
+    display: flex;
     position: absolute;
     font-size: 5rem; 
     font-weight: 600;
@@ -104,6 +110,7 @@ export const Ddate = styled.div`
 `;
 
 export const Index = styled.div`
+    display: flex;
     position: absolute;
     left: 97%;
     top: 85%;
@@ -111,6 +118,7 @@ export const Index = styled.div`
 `;
 
 export const ArrowButton = styled.button`
+    display: flex;
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
