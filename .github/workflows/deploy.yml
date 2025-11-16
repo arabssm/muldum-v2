@@ -21,9 +21,14 @@ jobs:
           node-version: 20
           cache: yarn
 
-      - name: Restore .env file
+      - name: Create .env file
         run: |
-          echo "${{ secrets.ENV_FILE }}" > .env
+          cat > .env << EOF
+          NEXT_PUBLIC_API_BASE_URL=https://backend.muldum.com
+          NEXT_PUBLIC_GOOGLE_CLIENT_ID=179606511270-u2gg8l9h1k261m3ienmgek6diogtflol.apps.googleusercontent.com
+          NEXT_REDIRECT_URI=http://localhost:3000/google/login
+          NEXT_PUBLIC_SENTRY_DSN=https://ea29e317a1cb0b75266baff6167669c4@o4510338415722496.ingest.s.sentry.io/4510338418933760
+          EOF
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile --production=false
