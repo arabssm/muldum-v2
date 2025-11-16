@@ -4,43 +4,28 @@ import * as _ from "./style";
 import Image from "next/image";
 import Link from "next/link";
 import Pagination from "@/components/pagination";
-import { NoticeData } from "@/widgets/student/main/data";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import NoticeSkeleton from "./skeleton";
+import useNotices from "@/shared/hooks/useNotices";
 
 export default function Notice() {
+    const { notices, isLoading } = useNotices();
     const [page, setPage] = useState(1);
-    const [isLoading, setIsLoading] = useState(true);
-    const [isMounted, setIsMounted] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
 
-    const filteredNotices = NoticeData.filter((item) =>
-        item.notice.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    const filteredNotices = Array.isArray(notices)
+        ? notices.filter((item) =>
+            item.notice.toLowerCase().includes(searchQuery.toLowerCase())
+        )
+        : [];
 
     const totalPages = Math.ceil(filteredNotices.length / 10);
-    const handlePageChange = (newPage: number) => {
-        setPage(newPage);
-    };
 
+    const handlePageChange = (newPage: number) => setPage(newPage);
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setSearchQuery(e.target.value);
         setPage(1);
     };
-
-    useEffect(() => {
-        setIsMounted(true);
-
-        const timer = setTimeout(() => {
-            setIsLoading(false);
-        }, 1500);
-
-        return () => clearTimeout(timer);
-    }, []);
-
-    if (!isMounted) {
-        return null;
-    }
 
     return (
         <_.Container>
@@ -56,6 +41,7 @@ export default function Notice() {
                     />
                 </_.SearchWrapper>
             </_.Group>
+
             {isLoading ? (
                 <NoticeSkeleton />
             ) : (
@@ -78,18 +64,21 @@ export default function Notice() {
                                 </Link>
                             ))
                         ) : (
-                            <div style={{
-                                display: 'flex',
-                                height: '65vh',
-                                justifyContent: 'center',
-                                alignItems: 'center',
-                                fontSize: '1rem',
-                                color: '#B2B2B2'
-                            }}>
+                            <div
+                                style={{
+                                    display: "flex",
+                                    height: "65vh",
+                                    justifyContent: "center",
+                                    alignItems: "center",
+                                    fontSize: "1rem",
+                                    color: "#B2B2B2",
+                                }}
+                            >
                                 검색 결과가 없습니다.
                             </div>
                         )}
                     </_.NoticeContainer>
+
                     {filteredNotices.length > 0 && (
                         <Pagination
                             currentPage={page}
