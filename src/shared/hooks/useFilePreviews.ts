@@ -1,8 +1,12 @@
+// hooks/useNoticeWrite.ts
+'use client';
+
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { createNoticeGeneral } from '@/shared/api/admin/notice';
 
 export type Preview = { file: File; url: string };
 
-export default function useFilePreviews() {
+export function useNoticeWrite() {
     const [files, setFiles] = useState<Preview[]>([]);
     const fileInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -18,13 +22,9 @@ export default function useFilePreviews() {
         handleFiles(dropped);
     }, [handleFiles]);
 
-    const onDragOver = useCallback((e: React.DragEvent) => {
-        e.preventDefault();
-    }, []);
+    const onDragOver = useCallback((e: React.DragEvent) => e.preventDefault(), []);
 
-    const onClickDrop = () => {
-        fileInputRef.current?.click();
-    };
+    const onClickDrop = () => fileInputRef.current?.click();
 
     const onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const chosen = Array.from(e.target.files || []);
@@ -47,15 +47,37 @@ export default function useFilePreviews() {
         };
     }, [files]);
 
+    const editorRef = useRef<any>(null);
+    const getContent = () => editorRef.current?.getContent?.() || '';
+
+    const [title, setTitle] = useState('');
+    const [deadlineDate, setDeadlineDate] = useState('');
+
+    const handleSubmit = async () => {
+        try {
+            const payloadFiles = files.map(f => ({ name: f.file.name, url: f.url }));
+            const content = getContent();
+
+            await createNoticeGeneral(title, content, payloadFiles, deadlineDate);
+        } catch (err) {
+        }
+    };
+
     return {
         files,
         fileInputRef,
-        handleFiles,
         onDrop,
         onDragOver,
         onClickDrop,
         onInputChange,
         removeAt,
         setFiles,
+        editorRef,
+        getContent,
+        title,
+        setTitle,
+        deadlineDate,
+        setDeadlineDate,
+        handleSubmit,
     } as const;
 }

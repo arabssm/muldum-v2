@@ -1,7 +1,7 @@
 import axios, { AxiosError, AxiosRequestConfig, AxiosRequestHeaders } from 'axios';
 import { getCookie, setCookie, deleteCookie } from './cookieUtils';
 
-const API_BASE_URL = process.env.NEXT_API_URL;
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 const axiosInstance = axios.create({
     baseURL: API_BASE_URL,
