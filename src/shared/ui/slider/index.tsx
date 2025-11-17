@@ -6,14 +6,19 @@ import "slick-carousel/slick/slick-theme.css";
 import * as _ from "./style";
 import sliderSettings from "./Setting";
 import Link from "next/link";
-import { useState, useEffect } from "react";
-import { getNotices } from "@/shared/api/admin/notice";
+import useNotices from "@/shared/hooks/useBanner";
 
 const NextArrow = (props: any) => {
   const { onClick } = props;
   return (
     <_.ArrowButton className="next-arrow" onClick={onClick}>
-      <Image src="/assets/Warrow.svg" alt="Next" width={24} height={24} style={{ transform: "rotate(180deg)", opacity: 0.5 }} />
+      <Image
+        src="/assets/Warrow.svg"
+        alt="Next"
+        width={24}
+        height={24}
+        style={{ transform: "rotate(180deg)", opacity: 0.5 }}
+      />
     </_.ArrowButton>
   );
 };
@@ -28,17 +33,7 @@ const PrevArrow = (props: any) => {
 };
 
 export default function SliderComponent() {
-  const [notices, setNotices] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    (async () => {
-      const res = await getNotices();
-      const arr = Array.isArray(res) ? res : res.data ?? [];
-      setNotices(arr);
-      setIsLoading(false);
-    })();
-  }, []);
+  const { notices, isLoading } = useNotices();
 
   const settings = {
     ...sliderSettings,
@@ -68,7 +63,7 @@ export default function SliderComponent() {
     <_.Container>
       <_.StyledSlider {...settings}>
         {notices.map((item, index) => (
-          <Link key={item.path || index} href={item.path || `/notice/${index + 1}`}>
+          <Link key={item.id} href={item.path}>
             <_.SlideWrapper>
               <Image
                 src={"/assets/basicBG.svg"}
@@ -79,9 +74,10 @@ export default function SliderComponent() {
               />
               <_.Overlay />
               <_.Title>{item.notice}</_.Title>
-              <_.Date>{item.date}</_.Date>
-              {item.subtitle && <_.SubTitle>{item.subtitle}</_.SubTitle>}
-              {item.dDay && <_.Ddate>{item.dDay}</_.Ddate>}
+              <_.Date>
+                {item.date}
+              </_.Date>
+              <_.SubTitle>{item.teacher}</_.SubTitle>
               <_.Index>
                 {index + 1}/{notices.length}
               </_.Index>
