@@ -12,3 +12,13 @@ export interface Notice {
   type: string;
   badge: string;
 }
+
+export interface NoticeDetail {
+  id: number;
+  title: string;
+  content: string;
+  files?: { url: string }[];
+  teacher?: string;
+  deadlineDate?: string;
+  updatedAt?: string;
+}
