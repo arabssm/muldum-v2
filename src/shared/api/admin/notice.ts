@@ -16,3 +16,8 @@ export const createNoticeGeneral = async (
   if (status < 200 || status >= 300) throw new Error(`업로드 실패 (status: ${status})`);
   return data;
 };
+
+export const getNoticeDetail = async (notice_id: string) => {
+  const res = await axiosInstance.get(`/api/ara/notice/${notice_id}`);
+  return res.data;
+};

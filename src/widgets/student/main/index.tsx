@@ -2,35 +2,15 @@
 
 import * as _ from "./style";
 import Link from "next/link";
-import { Menu } from "./data";
 import { useRouter } from "next/navigation";
 import Slider from "@/shared/ui/slider";
-import { useState, useEffect } from "react";
 import MainSkeleton from "./skeleton";
-import { getNotices } from "@/shared/api/admin/notice";
+import { Menu } from "./data";
+import useNotices from "@/shared/hooks/useNotices";
 
 export default function Main() {
     const router = useRouter();
-    const [isLoading, setIsLoading] = useState(true);
-    const [isMounted, setIsMounted] = useState(false);
-    const [notices, setNotices] = useState<any[]>([]);
-
-    useEffect(() => {
-        setIsMounted(true);
-
-        const fetchNotices = async () => {
-            try {
-                const res = await getNotices();
-                const arr = Array.isArray(res) ? res : res.data ?? [];
-                setNotices(arr);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-        fetchNotices();
-    }, []);
-
-    if (!isMounted) return null;
+    const { notices, isLoading } = useNotices();
 
     return (
         <_.Container>
@@ -65,11 +45,9 @@ export default function Main() {
                                     notices.map((item) => (
                                         <Link key={item.path} href={item.path}>
                                             <_.NoticeGroup>
-                                                {item.type === "new" ? (
-                                                    <_.Badge bgColor="#FF9B62">{item.badge}</_.Badge>
-                                                ) : (
-                                                    <_.Badge bgColor="#D1D1D1">{item.badge}</_.Badge>
-                                                )}
+                                                <_.Badge bgColor={item.type === "new" ? "#FF9B62" : "#D1D1D1"}>
+                                                    {item.badge}
+                                                </_.Badge>
                                                 <_.Notice>{item.notice}</_.Notice>
                                             </_.NoticeGroup>
                                         </Link>

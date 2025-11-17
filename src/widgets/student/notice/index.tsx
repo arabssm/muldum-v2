@@ -20,6 +20,8 @@ export default function Notice() {
         : [];
 
     const totalPages = Math.ceil(filteredNotices.length / 10);
+    const start = (page - 1) * 10;
+    const paginated = filteredNotices.slice(start, start + 10);
 
     const handlePageChange = (newPage: number) => setPage(newPage);
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -31,6 +33,7 @@ export default function Notice() {
         <_.Container>
             <_.Group>
                 <_.Title>공지사항</_.Title>
+
                 <_.SearchWrapper>
                     <Image src="/assets/search.svg" alt="search" width={18} height={18} />
                     <input
@@ -41,15 +44,14 @@ export default function Notice() {
                     />
                 </_.SearchWrapper>
             </_.Group>
-
             {isLoading ? (
                 <NoticeSkeleton />
             ) : (
                 <>
                     <_.NoticeContainer>
-                        {filteredNotices.length > 0 ? (
-                            filteredNotices.map((item) => (
-                                <Link key={item.path} href={item.path}>
+                        {paginated.length > 0 ? (
+                            paginated.map((item) => (
+                                <Link key={item.id} href={item.path}>
                                     <_.NoticeGroup>
                                         <_.NoticeWrapper>
                                             {item.type === "new" ? (

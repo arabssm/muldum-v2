@@ -4,9 +4,21 @@ export type FilePayload = {
 };
 
 export interface Notice {
+  id: number;
   notice: string;
+  date: string;
+  teacher: string;
+  path: string;
   type: string;
   badge: string;
-  date: string;
-  path: string;
+}
+
+export interface NoticeDetail {
+  id: number;
+  title: string;
+  content: string;
+  files?: { url: string }[];
+  teacher?: string;
+  deadlineDate?: string;
+  updatedAt?: string;
 }
