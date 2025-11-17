@@ -11,7 +11,20 @@ export default function useNotices() {
   useEffect(() => {
     getNotices()
       .then((res) => {
-        const arr = Array.isArray(res) ? res : res.data ?? [];
+        const data = res?.data ?? res;
+
+        const arr = Array.isArray(data?.content)
+          ? data.content.map((item: any) => ({
+            id: item.id,
+            notice: item.title,
+            date: item.updatedAt.slice(0, 10),
+            teacher: item.teacher,
+            path: `/notice/${item.id}`,
+            type: "normal",
+            badge: "공지",
+          }))
+          : [];
+
         setNotices(arr);
       })
       .catch((err) => console.error("공지 불러오기 실패:", err))

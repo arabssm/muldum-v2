@@ -4,9 +4,11 @@ export type FilePayload = {
 };
 
 export interface Notice {
+  id: number;
   notice: string;
+  date: string;
+  teacher: string;
+  path: string;
   type: string;
   badge: string;
-  date: string;
-  path: string;
 }
