@@ -4,8 +4,6 @@ import Image from "next/image";
 import Link from "next/link";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import Skeleton from "react-loading-skeleton";
-import "react-loading-skeleton/dist/skeleton.css";
 import * as _ from "./style";
 import sliderSettings from "./Setting";
 import { useQuery } from "@tanstack/react-query";
@@ -47,7 +45,7 @@ function useNoticesQuery() {
 }
 
 export default function SliderComponent() {
-  const { data, isLoading } = useNoticesQuery();
+  const { data } = useNoticesQuery();
 
   const notices: Notice[] = (data?.content ?? []).map((item: any) => ({
     id: item.id,
@@ -62,18 +60,6 @@ export default function SliderComponent() {
     nextArrow: <NextArrow />,
     prevArrow: <PrevArrow />,
   };
-
-  if (isLoading) {
-    return (
-      <_.Container>
-        <div style={{ display: "flex", gap: "1rem", padding: "2rem 0" }}>
-          {Array.from({ length: 3 }).map((_, i) => (
-            <Skeleton key={i} width={300} height={180} borderRadius={16} />
-          ))}
-        </div>
-      </_.Container>
-    );
-  }
 
   if (notices.length === 0) {
     return (
