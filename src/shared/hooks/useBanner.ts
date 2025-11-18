@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { getNotices } from "@/shared/api/admin/notice";
 
 function calcDDay(deadline: string | null) {
@@ -20,39 +20,30 @@ function calcDDay(deadline: string | null) {
     return `D+${Math.abs(diffDay)}`;
 }
 
-export default function useNotices() {
-    const [notices, setNotices] = useState<any[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
-
-    useEffect(() => {
-        (async () => {
+export function useNotices() {
+    const { data, isLoading, error } = useQuery({
+        queryKey: ["notices"],
+        queryFn: async () => {
             const res = await getNotices();
-            const data = res?.data ?? res;
+            return res?.data ?? res;
+        },
+    });
 
-            const arr = Array.isArray(data?.content)
-                ? data.content.map((item: any) => {
-                    const date = item.updatedAt
-                        .slice(0, 10)
-                        .replace(/-/g, ". ")
-                        .replace(/$/, ".");
+    const notices = (data?.content ?? []).map((item: any) => {
+        const date = item.updatedAt
+            .slice(0, 10)
+            .replace(/-/g, ". ")
+            .replace(/$/, ".");
+        const dday = item.deadline ? calcDDay(item.deadline) : null;
+        return {
+            id: item.id,
+            notice: item.title,
+            date,
+            teacher: item.teacher,
+            path: `/notice/${item.id}`,
+            dday,
+        };
+    });
 
-                    const dday = item.deadline ? calcDDay(item.deadline) : null;
-
-                    return {
-                        id: item.id,
-                        notice: item.title,
-                        date,
-                        teacher: item.teacher,
-                        path: `/notice/${item.id}`,
-                        dday,
-                    };
-                })
-                : [];
-
-            setNotices(arr);
-            setIsLoading(false);
-        })();
-    }, []);
-
-    return { notices, isLoading };
+    return { notices, isLoading, error };
 }
