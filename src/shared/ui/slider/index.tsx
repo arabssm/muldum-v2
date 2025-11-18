@@ -1,14 +1,18 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
 import * as _ from "./style";
 import sliderSettings from "./Setting";
-import Link from "next/link";
-import useNotices from "@/shared/hooks/useBanner";
+import { useQuery } from "@tanstack/react-query";
+import { getNotices } from "@/shared/api/admin/notice";
+import type { Notice } from "@/shared/types/notice";
 
-const NextArrow = (props: any) => {
+const NextArrow = (props: { onClick?: () => void }) => {
   const { onClick } = props;
   return (
     <_.ArrowButton className="next-arrow" onClick={onClick}>
@@ -23,7 +27,7 @@ const NextArrow = (props: any) => {
   );
 };
 
-const PrevArrow = (props: any) => {
+const PrevArrow = (props: { onClick?: () => void }) => {
   const { onClick } = props;
   return (
     <_.ArrowButton className="prev-arrow" onClick={onClick}>
@@ -32,8 +36,26 @@ const PrevArrow = (props: any) => {
   );
 };
 
+function useNoticesQuery() {
+  return useQuery({
+    queryKey: ["notices"],
+    queryFn: async () => {
+      const res = await getNotices();
+      return res?.data ?? res;
+    },
+  });
+}
+
 export default function SliderComponent() {
-  const { notices, isLoading } = useNotices();
+  const { data, isLoading } = useNoticesQuery();
+
+  const notices: Notice[] = (data?.content ?? []).map((item: any) => ({
+    id: item.id,
+    notice: item.title,
+    date: item.updatedAt.slice(0, 10).replace(/-/g, ". ") + ".",
+    teacher: item.teacher,
+    path: `/notice/${item.id}`,
+  }));
 
   const settings = {
     ...sliderSettings,
@@ -44,7 +66,11 @@ export default function SliderComponent() {
   if (isLoading) {
     return (
       <_.Container>
-        <div style={{ padding: "2rem 0", textAlign: "center" }}>로딩 중...</div>
+        <div style={{ display: "flex", gap: "1rem", padding: "2rem 0" }}>
+          {Array.from({ length: 3 }).map((_, i) => (
+            <Skeleton key={i} width={300} height={180} borderRadius={16} />
+          ))}
+        </div>
       </_.Container>
     );
   }
@@ -62,11 +88,11 @@ export default function SliderComponent() {
   return (
     <_.Container>
       <_.StyledSlider {...settings}>
-        {notices.map((item, index) => (
+        {notices.map((item: Notice, index: number) => (
           <Link key={item.id} href={item.path}>
             <_.SlideWrapper>
               <Image
-                src={"/assets/basicBG.svg"}
+                src="/assets/basicBG.svg"
                 alt={item.notice}
                 width={1700}
                 height={320}
@@ -74,9 +100,7 @@ export default function SliderComponent() {
               />
               <_.Overlay />
               <_.Title>{item.notice}</_.Title>
-              <_.Date>
-                {item.date}
-              </_.Date>
+              <_.Date>{item.date}</_.Date>
               <_.SubTitle>{item.teacher}</_.SubTitle>
               <_.Index>
                 {index + 1}/{notices.length}
