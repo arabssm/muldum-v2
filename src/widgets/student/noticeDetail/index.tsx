@@ -10,9 +10,8 @@ import type { NoticeDetail } from '@/shared/types/notice';
 
 export default function NoticeDetailPage() {
     const router = useRouter();
-    const params = useParams();
 
-    const noticeId = params.id as string;
+    const { id: noticeId } = useParams<{ id: string }>();
 
     const [notice, setNotice] = useState<NoticeDetail | null>(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -59,24 +58,22 @@ export default function NoticeDetailPage() {
                 <_.Subtitle>마감일: {notice.deadlineDate || '-'}</_.Subtitle>
                 <_.Subtitle>작성자: {notice.teacher || '-'}</_.Subtitle>
             </_.Group>
-
             {notice.files?.length ? (
                 <_.ImgGroup>
-                    {notice.files.map((file, idx) => (
-                        <Image
-                            key={idx}
-                            src={file.url}
-                            alt={`공지 이미지 ${idx + 1}`}
-                            width={1600}
-                            height={414}
-                            style={{ width: '100%', height: 'auto', marginBottom: 8 }}
-                        />
-                    ))}
+                    {notice.files
+                        .filter(file => file?.url)
+                        .map((file, idx) => (
+                            <Image
+                                key={idx}
+                                src={file.url}
+                                alt={`공지 이미지 ${idx + 1}`}
+                                width={1600}
+                                height={414}
+                                style={{ width: '100%', height: 'auto', marginBottom: 8 }}
+                            />
+                        ))}
                 </_.ImgGroup>
             ) : null}
-
-            <_.TopContent>{notice.title}</_.TopContent>
-
             <div dangerouslySetInnerHTML={{ __html: notice.content || '' }} />
         </_.Container>
     );
