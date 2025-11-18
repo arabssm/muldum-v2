@@ -113,13 +113,8 @@ export default function Apply() {
                 <_.ModalInner>
                     <Image src="/assets/n.svg" alt="플러스 아이콘" width={48} height={48} />
                     <_.ModalTitle>n차 물품 신청 기간 열기 <br /> 차수를 입력해주세요  </_.ModalTitle>
-                    <_.ModalInput
-                        placeholder="차수 입력 (예: 1, 2, 3)"
-                        value={title}
-                        onChange={(e) => setTitle(e.target.value)}
-                        onKeyDown={(e) => e.key === "Enter" && handleSave()}
-                    />
                     <_.Row>
+                        <_.NoBtn onClick={() => setIsOpen(false)}>닫기</_.NoBtn>
                         <_.SaveBtn onClick={handleSave}>열기</_.SaveBtn>
                     </_.Row>
                 </_.ModalInner>
