@@ -7,6 +7,7 @@ import { useParams } from 'next/navigation';
 import { useEffect, useState, ReactNode } from 'react';
 import { getNoticeDetail } from '@/shared/api/admin/notice';
 import type { NoticeDetail, NoticeDetailProps } from '@/shared/types/notice';
+import Toast, { handleSuccess, handleError } from "@/shared/ui/toast";
 
 export default function NoticeDetailPage({ id }: NoticeDetailProps) {
     const router = useRouter();
@@ -19,8 +20,15 @@ export default function NoticeDetailPage({ id }: NoticeDetailProps) {
         if (!noticeId) return;
 
         getNoticeDetail(noticeId)
-            .then(res => setNotice(res?.data ?? res))
-            .catch(err => console.error('공지 상세 불러오기 실패:', err))
+            .then(res => {
+                const data = res?.data ?? res;
+                setNotice(data);
+                handleSuccess();
+            })
+            .catch(err => {
+                console.error('공지 상세 불러오기 실패:', err);
+                handleError();
+            })
             .finally(() => setIsLoading(false));
     }, [noticeId]);
 
@@ -65,38 +73,41 @@ export default function NoticeDetailPage({ id }: NoticeDetailProps) {
     if (!notice) return <_.Container>공지가 존재하지 않습니다.</_.Container>;
 
     return (
-        <_.Container>
-            <Image
-                src="/assets/arrow.svg"
-                alt="뒤로가기"
-                width={24}
-                height={24}
-                style={{ cursor: 'pointer' }}
-                onClick={() => router.back()}
-            />
-            <_.Title>{notice.title}</_.Title>
-            <_.Group>
-                <_.Subtitle>등록일: {formatDate(notice.updatedAt)}</_.Subtitle>
-                <_.Subtitle>마감일: {notice.deadlineDate || '-'}</_.Subtitle>
-                <_.Subtitle>작성자: {notice.teacher || '-'}</_.Subtitle>
-            </_.Group>
-            {notice.files?.length ? (
-                <_.ImgGroup>
-                    {notice.files
-                        .filter(file => file?.url)
-                        .map((file, idx) => (
-                            <Image
-                                key={idx}
-                                src={file.url}
-                                alt={`공지 이미지 ${idx + 1}`}
-                                width={1600}
-                                height={414}
-                                style={{ width: '100%', height: 'auto', marginBottom: 8 }}
-                            />
-                        ))}
-                </_.ImgGroup>
-            ) : null}
-            <div>{parseCustomTags(notice.content || '')}</div>
-        </_.Container>
+        <>
+            <Toast />
+            <_.Container>
+                <Image
+                    src="/assets/arrow.svg"
+                    alt="뒤로가기"
+                    width={24}
+                    height={24}
+                    style={{ cursor: 'pointer' }}
+                    onClick={() => router.back()}
+                />
+                <_.Title>{notice.title}</_.Title>
+                <_.Group>
+                    <_.Subtitle>등록일: {formatDate(notice.updatedAt)}</_.Subtitle>
+                    <_.Subtitle>마감일: {notice.deadlineDate || '-'}</_.Subtitle>
+                    <_.Subtitle>작성자: {notice.teacher || '-'}</_.Subtitle>
+                </_.Group>
+                {notice.files?.length ? (
+                    <_.ImgGroup>
+                        {notice.files
+                            .filter(file => file?.url)
+                            .map((file, idx) => (
+                                <Image
+                                    key={idx}
+                                    src={file.url}
+                                    alt={`공지 이미지 ${idx + 1}`}
+                                    width={1600}
+                                    height={414}
+                                    style={{ width: '100%', height: 'auto', marginBottom: 8 }}
+                                />
+                            ))}
+                    </_.ImgGroup>
+                ) : null}
+                <div>{parseCustomTags(notice.content || '')}</div>
+            </_.Container>
+        </>
     );
 }
