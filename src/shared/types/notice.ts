@@ -22,3 +22,7 @@ export interface NoticeDetail {
   deadlineDate?: string;
   updatedAt?: string;
 }
+
+export interface NoticeDetailProps {
+  id: string;
+}

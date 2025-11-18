@@ -6,9 +6,9 @@ import { useRouter } from 'next/navigation';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { getNoticeDetail } from '@/shared/api/admin/notice';
-import type { NoticeDetail } from '@/shared/types/notice';
+import type { NoticeDetail, NoticeDetailProps } from '@/shared/types/notice';
 
-export default function NoticeDetailPage() {
+export default function NoticeDetailPage({ id }: NoticeDetailProps) {
     const router = useRouter();
 
     const { id: noticeId } = useParams<{ id: string }>();
