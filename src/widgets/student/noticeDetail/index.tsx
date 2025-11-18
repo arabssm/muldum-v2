@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useParams } from 'next/navigation';
 import { useEffect, useState, ReactNode } from 'react';
-import { getNoticeDetail } from '@/shared/api/admin/notice';
+import { getNoticeDetail } from '@/shared/api';
 import type { NoticeDetail, NoticeDetailProps } from '@/shared/types/notice';
 import Toast, { handleSuccess, handleError } from "@/shared/ui/toast";
 
