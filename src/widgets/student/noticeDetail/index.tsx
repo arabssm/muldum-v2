@@ -4,13 +4,12 @@ import * as _ from './style';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, ReactNode } from 'react';
 import { getNoticeDetail } from '@/shared/api/admin/notice';
 import type { NoticeDetail, NoticeDetailProps } from '@/shared/types/notice';
 
 export default function NoticeDetailPage({ id }: NoticeDetailProps) {
     const router = useRouter();
-
     const { id: noticeId } = useParams<{ id: string }>();
 
     const [notice, setNotice] = useState<NoticeDetail | null>(null);
@@ -37,6 +36,29 @@ export default function NoticeDetailPage({ id }: NoticeDetailProps) {
         if (h > 12) h -= 12;
         if (h === 0) h = 12;
         return `${Y}-${M}-${D}. ${ampm} ${h}:${m}`;
+    };
+
+    const parseCustomTags = (text: string): ReactNode => {
+        if (!text) return null;
+        const parts = text.split(/<\/?제목[1-4]>/).filter(Boolean);
+        const matches = text.match(/<제목[1-4]>|<\/제목[1-4]>/g) || [];
+        const result: ReactNode[] = [];
+        let tagIndex = 0;
+
+        for (let i = 0; i < parts.length; i++) {
+            const content = parts[i].trim();
+            let tag = matches[tagIndex] || '<제목1>';
+
+            if (tag.startsWith('<제목1')) result.push(<h1 key={i} style={{ margin: '8px 0' }}>{content}</h1>);
+            else if (tag.startsWith('<제목2')) result.push(<h2 key={i} style={{ margin: '8px 0' }}>{content}</h2>);
+            else if (tag.startsWith('<제목3')) result.push(<h3 key={i} style={{ margin: '8px 0' }}>{content}</h3>);
+            else if (tag.startsWith('<제목4')) result.push(<h4 key={i} style={{ margin: '8px 0' }}>{content}</h4>);
+            else result.push(<p key={i} style={{ margin: '8px 0' }}>{content}</p>);
+
+            tagIndex++;
+        }
+
+        return <>{result}</>;
     };
 
     if (isLoading) return <_.Container>로딩 중...</_.Container>;
@@ -74,7 +96,7 @@ export default function NoticeDetailPage({ id }: NoticeDetailProps) {
                         ))}
                 </_.ImgGroup>
             ) : null}
-            <div dangerouslySetInnerHTML={{ __html: notice.content || '' }} />
+            <div>{parseCustomTags(notice.content || '')}</div>
         </_.Container>
     );
 }
