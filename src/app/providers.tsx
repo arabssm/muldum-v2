@@ -1,5 +1,7 @@
 'use client';
 
+import { QueryClientProvider } from "@tanstack/react-query";
+import { queryClient } from "@/shared/hooks/queryClient";
 import EmotionRegistry from '@/shared/lib/emotionRegistry';
 import GlobalStyle from '@/styles/GlobalStyle';
 import styled from '@emotion/styled';
@@ -30,11 +32,16 @@ export default function Providers({ children }: ProvidersProps) {
           }}
         />
       </Head>
+
       <GlobalStyle />
       <TopAppBar />
-      <Container>{children}</Container>
-      <div id="modal-root"></div>
-      <Toast />
+
+      <QueryClientProvider client={queryClient}>
+        <Container>{children}</Container>
+        <div id="modal-root"></div>
+        <Toast />
+      </QueryClientProvider>
+
       <Footer />
     </EmotionRegistry>
   );
