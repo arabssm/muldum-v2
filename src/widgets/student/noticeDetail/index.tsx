@@ -11,7 +11,8 @@ import type { NoticeDetail } from '@/shared/types/notice';
 export default function NoticeDetailPage() {
     const router = useRouter();
     const params = useParams();
-    const noticeId = params?.notice_id as string;
+
+    const noticeId = params.id as string;
 
     const [notice, setNotice] = useState<NoticeDetail | null>(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -58,6 +59,7 @@ export default function NoticeDetailPage() {
                 <_.Subtitle>마감일: {notice.deadlineDate || '-'}</_.Subtitle>
                 <_.Subtitle>작성자: {notice.teacher || '-'}</_.Subtitle>
             </_.Group>
+
             {notice.files?.length ? (
                 <_.ImgGroup>
                     {notice.files.map((file, idx) => (
@@ -72,7 +74,9 @@ export default function NoticeDetailPage() {
                     ))}
                 </_.ImgGroup>
             ) : null}
+
             <_.TopContent>{notice.title}</_.TopContent>
+
             <div dangerouslySetInnerHTML={{ __html: notice.content || '' }} />
         </_.Container>
     );

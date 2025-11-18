@@ -6,7 +6,8 @@ interface NoticeDetailPageProps {
   }>;
 }
 
-export default async function NoticeDetailPage({params}: NoticeDetailPageProps) {
+export default async function NoticeDetailPage({ params }: NoticeDetailPageProps) {
   const { id } = await params;
-  return <NoticeDetail id={id} />
+
+  return <NoticeDetail id={id} />;
 }
