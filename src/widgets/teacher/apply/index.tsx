@@ -15,9 +15,8 @@ export default function Apply() {
         activeGroup, activeClass,
         openIndex, checked, setActiveGroup,
         setActiveClass, handleToggle, handleCheckboxClick,
-        getCheckboxIcon, isOpen, title,
-        setIsOpen, setTitle,
-        handleSave, isNoticeOpen,
+        getCheckboxIcon, isOpen,
+        setIsOpen, handleSave, isNoticeOpen,
         noticeText, setIsNoticeOpen,
         setNoticeText, handleSaveNotice,
     } = useApplyAndModalState();
