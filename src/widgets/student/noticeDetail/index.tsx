@@ -87,7 +87,7 @@ export default function NoticeDetailPage({ id }: NoticeDetailProps) {
                 <_.Title>{notice.title}</_.Title>
                 <_.Group>
                     <_.Subtitle>등록일: {formatDate(notice.updatedAt)}</_.Subtitle>
-                    <_.Subtitle>마감일: {notice.deadlineDate || '-'}</_.Subtitle>
+                    <_.Subtitle>마감일: {notice.deadlineDate || '-'}.</_.Subtitle>
                     <_.Subtitle>작성자: {notice.teacher || '-'}</_.Subtitle>
                 </_.Group>
                 {notice.files?.length ? (

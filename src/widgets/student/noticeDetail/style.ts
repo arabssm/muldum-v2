@@ -8,7 +8,7 @@ export const Container = styled.div`
 `;
 
 export const Title = styled.div`
-    font-size: 1.5rem;
+    font-size: 1.8rem;
     font-weight: 500;
 `;
 
