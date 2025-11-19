@@ -164,25 +164,12 @@ export const ModalTitle = styled.h4`
   line-height: 1.4;
 `;
 
-export const ModalInput = styled.input`
-  width: 100%;
-  padding: 0.75rem 1rem;
-  border: 1px solid #e7e8ea;
-  border-radius: 4px;
-  outline: none;
-  font-size: 1rem;
-  color: #333;
-
-  ::placeholder {
-    color: #b2b2b2;
-  }
-`;
-
 export const Row = styled.div`
   display: flex;
   justify-content: end;
   align-items: center;
   width: 100%;
+  gap: 0.6rem;
 `;
 
 export const SmallText = styled.div`
@@ -192,6 +179,7 @@ export const SmallText = styled.div`
 
 export const SaveBtn = styled.button`
   padding: 0.6rem 1.25rem;
+  width: 50%;
   background: #ff9b62;
   color: #fff;
   border: none;
@@ -200,5 +188,19 @@ export const SaveBtn = styled.button`
   
   &:hover {
     background: #ff8640;
+  }
+`;
+
+export const NoBtn = styled.button`
+  padding: 0.6rem 1.25rem;
+  width: 50%;
+  background: #fff;
+  color: #ff9b62;
+  border: 1px solid #ff9b62;
+  border-radius: 8px;
+  cursor: pointer;
+  
+  &:hover {
+    background: #ff864025;
   }
 `;

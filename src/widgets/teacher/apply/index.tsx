@@ -1,40 +1,25 @@
 "use client";
 
 import * as _ from "./style";
-import { useState } from "react";
 import { items } from "@/widgets/student/itemList/data";
 import { BtnPrimary, BtnSecondary } from "@/shared/ui/button";
 import Image from "next/image";
 import { Modal } from "@/components/modal/modal";
+import { useApplyAndModalState } from "@/shared/hooks/apply";
 
-type GroupType = "승인 가능 물품 조회" | "승인된 물품 조회" | "거절된 물품 조회";
-type ClassType = "전체" | "전공동아리" | "1반" | "2반" | "3반" | "4반";
-
-const Groups: GroupType[] = ["승인 가능 물품 조회", "승인된 물품 조회", "거절된 물품 조회"];
-const Classes: ClassType[] = ["전체", "전공동아리", "1반", "2반", "3반", "4반"];
+const Groups = ["승인 가능 물품 조회", "승인된 물품 조회", "거절된 물품 조회"] as const;
+const Classes = ["전체", "전공동아리", "1반", "2반", "3반", "4반"] as const;
 
 export default function Apply() {
-    const [activeGroup, setActiveGroup] = useState<GroupType>("승인 가능 물품 조회");
-    const [activeClass, setActiveClass] = useState<ClassType>("전체");
-    const [openIndex, setOpenIndex] = useState<number | null>(null);
-    const [checked, setChecked] = useState<boolean[]>(() => items.map(() => false));
-    const [isOpen, setIsOpen] = useState(false);
-    const [title, setTitle] = useState("");
-
-    const handleToggle = (index: number) => setOpenIndex(prev => (prev === index ? null : index));
-    const handleCheckboxClick = (index: number, e: React.MouseEvent) => {
-        e.stopPropagation();
-        setChecked(prev => prev.map((val, i) => (i === index ? !val : val)));
-    };
-    const getCheckboxIcon = (isChecked: boolean) =>
-        isChecked ? "/assets/checkbox.svg" : "/assets/nonCheck.svg";
-
-    const handleSave = () => {
-        if (title.trim() === "") return alert("차수를 입력해주세요");
-        alert(`${title}차 물품 신청 기간이 열렸습니다.`);
-        setTitle("");
-        setIsOpen(false);
-    };
+    const {
+        activeGroup, activeClass,
+        openIndex, checked, setActiveGroup,
+        setActiveClass, handleToggle, handleCheckboxClick,
+        getCheckboxIcon, isOpen,
+        setIsOpen, handleSave, isNoticeOpen,
+        noticeText, setIsNoticeOpen,
+        setNoticeText, handleSaveNotice,
+    } = useApplyAndModalState();
 
     return (
         <_.Container>
@@ -50,6 +35,7 @@ export default function Apply() {
                         </_.ClassText>
                     ))}
                 </_.Group>
+
                 <_.TopWrapper>
                     <_.Group>
                         {Classes.map((label) => (
@@ -62,6 +48,7 @@ export default function Apply() {
                             </_.ClassText>
                         ))}
                     </_.Group>
+                    <_.GrayBtn onClick={() => setIsNoticeOpen(true)}>주의사항 작성</_.GrayBtn>
                     <_.GrayBtn onClick={() => setIsOpen(true)}>n차 물품 열기</_.GrayBtn>
                     <_.GrayBtn>승인 항목 다운로드</_.GrayBtn>
                     <_.GrayBtn>전체선택</_.GrayBtn>
@@ -72,7 +59,7 @@ export default function Apply() {
                 <_.Btn>아라</_.Btn>
                 <_.Btn>인서트</_.Btn>
                 <_.Btn>테라</_.Btn>
-                <Image src="assets/arrow.svg" alt="화살표" width={24} height={24} style={{ transform: "rotate(180deg)", cursor: "pointer", display: "block", marginLeft: "auto" }} />
+                <Image src="assets/arrow.svg" alt="화살표" width={24} height={24} style={{ transform: "rotate(180deg)", cursor: "pointer", marginLeft: "auto" }} />
             </_.BtnGroup>
             <_.InfoContainer>
                 {items.map((item, index) => (
@@ -90,8 +77,10 @@ export default function Apply() {
                             <_.ToggleImage isOpen={openIndex === index}>
                                 <Image src="/assets/toggle.svg" alt="토글" width={24} height={24} />
                             </_.ToggleImage>
+
                             {item.name}
                         </_.ToggleWrapper>
+
                         {openIndex === index && (
                             <_.InfoGroup>
                                 <_.UnContent>{item.link}</_.UnContent>
@@ -105,6 +94,7 @@ export default function Apply() {
                     </_.InfoWrapper>
                 ))}
             </_.InfoContainer>
+
             <_.BtnWrapper>
                 <BtnSecondary>거절</BtnSecondary>
                 <BtnPrimary>승인</BtnPrimary>
@@ -112,15 +102,39 @@ export default function Apply() {
             <Modal isOpen={isOpen} closeModal={() => setIsOpen(false)}>
                 <_.ModalInner>
                     <Image src="/assets/n.svg" alt="플러스 아이콘" width={48} height={48} />
-                    <_.ModalTitle>n차 물품 신청 기간 열기 <br /> 차수를 입력해주세요  </_.ModalTitle>
-                    <_.ModalInput
-                        placeholder="차수 입력 (예: 1, 2, 3)"
-                        value={title}
-                        onChange={(e) => setTitle(e.target.value)}
-                        onKeyDown={(e) => e.key === "Enter" && handleSave()}
+                    <_.ModalTitle>
+                        n차 물품 신청 기간 열기 <br /> 차수를 입력해주세요
+                    </_.ModalTitle>
+                    <_.Row>
+                        <_.NoBtn onClick={() => setIsOpen(false)}>닫기</_.NoBtn>
+                        <_.SaveBtn onClick={handleSave}>열기</_.SaveBtn>
+                    </_.Row>
+                </_.ModalInner>
+            </Modal>
+
+            <Modal isOpen={isNoticeOpen} closeModal={() => setIsNoticeOpen(false)}>
+                <_.ModalInner>
+                    <Image src="/assets/warn.svg" alt="충고 아이콘" width={48} height={48} />
+                    <_.ModalTitle>
+                        학생들에게 주의사항을 <br /> 알려주세요
+                    </_.ModalTitle>
+
+                    <input
+                        value={noticeText}
+                        onChange={(e) => setNoticeText(e.target.value)}
+                        placeholder="1. 내용을 입력하세요"
+                        style={{
+                            width: "100%",
+                            padding: "1rem",
+                            borderRadius: "4px",
+                            border: "1px solid #D1D1D1",
+                            outline: "none",
+                            marginBottom: "1rem"
+                        }}
                     />
                     <_.Row>
-                        <_.SaveBtn onClick={handleSave}>열기</_.SaveBtn>
+                        <_.NoBtn onClick={() => setIsNoticeOpen(false)}>취소</_.NoBtn>
+                        <_.SaveBtn onClick={handleSaveNotice}>등록</_.SaveBtn>
                     </_.Row>
                 </_.ModalInner>
             </Modal>
