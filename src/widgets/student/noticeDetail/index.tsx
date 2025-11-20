@@ -99,9 +99,9 @@ export default function NoticeDetailPage({ id }: NoticeDetailProps) {
                                     key={idx}
                                     src={file.url}
                                     alt={`공지 이미지 ${idx + 1}`}
-                                    width={1600}
-                                    height={414}
-                                    style={{ width: '100%', height: 'auto', marginBottom: 8 }}
+                                    width={100}
+                                    height={100}
+                                    style={{ width: '30%', height: 'auto', marginBottom: 8 }}
                                 />
                             ))}
                     </_.ImgGroup>
