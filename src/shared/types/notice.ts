@@ -11,6 +11,9 @@ export interface Notice {
   path: string;
   type: string;
   badge: string;
+  updatedAt?: string;
+  bgColor: string;
+  dday: string;
 }
 
 export interface NoticeDetail {

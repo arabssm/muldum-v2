@@ -30,8 +30,6 @@ export const Group = styled.div`
 
 export const ImgGroup = styled.div`
     display: flex;
-    align-items: center;
-    justify-content: center;
     flex-direction: column;
     row-gap: 1rem;
 `;
