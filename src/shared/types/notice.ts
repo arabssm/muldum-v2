@@ -13,6 +13,7 @@ export interface Notice {
   badge: string;
   updatedAt?: string;
   bgColor: string;
+  dday: string;
 }
 
 export interface NoticeDetail {

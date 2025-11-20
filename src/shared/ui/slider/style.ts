@@ -74,7 +74,7 @@ export const Title = styled.div`
     font-size: 2.5rem;
     font-weight: 500;
     top: 20%;
-    left: 4%;
+    left: 5%;
     width: 100%;
     color: #fff
 `;
@@ -84,7 +84,7 @@ export const SubTitle = styled.div`
     font-size: 1.5rem;
     position: absolute;
     font-weight: 400;
-    left: 4%;
+    left: 5%;
     top: 67%;
     color: #e9e9e9ff;
 `;
@@ -94,7 +94,7 @@ export const Date = styled.div`
     font-size: 1.5rem;
     font-weight: 400;
     position: absolute;
-    left: 4%;
+    left: 5%;
     top: 52%;
     color: #e9e9e9ff;
 `;
@@ -144,4 +144,14 @@ export const ArrowButton = styled.button`
     &.next-arrow {
         right: 1rem;
     }
+`;
+
+export const DDay = styled.div`
+    display: flex;
+    position: absolute;
+    font-size: 5rem;
+    left: 82%;
+    top: 31%;
+    color: #fff;
+    font-weight: 600;
 `;

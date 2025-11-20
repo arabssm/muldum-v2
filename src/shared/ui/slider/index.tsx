@@ -10,6 +10,23 @@ import { useQuery } from "@tanstack/react-query";
 import { getNotices } from "@/shared/api/admin/notice";
 import type { Notice } from "@/shared/types/notice";
 
+const getDDay = (dateString: string) => {
+  if (!dateString) return "";
+  const clean = dateString.replace(/\./g, "");
+  const target = new Date(clean);
+  const today = new Date();
+
+  target.setHours(0, 0, 0, 0);
+  today.setHours(0, 0, 0, 0);
+
+  const diff = target.getTime() - today.getTime();
+  const day = Math.floor(diff / (1000 * 60 * 60 * 24));
+
+  if (day === 0) return "D-0";
+  if (day > 0) return `D-${day}`;
+  return `D+${Math.abs(day)}`;
+};
+
 const NextArrow = (props: { onClick?: () => void }) => {
   const { onClick } = props;
   return (
@@ -47,13 +64,19 @@ function useNoticesQuery() {
 export default function SliderComponent() {
   const { data } = useNoticesQuery();
 
-  const notices: Notice[] = (data?.content ?? []).map((item: any) => ({
-    id: item.id,
-    notice: item.title,
-    date: item.updatedAt.slice(0, 10).replace(/-/g, ". ") + ".",
-    teacher: item.teacher,
-    path: `/notice/${item.id}`,
-  }));
+  const notices: Notice[] = (data?.content ?? []).map((item: any) => {
+    const rawDate = item.updatedAt?.slice(0, 10);
+    const deadline = item.deadline?.slice(0, 10);
+
+    return {
+      id: item.id,
+      notice: item.title,
+      date: rawDate ? rawDate.replace(/-/g, ". ") + "." : "",
+      teacher: item.teacher,
+      dday: getDDay(deadline || rawDate),
+      path: `/notice/${item.id}`,
+    };
+  });
 
   const settings = {
     ...sliderSettings,
@@ -85,6 +108,7 @@ export default function SliderComponent() {
                 style={{ objectFit: "cover", borderRadius: "1rem" }}
               />
               <_.Overlay />
+              <_.DDay>{item.dday}</_.DDay>
               <_.Title>{item.notice}</_.Title>
               <_.Date>{item.date}</_.Date>
               <_.SubTitle>{item.teacher}</_.SubTitle>
