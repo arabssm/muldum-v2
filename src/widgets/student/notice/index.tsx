@@ -13,9 +13,30 @@ export default function Notice() {
     const [page, setPage] = useState(1);
     const [searchQuery, setSearchQuery] = useState("");
 
+    const getDateFromItem = (item: any): string | undefined => {
+        if (!item) return undefined;
+        const candidates = ["updatedAt", "date"];
+        for (const key of candidates) {
+            if (item[key]) return item[key];
+        }
+        return undefined;
+    };
+
+    const isNew = (date?: string) => {
+        if (!date) return false;
+
+        const updated = new Date(date).getTime();
+        const now = Date.now();
+
+        const diff = now - updated;
+        const sevenDays = 7 * 24 * 60 * 60 * 1000;
+
+        return diff <= sevenDays;
+    };
+
     const filteredNotices = Array.isArray(notices)
         ? notices.filter((item) =>
-            item.notice.toLowerCase().includes(searchQuery.toLowerCase())
+            item.notice?.toLowerCase().includes(searchQuery.toLowerCase())
         )
         : [];
 
@@ -50,21 +71,38 @@ export default function Notice() {
                 <>
                     <_.NoticeContainer>
                         {paginated.length > 0 ? (
-                            paginated.map((item) => (
-                                <Link key={item.id} href={item.path}>
-                                    <_.NoticeGroup>
-                                        <_.NoticeWrapper>
-                                            {item.type === "new" ? (
-                                                <_.Badge bgColor="#FF9B62">{item.badge}</_.Badge>
-                                            ) : (
-                                                <_.Badge bgColor="#D1D1D1">{item.badge}</_.Badge>
-                                            )}
-                                            <_.Notice>{item.notice}</_.Notice>
-                                        </_.NoticeWrapper>
-                                        <_.Date>{item.date}</_.Date>
-                                    </_.NoticeGroup>
-                                </Link>
-                            ))
+                            paginated.map((item) => {
+                                const itemDate = getDateFromItem(item);
+                                const newFlag = isNew(itemDate);
+
+                                return (
+                                    <Link key={item.id} href={item.path}>
+                                        <_.NoticeGroup>
+                                            <_.NoticeWrapper>
+                                                <div
+                                                    style={{
+                                                        padding: "0.6rem 1.2rem",
+                                                        borderRadius: 999,
+                                                        backgroundColor: newFlag ? "#FF9B62" : "#D1D1D1",
+                                                        color: "#fff",
+                                                        fontSize: "1rem",
+                                                        textAlign: "center",
+                                                        minWidth: "48px",
+                                                        display: "flex",
+                                                        justifyContent: "center",
+                                                    }}
+                                                >
+                                                    {newFlag ? "신규" : "공지"}
+                                                </div>
+
+                                                <_.Notice>{item.notice}</_.Notice>
+                                            </_.NoticeWrapper>
+
+                                            <_.Date>{itemDate}</_.Date>
+                                        </_.NoticeGroup>
+                                    </Link>
+                                );
+                            })
                         ) : (
                             <div
                                 style={{
@@ -80,7 +118,6 @@ export default function Notice() {
                             </div>
                         )}
                     </_.NoticeContainer>
-
                     {filteredNotices.length > 0 && (
                         <Pagination
                             currentPage={page}

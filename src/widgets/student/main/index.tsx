@@ -15,10 +15,7 @@ export default function Main() {
 
     const getDateFromItem = (item: any): string | undefined => {
         if (!item) return undefined;
-        const candidates = [
-            "updatedAt",
-            "date",
-        ];
+        const candidates = [ "updatedAt", "date" ];
         for (const key of candidates) {
             if (item[key]) return item[key];
         }
