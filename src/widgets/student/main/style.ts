@@ -76,14 +76,6 @@ export const Group = styled.div`
     align-items: center;
 `;
 
-export const Badge = styled.div<Badgeprops>`
-  ${centerAlign}
-  padding: 0.6rem 1.2rem;
-  border-radius: 10rem;
-  color: #fff;
-  background-color: ${({ bgColor }) => bgColor};
-`;
-
 export const Notice = styled.div`
     font-size: 1.25rem;
 `;
