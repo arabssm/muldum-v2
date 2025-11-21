@@ -25,13 +25,10 @@ export default function Tnotice() {
 
     const isNew = (date?: string) => {
         if (!date) return false;
-
         const updated = new Date(date).getTime();
         const now = Date.now();
-
         const diff = now - updated;
         const sevenDays = 7 * 24 * 60 * 60 * 1000;
-
         return diff <= sevenDays;
     };
 
@@ -50,6 +47,7 @@ export default function Tnotice() {
             <_.TitleGroup>
                 <_.Group>
                     <_.Title>공지사항</_.Title>
+
                     <_.SearchWrapper>
                         <Image src="/assets/search.svg" alt="search" width={18} height={18} />
                         <input
@@ -78,7 +76,11 @@ export default function Tnotice() {
                         const newFlag = isNew(itemDate);
 
                         return (
-                            <_.NoticeGroup key={item.id}>
+                            <_.NoticeGroup
+                                key={item.id}
+                                onClick={() => router.push(`/notice/${item.id}`)}
+                                style={{ cursor: "pointer" }}
+                            >
                                 <_.NoticeWrapper>
                                     <div
                                         style={{
