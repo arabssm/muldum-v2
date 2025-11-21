@@ -25,6 +25,7 @@ export function useVideoChat() {
     const screenStreamRef = useRef<MediaStream | null>(null);
     const peerConnectionsRef = useRef<{ [userId: string]: RTCPeerConnection }>({});
     const remoteVideosRef = useRef<{ [userId: string]: HTMLVideoElement }>({});
+    const heartbeatIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
     const [isScreenSharing, setIsScreenSharing] = useState(false);
 
@@ -182,9 +183,13 @@ export function useVideoChat() {
                 setConnectionStatus(`Connected to room ${roomId}`);
                 console.log('WebSocket connected successfully');
                 
-                // 서버가 초기 메시지로 userId를 요구하는 경우
-                // TODO: 백엔드 팀에 확인 필요
-                // ws.send(JSON.stringify({ type: 'auth', userId: 110 }));
+                // Heartbeat: 30초마다 ping 메시지 전송
+                heartbeatIntervalRef.current = setInterval(() => {
+                    if (ws.readyState === WebSocket.OPEN) {
+                        ws.send(JSON.stringify({ type: 'ping' }));
+                        console.log('Sent ping to keep connection alive');
+                    }
+                }, 30000); // 30초
             };
 
             ws.onmessage = async (event) => {
@@ -241,10 +246,17 @@ export function useVideoChat() {
                 }
             };
 
-            ws.onclose = () => {
+            ws.onclose = (event) => {
                 setIsConnected(false);
                 setConnectionStatus('Disconnected');
-                console.log('WebSocket disconnected');
+                console.log('WebSocket disconnected', { code: event.code, reason: event.reason });
+                
+                // Heartbeat 정리
+                if (heartbeatIntervalRef.current) {
+                    clearInterval(heartbeatIntervalRef.current);
+                    heartbeatIntervalRef.current = null;
+                }
+                
                 stopLocalMedia();
             };
 
@@ -267,6 +279,12 @@ export function useVideoChat() {
             }
         } catch (error) {
             console.error('Error leaving room via API:', error);
+        }
+
+        // Heartbeat 정리
+        if (heartbeatIntervalRef.current) {
+            clearInterval(heartbeatIntervalRef.current);
+            heartbeatIntervalRef.current = null;
         }
 
         if (wsRef.current) {
