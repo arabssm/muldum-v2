@@ -58,9 +58,10 @@ export default function Apply() {
                         ))}
                     </_.Group>
                     <_.GrayBtn onClick={() => setIsNoticeOpen(true)}>주의사항 작성</_.GrayBtn>
+                    <_.GrayBtn>규칙 추가</_.GrayBtn>
                     <_.GrayBtn onClick={() => setIsOpen(true)}>n차 물품 열기</_.GrayBtn>
-                    <_.GrayBtn>승인 항목 다운로드</_.GrayBtn>
                     <_.GrayBtn>전체선택</_.GrayBtn>
+                    <_.GrayBtn>승인 항목 다운로드</_.GrayBtn>
                 </_.TopWrapper>
             </_.Wrapper>
             <_.BtnGroup>

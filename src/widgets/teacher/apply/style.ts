@@ -144,7 +144,7 @@ export const InfoGroup = styled.div`
 
 export const GrayBtn = styled.button`
   padding: 0;
-  width: 10rem;
+  width: 11rem;
   color: #909090;
   font-size: 0.95rem;
   background-color: transparent;
