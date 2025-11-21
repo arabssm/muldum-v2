@@ -163,6 +163,16 @@ export function useVideoChat() {
             
             const wsProtocol = apiBaseUrl.startsWith('https') ? 'wss' : 'ws';
             const wsHost = apiBaseUrl.replace(/^https?:\/\//, '');
+            
+            // 쿠키 확인
+            console.log('All cookies:', document.cookie);
+            const cookies = document.cookie.split(';').reduce((acc, cookie) => {
+                const [key, value] = cookie.trim().split('=');
+                acc[key] = value;
+                return acc;
+            }, {} as Record<string, string>);
+            console.log('Access token exists:', !!cookies.access_token);
+            
             const wsUrl = `${wsProtocol}://${wsHost}/api/ws/signal?roomId=${roomId}`;
             
             console.log('WebSocket URL:', wsUrl);
