@@ -3,15 +3,18 @@
 import * as _ from "./style";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import Pagination from "@/components/pagination";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import NoticeSkeleton from "./skeleton";
 import useNotices from "@/shared/hooks/useNotices";
+import { getUserInfo } from "@/shared/api/user";
 
 export default function Notice() {
     const { notices, isLoading } = useNotices();
     const [page, setPage] = useState(1);
     const [searchQuery, setSearchQuery] = useState("");
+    const [userRole, setUserRole] = useState<string | null>(null);
 
     const getDateFromItem = (item: any): string | undefined => {
         if (!item) return undefined;
@@ -50,21 +53,44 @@ export default function Notice() {
         setPage(1);
     };
 
+    const router = useRouter();
+
+    useEffect(() => {
+        const fetchUserRole = async () => {
+            try {
+                const userInfo = await getUserInfo();
+                setUserRole(userInfo.user_type);
+            } catch (error) {
+                console.error('사용자 정보 조회 실패:', error);
+            }
+        };
+
+        fetchUserRole();
+    }, []);
+
     return (
         <_.Container>
-            <_.Group>
-                <_.Title>공지사항</_.Title>
+            <_.TitleGroup>
+                <_.Group>
+                    <_.Title>공지사항</_.Title>
 
-                <_.SearchWrapper>
-                    <Image src="/assets/search.svg" alt="search" width={18} height={18} />
-                    <input
-                        type="text"
-                        placeholder="공지사항 검색"
-                        value={searchQuery}
-                        onChange={handleSearchChange}
-                    />
-                </_.SearchWrapper>
-            </_.Group>
+                    <_.SearchWrapper>
+                        <Image src="/assets/search.svg" alt="search" width={18} height={18} />
+                        <input
+                            type="text"
+                            placeholder="공지사항 검색"
+                            value={searchQuery}
+                            onChange={handleSearchChange}
+                        />
+                    </_.SearchWrapper>
+                </_.Group>
+
+                {userRole === "TEACHER" && (
+                    <_.Btn onClick={() => router.push("/noticeWrite")}>
+                        공지등록
+                    </_.Btn>
+                )}
+            </_.TitleGroup>
             {isLoading ? (
                 <NoticeSkeleton />
             ) : (

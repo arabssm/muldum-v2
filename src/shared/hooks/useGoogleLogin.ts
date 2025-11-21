@@ -30,16 +30,6 @@ export default function useGoogleLogin() {
                 if (data.accessToken && data.refreshToken) {
                     setCookie('access_token', data.accessToken);
                     setCookie('refresh_token', data.refreshToken);
-                    localStorage.setItem(
-                        'user',
-                        JSON.stringify({
-                            userId: data.userId,
-                            name: data.name,
-                            userType: data.userType,
-                            role: data.role,
-                            teamId: data.teamId ?? null,
-                        })
-                    );
                     showToast.success("로그인되었습니다!");
                     
                     // 다른 컴포넌트에 로그인 상태 변경 알림

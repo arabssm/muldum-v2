@@ -9,11 +9,17 @@ const BlockNoteEditor = dynamic(
   async () => {
     const { useCreateBlockNote } = await import('@blocknote/react');
     const { BlockNoteView } = await import('@blocknote/mantine');
+    const { defaultBlockSpecs } = await import('@blocknote/core');
 
     return function Editor({ initialContent, onChange, editable = true }: BlockNoteEditorProps) {
+      const { image, audio, video, file, ...allowedBlocks } = defaultBlockSpecs;
+
       const editor = useCreateBlockNote({
         initialContent: initialContent ? JSON.parse(initialContent) : undefined,
-        uploadFile: async (file: File) => URL.createObjectURL(file),
+        blockSpecs: allowedBlocks,
+        placeholders: {
+          default: "내용을 입력하세요...",
+        },
       });
 
       useEffect(() => {
@@ -25,7 +31,11 @@ const BlockNoteEditor = dynamic(
         return () => unsubscribe();
       }, [editor, onChange]);
 
-      return <BlockNoteView editor={editor} theme="light" editable={editable} />;
+      return (
+        <div style={{ width: '100%' }}>
+          <BlockNoteView editor={editor} theme="light" editable={editable} />
+        </div>
+      );
     };
   },
   { ssr: false }
