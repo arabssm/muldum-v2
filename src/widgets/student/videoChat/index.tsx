@@ -42,16 +42,23 @@ export default function VideoChat() {
             }
 
             try {
+                console.log('Starting video chat for team:', teamId);
+                
                 // 팀 방 찾거나 생성
-                const foundRoomId = await findOrCreateTeamRoom(teamId);
-                setInputRoomId(foundRoomId);
+                const room = await findOrCreateTeamRoom(teamId);
+                console.log('Room found/created:', room);
+                
+                setInputRoomId(room.roomId);
+                
+                // 잠시 대기 후 방 입장 (방 생성이 완료될 시간 확보)
+                await new Promise(resolve => setTimeout(resolve, 500));
                 
                 // 방 입장
-                await joinRoom(foundRoomId);
+                await joinRoom(room.roomId);
                 setIsCallActive(true);
             } catch (error) {
                 console.error("Failed to start video chat:", error);
-                alert("화상통화를 시작할 수 없습니다.");
+                alert(`화상통화를 시작할 수 없습니다: ${error instanceof Error ? error.message : '알 수 없는 오류'}`);
             }
         }
     };

@@ -140,22 +140,32 @@ export function useVideoChat() {
     const joinRoom = async (roomId: string) => {
         try {
             setConnectionStatus(`Connecting to room ${roomId}...`);
+            console.log('Attempting to join room:', roomId);
 
             await startLocalMedia();
 
-            const wsUrl = `ws://localhost:8080/api/ws/signal?roomId=${roomId}`;
+            const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8080';
+            const wsProtocol = apiBaseUrl.startsWith('https') ? 'wss' : 'ws';
+            const wsHost = apiBaseUrl.replace(/^https?:\/\//, '');
+            const wsUrl = `${wsProtocol}://${wsHost}/api/ws/signal?roomId=${roomId}`;
+            
+            console.log('WebSocket URL:', wsUrl);
+            
             const ws = new WebSocket(wsUrl);
             wsRef.current = ws;
 
             ws.onopen = () => {
                 setIsConnected(true);
                 setConnectionStatus(`Connected to room ${roomId}`);
+                console.log('WebSocket connected successfully');
             };
 
             ws.onmessage = async (event) => {
                 const message: WebRTCMessage = JSON.parse(event.data);
                 const from = message.from;
                 const data = message.data;
+
+                console.log('WebSocket message received:', message.type, message);
 
                 switch (message.type) {
                     case 'existing_users':
@@ -195,6 +205,7 @@ export function useVideoChat() {
                         break;
                     case 'error':
                         console.error(`Error from server: ${message.message}`);
+                        alert(`화상통화 오류: ${message.message}`);
                         leaveRoom();
                         break;
                 }
@@ -203,6 +214,7 @@ export function useVideoChat() {
             ws.onclose = () => {
                 setIsConnected(false);
                 setConnectionStatus('Disconnected');
+                console.log('WebSocket disconnected');
                 stopLocalMedia();
             };
 
@@ -214,6 +226,7 @@ export function useVideoChat() {
         } catch (error) {
             console.error('Error joining room:', error);
             setConnectionStatus('Failed to join room');
+            alert('화상통화 연결에 실패했습니다.');
         }
     };
 
@@ -247,8 +260,9 @@ export function useVideoChat() {
     const findOrCreateTeamRoom = async (teamId: number) => {
         try {
             const room = await videoChatAPI.findOrCreateTeamRoom(teamId);
+            console.log('Team room:', room);
             setRoomId(room.roomId);
-            return room.roomId;
+            return room;
         } catch (error) {
             console.error('Error finding or creating team room:', error);
             throw error;
