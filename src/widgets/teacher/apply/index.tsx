@@ -18,7 +18,8 @@ export default function Apply() {
         getCheckboxIcon, isOpen,
         setIsOpen, handleSave, isNoticeOpen,
         noticeText, setIsNoticeOpen,
-        setNoticeText, handleSaveNotice,
+        setNoticeText, handleSaveNotice, searchQuery,
+        handleSearchChange,
     } = useApplyAndModalState();
 
     return (
@@ -34,8 +35,16 @@ export default function Apply() {
                             {label}
                         </_.ClassText>
                     ))}
+                    <_.SearchWrapper>
+                        <Image src="/assets/search.svg" alt="search" width={18} height={18} />
+                        <input
+                            type="text"
+                            placeholder="물품 검색"
+                            value={searchQuery}
+                            onChange={handleSearchChange}
+                        />
+                    </_.SearchWrapper>
                 </_.Group>
-
                 <_.TopWrapper>
                     <_.Group>
                         {Classes.map((label) => (

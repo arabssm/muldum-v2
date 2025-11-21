@@ -21,6 +21,11 @@ export function useApplyAndModalState() {
     const getCheckboxIcon = (isChecked: boolean) =>
         isChecked ? "/assets/checkbox.svg" : "/assets/nonCheck.svg";
 
+    const [searchQuery, setSearchQuery] = useState("");
+
+    const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchQuery(e.target.value);
+    };
     const [isOpen, setIsOpen] = useState(false);
     const [title, setTitle] = useState("");
 
@@ -57,6 +62,8 @@ export function useApplyAndModalState() {
         handleToggle,
         handleCheckboxClick,
         getCheckboxIcon,
+        searchQuery,
+        handleSearchChange,
         isOpen,
         title,
         setIsOpen,

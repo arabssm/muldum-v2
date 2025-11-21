@@ -9,6 +9,36 @@ export const Container = styled.div`
     gap: 3rem;
 `;
 
+export const SearchWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  font-size: 1rem;
+  background-color: #FAFAFA;
+  border: none;
+  border-radius: 4px;
+  padding: 0.75rem;
+  gap: 0.5rem;
+  background-color: #FAFAFA;
+  width: fit-content;
+  margin-left: auto;
+
+  input {
+    background-color: #FAFAFA;
+    border: none;
+    outline: none;
+    font-size: 0.9rem;
+    width: 20rem;
+  }
+
+  ::placeholder {
+    color: #D1D1D1;
+  }
+
+  &:focus {
+    outline: none;
+  }
+`;
+
 export const Wrapper = styled.div`
     display: flex;
     flex-direction: column;
