@@ -227,8 +227,11 @@ export function useVideoChat() {
                         }
                         break;
                     case 'user_left':
-                        setConnectionStatus(`User ${data} left.`);
-                        closePeerConnection(data);
+                        // data가 객체인 경우 sessionId 추출
+                        const leftUserId = typeof data === 'object' && data !== null ? data.sessionId : data;
+                        const leftUserName = typeof data === 'object' && data !== null ? data.userName : '';
+                        setConnectionStatus(`User ${leftUserName || leftUserId} left.`);
+                        closePeerConnection(leftUserId);
                         break;
                     case 'error':
                         console.error(`Error from server: ${message.message}`);
