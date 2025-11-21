@@ -9,6 +9,7 @@ export interface GroupProps {
   active: GroupType | null;
   setActive: React.Dispatch<React.SetStateAction<GroupType | null>>;
   setMessage: React.Dispatch<React.SetStateAction<string>>;
+  isOwnTeam?: boolean;
 }
 
 export interface Errors {

@@ -4,7 +4,7 @@ import { getCookie, setCookie, deleteCookie } from './cookieUtils';
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 const axiosInstance = axios.create({
-    baseURL: API_BASE_URL,
+    baseURL: `${API_BASE_URL}/api`,
     headers: { 'Content-Type': 'application/json' },
     withCredentials: true,
 });

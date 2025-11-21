@@ -1,86 +1,101 @@
-const API_BASE_URL = 'http://localhost:8001';
-const MOCK_USER_ID = '1';
-const MOCK_USER_ROLE = 'mentor';
+import axiosInstance from '../lib/axiosInstance';
 
 export interface Room {
     roomId: string;
     title: string;
     teamId: number;
-    maxParticipants: number;
-    currentParticipants: number;
+    createdBy: string;
     createdAt: string;
+    participants?: number;
+    maxParticipants: number;
+    status?: string;
+}
+
+export interface RoomDetail {
+    roomId: string;
+    title: string;
+    teamId: number;
+    createdBy: string;
+    createdAt: string;
+    participants: {
+        amount: number;
+        list: Array<{
+            userId: number;
+            role: string;
+        }>;
+    };
+    maxParticipants: number;
+    status: string;
 }
 
 export interface CreateRoomRequest {
     title: string;
     teamId: number;
-    maxParticipants?: number;
+    maxParticipants: number;
+}
+
+export interface LeaveRoomResponse {
+    message: string;
+    status: {
+        userId: number;
+        roomId: string;
+        executedAt: string;
+    };
 }
 
 export const videoChatAPI = {
     async createRoom(data: CreateRoomRequest): Promise<Room> {
-        const response = await fetch(`${API_BASE_URL}/rooms`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-User-Id': MOCK_USER_ID,
-                'X-User-Role': MOCK_USER_ROLE
-            },
-            body: JSON.stringify({
-                ...data,
-                maxParticipants: data.maxParticipants || 20
-            })
+        const { data: responseData } = await axiosInstance.post<Room>('/ara/rooms', {
+            title: data.title,
+            teamId: data.teamId,
+            maxParticipants: data.maxParticipants || 20
         });
 
-        if (!response.ok) {
-            throw new Error(`Failed to create room: ${response.statusText}`);
-        }
-
-        return response.json();
+        return responseData;
     },
 
     async listRooms(): Promise<Room[]> {
-        const response = await fetch(`${API_BASE_URL}/sup/rooms/all`, {
-            method: 'GET'
-        });
-
-        if (!response.ok) {
-            throw new Error(`Failed to list rooms: ${response.statusText}`);
-        }
-
-        return response.json();
+        const { data } = await axiosInstance.get<Room[]>('/ara/rooms');
+        return data;
     },
 
-    async leaveRoom(roomId: string): Promise<void> {
-        const response = await fetch(`${API_BASE_URL}/rooms/${roomId}/leave`, {
-            method: 'POST',
-            headers: {
-                'X-User-Id': MOCK_USER_ID
-            }
-        });
+    async getRoomDetail(roomId: string): Promise<RoomDetail> {
+        const { data } = await axiosInstance.get<RoomDetail>(`/ara/rooms/${roomId}`);
+        return data;
+    },
 
-        if (!response.ok) {
-            throw new Error(`Failed to leave room: ${response.statusText}`);
-        }
+    async leaveRoom(roomId: string): Promise<LeaveRoomResponse> {
+        const { data } = await axiosInstance.post<LeaveRoomResponse>(`/ara/rooms/${roomId}/leave`);
+        return data;
     },
 
     async deleteRoom(roomId: string): Promise<void> {
-        const response = await fetch(`${API_BASE_URL}/rooms/${roomId}`, {
-            method: 'DELETE'
-        });
+        await axiosInstance.delete(`/ara/rooms/${roomId}`);
+    },
 
-        if (!response.ok) {
-            throw new Error(`Failed to delete room: ${response.statusText}`);
-        }
+    async listAllRooms(): Promise<Room[]> {
+        const { data } = await axiosInstance.get<Room[]>('/ara/sup/rooms/all');
+        return data;
     },
 
     async deleteAllRooms(): Promise<void> {
-        const response = await fetch(`${API_BASE_URL}/sup/rooms/all`, {
-            method: 'DELETE'
-        });
+        await axiosInstance.delete('/ara/sup/rooms/all');
+    },
 
-        if (!response.ok) {
-            throw new Error(`Failed to delete all rooms: ${response.statusText}`);
+    async findOrCreateTeamRoom(teamId: number): Promise<Room> {
+        // 먼저 해당 팀의 방이 있는지 확인
+        const rooms = await this.listRooms();
+        const existingRoom = rooms.find(room => room.teamId === teamId);
+
+        if (existingRoom) {
+            return existingRoom;
         }
+
+        // 없으면 새로 생성
+        return await this.createRoom({
+            title: `Team ${teamId} Room`,
+            teamId,
+            maxParticipants: 20
+        });
     }
 };

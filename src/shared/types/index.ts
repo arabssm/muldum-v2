@@ -19,7 +19,8 @@ export interface PaginationProps {
 
 export interface BlockNoteEditorProps {
     initialContent: string;
-    onChange: (content: string) => void;
+    onChange?: (content: string) => void;
+    editable?: boolean;
 }
 
 export interface ModalPortalProps {
