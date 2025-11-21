@@ -144,6 +144,11 @@ export function useVideoChat() {
 
             await startLocalMedia();
 
+            // 사용자 정보 가져오기
+            const { getUserInfo } = await import('../api/user');
+            const userInfo = await getUserInfo();
+            console.log('User info for WebSocket:', { userId: userInfo.id, userName: userInfo.name });
+
             // 환경 변수 또는 현재 도메인 기반으로 API URL 결정
             let apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
             
@@ -164,16 +169,8 @@ export function useVideoChat() {
             const wsProtocol = apiBaseUrl.startsWith('https') ? 'wss' : 'ws';
             const wsHost = apiBaseUrl.replace(/^https?:\/\//, '');
             
-            // 쿠키 확인
-            console.log('All cookies:', document.cookie);
-            const cookies = document.cookie.split(';').reduce((acc, cookie) => {
-                const [key, value] = cookie.trim().split('=');
-                acc[key] = value;
-                return acc;
-            }, {} as Record<string, string>);
-            console.log('Access token exists:', !!cookies.access_token);
-            
-            const wsUrl = `${wsProtocol}://${wsHost}/api/ws/signal?roomId=${roomId}`;
+            // WebSocket URL에 roomId, userId, userName 파라미터 추가
+            const wsUrl = `${wsProtocol}://${wsHost}/api/ws/signal?roomId=${roomId}&userId=${userInfo.id}&userName=${encodeURIComponent(userInfo.name)}`;
             
             console.log('WebSocket URL:', wsUrl);
             
@@ -184,6 +181,10 @@ export function useVideoChat() {
                 setIsConnected(true);
                 setConnectionStatus(`Connected to room ${roomId}`);
                 console.log('WebSocket connected successfully');
+                
+                // 서버가 초기 메시지로 userId를 요구하는 경우
+                // TODO: 백엔드 팀에 확인 필요
+                // ws.send(JSON.stringify({ type: 'auth', userId: 110 }));
             };
 
             ws.onmessage = async (event) => {
