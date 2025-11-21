@@ -1,9 +1,25 @@
 import axiosInstance from "@/shared/lib/axiosInstance";
 import type { FilePayload } from "@/shared/types/notice";
+import axios from "axios";
 
 export const getNotices = async () => {
   const res = await axiosInstance.get("/ara/notice");
   return res.data;
+};
+
+export const getPresignedUrl = async (fileName: string) => {
+  const res = await axiosInstance.get(`/files/presigned?fileName=${encodeURIComponent(fileName)}`);
+  return res.data;
+};
+
+export const uploadFileToS3 = async (presignedUrl: string, file: File) => {
+  await axios.put(presignedUrl, file, {
+    headers: {
+      'Content-Type': file.type,
+    },
+  });
+  // presigned URL에서 실제 파일 URL 추출 (쿼리 파라미터 제거)
+  return presignedUrl.split('?')[0];
 };
 
 export const createNoticeGeneral = async (

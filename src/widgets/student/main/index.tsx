@@ -3,15 +3,18 @@
 import * as _ from "./style";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
 import Slider from "@/shared/ui/slider";
 import MainSkeleton from "./skeleton";
 import { Menu } from "./data";
 import useNotices from "@/shared/hooks/useNotices";
+import { getUserInfo } from "@/shared/api/user";
 import type { Notice } from "@/shared/types/notice";
 
 export default function Main() {
     const router = useRouter();
     const { notices, isLoading } = useNotices();
+    const [userRole, setUserRole] = useState<string | null>(null);
 
     const getDateFromItem = (item: any): string | undefined => {
         if (!item) return undefined;
@@ -49,6 +52,19 @@ export default function Main() {
         return diff <= 7;
     };
 
+    useEffect(() => {
+        const fetchUserRole = async () => {
+            try {
+                const userInfo = await getUserInfo();
+                setUserRole(userInfo.user_type);
+            } catch (error) {
+                console.error('사용자 정보 조회 실패:', error);
+            }
+        };
+
+        fetchUserRole();
+    }, []);
+
     return (
         <_.Container>
             {isLoading ? (
@@ -71,9 +87,16 @@ export default function Main() {
                         <_.Wrapper>
                             <_.Group>
                                 <_.Title>공지사항</_.Title>
-                                <_.Subtitle onClick={() => router.push("/notice")}>
-                                    전체보기
-                                </_.Subtitle>
+                                <div style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
+                                    {userRole === "TEACHER" && (
+                                        <_.Subtitle onClick={() => router.push("/noticeWrite")}>
+                                            등록
+                                        </_.Subtitle>
+                                    )}
+                                    <_.Subtitle onClick={() => router.push("/notice")}>
+                                        전체보기
+                                    </_.Subtitle>
+                                </div>
                             </_.Group>
 
                             <_.NoticeContainer>

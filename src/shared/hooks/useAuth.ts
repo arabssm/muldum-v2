@@ -4,18 +4,25 @@ import { useState, useEffect } from 'react';
 import { getCookie, deleteCookie } from '@/shared/lib/cookieUtils';
 import axiosInstance from '@/shared/lib/axiosInstance';
 import { showToast } from '@/shared/ui/toast';
+import { getUserInfo } from '@/shared/api/user';
 
 export function useAuth() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState<any>(null);
 
-  const checkAuthStatus = () => {
+  const checkAuthStatus = async () => {
     const accessToken = getCookie('access_token');
-    const userStr = localStorage.getItem('user');
     
-    if (accessToken && userStr) {
-      setIsLoggedIn(true);
-      setUser(JSON.parse(userStr));
+    if (accessToken) {
+      try {
+        const userInfo = await getUserInfo();
+        setIsLoggedIn(true);
+        setUser(userInfo);
+      } catch (error) {
+        console.error('사용자 정보 조회 실패:', error);
+        setIsLoggedIn(false);
+        setUser(null);
+      }
     } else {
       setIsLoggedIn(false);
       setUser(null);
@@ -25,19 +32,15 @@ export function useAuth() {
   useEffect(() => {
     checkAuthStatus();
 
-    // storage 이벤트 리스너 추가 (다른 탭에서의 변경 감지)
-    const handleStorageChange = () => {
+    // 커스텀 이벤트 리스너 추가 (같은 탭에서의 로그인 감지)
+    const handleAuthChange = () => {
       checkAuthStatus();
     };
 
-    window.addEventListener('storage', handleStorageChange);
-    
-    // 커스텀 이벤트 리스너 추가 (같은 탭에서의 로그인 감지)
-    window.addEventListener('auth-change', handleStorageChange);
+    window.addEventListener('auth-change', handleAuthChange);
 
     return () => {
-      window.removeEventListener('storage', handleStorageChange);
-      window.removeEventListener('auth-change', handleStorageChange);
+      window.removeEventListener('auth-change', handleAuthChange);
     };
   }, []);
 
@@ -47,10 +50,9 @@ export function useAuth() {
     } catch (error) {
       console.error('로그아웃 요청 실패:', error);
     } finally {
-      // 쿠키와 로컬스토리지 정리
+      // 쿠키 정리
       deleteCookie('access_token');
       deleteCookie('refresh_token');
-      localStorage.removeItem('user');
       setIsLoggedIn(false);
       setUser(null);
       showToast.success("로그아웃되었습니다!");

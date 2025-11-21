@@ -38,6 +38,11 @@ const GlobalStyle = () => (
       #nprogress .peg {
         box-shadow: 0 0 10px rgba(54, 65, 85, 0.6), 0 0 5px rgba(54, 65, 85, 0.6) !important;
       }
+
+      /* BlockNote 에디터 너비 확장 */
+      .bn-container .bn-editor {
+        max-width: 100% !important;
+      }
     
     `}
   />
