@@ -334,21 +334,22 @@ export function useVideoChat() {
 
     const startScreenShare = async () => {
         try {
-            if (Object.keys(peerConnectionsRef.current).length === 0) {
-                throw new Error('Join a room and connect to a peer before sharing screen');
-            }
-
             const screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true });
             screenStreamRef.current = screenStream;
             const screenTrack = screenStream.getVideoTracks()[0];
 
-            // Replace video track in all peer connections
+            // Replace video track in all peer connections (if any)
             for (const userId in peerConnectionsRef.current) {
                 const pc = peerConnectionsRef.current[userId];
                 const videoSender = pc.getSenders().find(sender => sender.track?.kind === 'video');
                 if (videoSender) {
                     await videoSender.replaceTrack(screenTrack);
                 }
+            }
+
+            // 로컬 비디오도 화면 공유로 변경
+            if (videoRef.current) {
+                videoRef.current.srcObject = screenStream;
             }
 
             setIsScreenSharing(true);
@@ -367,6 +368,7 @@ export function useVideoChat() {
 
         const cameraTrack = localStreamRef.current.getVideoTracks()[0];
 
+        // 모든 피어 연결의 비디오 트랙을 카메라로 복원
         for (const userId in peerConnectionsRef.current) {
             const pc = peerConnectionsRef.current[userId];
             const videoSender = pc.getSenders().find(sender => sender.track?.kind === 'video');
@@ -375,6 +377,12 @@ export function useVideoChat() {
             }
         }
 
+        // 로컬 비디오도 카메라로 복원
+        if (videoRef.current && localStreamRef.current) {
+            videoRef.current.srcObject = localStreamRef.current;
+        }
+
+        // 화면 공유 스트림 정리
         if (screenStreamRef.current) {
             screenStreamRef.current.getTracks().forEach(track => track.stop());
             screenStreamRef.current = null;
