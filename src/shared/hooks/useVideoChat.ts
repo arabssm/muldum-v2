@@ -4,9 +4,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { videoChatAPI } from "../api/videoChat";
 import type { Participant, WebRTCMessage } from "@/shared/types/video";
 
-const API_BASE_URL = 'http://localhost:8001';
-const MOCK_USER_ID = '1';
-const MOCK_USER_ROLE = 'mentor';
+
 
 export function useVideoChat() {
     const [showParticipants, setShowParticipants] = useState(true);
@@ -44,9 +42,9 @@ export function useVideoChat() {
         }
     }, []);
 
-    const createRoom = async (title: string, teamId: number = 1) => {
+    const createRoom = async (title: string, teamId: number = 1, maxParticipants: number = 20) => {
         try {
-            const result = await videoChatAPI.createRoom({ title, teamId });
+            const result = await videoChatAPI.createRoom({ title, teamId, maxParticipants });
             if (result.roomId) {
                 setRoomId(result.roomId);
                 return result.roomId;
@@ -145,7 +143,7 @@ export function useVideoChat() {
 
             await startLocalMedia();
 
-            const wsUrl = `ws://localhost:8001/ws/signal?roomId=${roomId}`;
+            const wsUrl = `ws://localhost:8080/api/ws/signal?roomId=${roomId}`;
             const ws = new WebSocket(wsUrl);
             wsRef.current = ws;
 
@@ -242,6 +240,17 @@ export function useVideoChat() {
             return await videoChatAPI.listRooms();
         } catch (error) {
             console.error('Error listing rooms:', error);
+            throw error;
+        }
+    };
+
+    const findOrCreateTeamRoom = async (teamId: number) => {
+        try {
+            const room = await videoChatAPI.findOrCreateTeamRoom(teamId);
+            setRoomId(room.roomId);
+            return room.roomId;
+        } catch (error) {
+            console.error('Error finding or creating team room:', error);
             throw error;
         }
     };
@@ -393,6 +402,7 @@ export function useVideoChat() {
         joinRoom,
         leaveRoom,
         listRooms,
+        findOrCreateTeamRoom,
         toggleCamera,
         toggleMicrophone,
         startScreenShare,

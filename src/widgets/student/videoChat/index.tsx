@@ -1,17 +1,21 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { useParams } from "next/navigation";
 import Image from "next/image";
 import * as _ from "./style";
 import { useVideoChat } from "@/shared/hooks/useVideoChat";
 
 export default function VideoChat() {
+    const params = useParams();
+    const teamId = params?.id ? parseInt(params.id as string, 10) : null;
+
     const {
         showParticipants, setShowParticipants, chatWidth, chatScrollRef,
         videoRef, message, setMessage, messages, participants, remoteStreams,
         selectedParticipant, setSelectedParticipant, localStream, roomId,
         isConnected, connectionStatus, isScreenSharing, handleResize,
-        handleKeyDown, createRoom, joinRoom, leaveRoom, toggleCamera,
+        handleKeyDown, createRoom, joinRoom, leaveRoom, findOrCreateTeamRoom, toggleCamera,
         toggleMicrophone, startScreenShare, stopScreenShare
     } = useVideoChat();
 
@@ -25,8 +29,31 @@ export default function VideoChat() {
     const remoteVideoRef = useRef<HTMLVideoElement>(null);
     const localPipVideoRef = useRef<HTMLVideoElement>(null);
 
-    const handleToggleCall = () => {
-        setIsCallActive((prev) => !prev);
+    const handleToggleCall = async () => {
+        if (isCallActive) {
+            // 화상통화 종료
+            await leaveRoom();
+            setIsCallActive(false);
+        } else {
+            // 화상통화 시작
+            if (!teamId) {
+                alert("팀 정보를 찾을 수 없습니다.");
+                return;
+            }
+
+            try {
+                // 팀 방 찾거나 생성
+                const foundRoomId = await findOrCreateTeamRoom(teamId);
+                setInputRoomId(foundRoomId);
+                
+                // 방 입장
+                await joinRoom(foundRoomId);
+                setIsCallActive(true);
+            } catch (error) {
+                console.error("Failed to start video chat:", error);
+                alert("화상통화를 시작할 수 없습니다.");
+            }
+        }
     };
 
     useEffect(() => {

@@ -7,7 +7,7 @@ import { useParams } from 'next/navigation';
 import { useEffect, useState, ReactNode } from 'react';
 import { getNoticeDetail } from '@/shared/api';
 import type { NoticeDetail, NoticeDetailProps } from '@/shared/types/notice';
-import Toast, { handleSuccess, handleError } from "@/shared/ui/toast";
+import Toast, { showToast } from "@/shared/ui/toast";
 
 export default function NoticeDetailPage({ id }: NoticeDetailProps) {
     const router = useRouter();
@@ -23,11 +23,11 @@ export default function NoticeDetailPage({ id }: NoticeDetailProps) {
             .then(res => {
                 const data = res?.data ?? res;
                 setNotice(data);
-                handleSuccess();
+                showToast.success("공지를 불러왔습니다!");
             })
             .catch(err => {
                 console.error('공지 상세 불러오기 실패:', err);
-                handleError();
+                showToast.error("공지를 불러오는데 실패했습니다!");
             })
             .finally(() => setIsLoading(false));
     }, [noticeId]);

@@ -10,14 +10,14 @@ const BlockNoteEditor = dynamic(
     const { useCreateBlockNote } = await import('@blocknote/react');
     const { BlockNoteView } = await import('@blocknote/mantine');
 
-    return function Editor({ initialContent, onChange }: BlockNoteEditorProps) {
+    return function Editor({ initialContent, onChange, editable = true }: BlockNoteEditorProps) {
       const editor = useCreateBlockNote({
         initialContent: initialContent ? JSON.parse(initialContent) : undefined,
         uploadFile: async (file: File) => URL.createObjectURL(file),
       });
 
       useEffect(() => {
-        if (!editor) return;
+        if (!editor || !onChange) return;
         const unsubscribe = editor.onChange(() => {
           const content = JSON.stringify(editor.document, null, 2);
           onChange(content);
@@ -25,7 +25,7 @@ const BlockNoteEditor = dynamic(
         return () => unsubscribe();
       }, [editor, onChange]);
 
-      return <BlockNoteView editor={editor} theme="light" />;
+      return <BlockNoteView editor={editor} theme="light" editable={editable} />;
     };
   },
   { ssr: false }
