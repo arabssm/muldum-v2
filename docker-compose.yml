@@ -2,7 +2,13 @@ version: "3.9"
 
 services:
   frontend:
-    build: .
+    build:
+      context: .
+      args:
+        - NEXT_PUBLIC_API_BASE_URL=https://backend.muldum.com
+        - NEXT_PUBLIC_GOOGLE_CLIENT_ID=179606511270-u2gg8l9h1k261m3ienmgek6diogtflol.apps.googleusercontent.com
+        - NEXT_PUBLIC_REDIRECT_URI=https://v2.muldum.com/google/login
+        - NEXT_PUBLIC_SENTRY_DSN=https://ea29e317a1cb0b75266baff6167669c4@o4510338415722496.ingest.us.sentry.io/4510338418933760
     container_name: muldum-frontend
     restart: always
     ports:

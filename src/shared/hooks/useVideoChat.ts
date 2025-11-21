@@ -144,7 +144,23 @@ export function useVideoChat() {
 
             await startLocalMedia();
 
-            const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8080';
+            // 환경 변수 또는 현재 도메인 기반으로 API URL 결정
+            let apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+            
+            if (!apiBaseUrl && typeof window !== 'undefined') {
+                // 배포 환경에서 환경 변수가 없으면 현재 도메인 기반으로 추론
+                const hostname = window.location.hostname;
+                if (hostname.includes('muldum.com')) {
+                    apiBaseUrl = 'https://backend.muldum.com';
+                } else {
+                    apiBaseUrl = 'http://localhost:8080';
+                }
+            }
+            
+            apiBaseUrl = apiBaseUrl || 'http://localhost:8080';
+            console.log('API Base URL from env:', process.env.NEXT_PUBLIC_API_BASE_URL);
+            console.log('Using API Base URL:', apiBaseUrl);
+            
             const wsProtocol = apiBaseUrl.startsWith('https') ? 'wss' : 'ws';
             const wsHost = apiBaseUrl.replace(/^https?:\/\//, '');
             const wsUrl = `${wsProtocol}://${wsHost}/api/ws/signal?roomId=${roomId}`;

@@ -51,9 +51,11 @@ export default function VideoChat() {
                 setInputRoomId(room.roomId);
                 
                 // 잠시 대기 후 방 입장 (방 생성이 완료될 시간 확보)
-                await new Promise(resolve => setTimeout(resolve, 500));
+                console.log('Waiting before joining room...');
+                await new Promise(resolve => setTimeout(resolve, 1500));
                 
                 // 방 입장
+                console.log('Now joining room:', room.roomId);
                 await joinRoom(room.roomId);
                 setIsCallActive(true);
             } catch (error) {
