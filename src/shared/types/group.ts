@@ -26,6 +26,8 @@ export interface FormInputProps {
   width?: string;
   height?: string;
   error?: string;
+  onBlur?: () => void;
+  type?: string;
 }
 export interface ItemFormProps {
   handleSubmit?: (data: { item: string; price: string; link: string; reason: string; quantity: number; drivePrice: string; expectDrive: string }) => void;

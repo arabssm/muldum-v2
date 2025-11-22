@@ -2,22 +2,82 @@
 
 import * as _ from "./style";
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { items } from "./data";
 import { BtnPrimary, BtnSecondary } from "@/shared/ui/button";
 import { useRouter } from "next/navigation";
 import { useApplyAndModalState } from "@/shared/hooks/apply";
 
 const Groups = ["임시신청", "최종신청"] as const;
+import { getItemList } from "@/shared/api/items";
 
 export default function ItemList() {
     const [openIndex, setOpenIndex] = useState<number | null>(null);
     const { activeGroup, setActiveGroup } = useApplyAndModalState();
     const [club, setClub] = useState("");
+    const [itemsData, setItemsData] = useState<any[]>(items);
     const [checked, setChecked] = useState<boolean[]>(() =>
         items.map(() => false)
     );
+    const [isLoading, setIsLoading] = useState(true);
     const router = useRouter();
+
+    useEffect(() => {
+        const fetchItems = async () => {
+            try {
+                const isTemp = activeGroup === "임시신청";
+                const data = await getItemList(isTemp);
+                console.log('물품 목록:', data);
+                
+                // API 데이터를 UI 형식에 맞게 변환
+                const transformedData = data.map((item: any) => {
+                    let state = "승인 대기";
+                    let color = "#B2B2B2";
+                    
+                    if (item.status === "APPROVED") {
+                        state = "승인 완료";
+                        color = "#60D18F";
+                    } else if (item.status === "REJECTED") {
+                        state = "승인 거부";
+                        color = "#DF3636";
+                    }
+                    
+                    // 날짜 포맷 변환 (2025-11-19T00:00:00 -> 11/19(화))
+                    let exportDate = "-";
+                    if (item.deliveryTime) {
+                        const date = new Date(item.deliveryTime);
+                        const month = date.getMonth() + 1;
+                        const day = date.getDate();
+                        const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
+                        const weekday = weekdays[date.getDay()];
+                        exportDate = `${month}/${day}(${weekday})`;
+                    }
+                    
+                    return {
+                        id: item.id,
+                        state,
+                        color,
+                        price: item.price?.toLocaleString() || "0",
+                        name: item.product_name,
+                        link: item.productLink || item.product_link || "-",
+                        quantity: item.quantity,
+                        export: exportDate,
+                        money: item.deliveryPrice || item.delivery_price || "0",
+                        reason: item.reason || item.rejectReason || "-",
+                    };
+                });
+                
+                setItemsData(transformedData);
+                setChecked(transformedData.map(() => false));
+            } catch (error) {
+                console.error('물품 목록 조회 실패:', error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchItems();
+    }, [activeGroup]);
 
     const handleToggle = (index: number) => {
         setOpenIndex((prev) => (prev === index ? null : index));
@@ -78,7 +138,9 @@ export default function ItemList() {
             </_.SelectGroup>
             <_.BtnWrapper>
                 <_.InfoContainer>
-                    {items.map((item, index) => (
+                    {isLoading ? (
+                        <div>로딩 중...</div>
+                    ) : itemsData.map((item, index) => (
                         <_.Wrapper key={index}>
                             <_.ToggleWrapper onClick={() => handleToggle(index)}>
                                 <Image
@@ -102,14 +164,23 @@ export default function ItemList() {
                             </_.ToggleWrapper>
                             {openIndex === index && (
                                 <_.Group>
-                                    <_.Content>{item.link}</_.Content>
-                                    <_.UnContent>가격 : {item.price}원</_.UnContent>
+                                    <_.UnContent 
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            if (item.link && item.link !== "-") {
+                                                window.open(item.link, '_blank');
+                                            }
+                                        }}
+                                        style={{ cursor: item.link && item.link !== "-" ? 'pointer' : 'default' }}
+                                    >
+                                        가격 : {item.price}원
+                                    </_.UnContent>
                                     <_.Content>{item.quantity}개</_.Content>
                                     <_.Content>{item.reason}</_.Content>
                                     <_.Content>{item.export} 도착예정</_.Content>
                                     <_.Content>배송비 : {item.money}원</_.Content>
                                     {item.state === "승인 거부" && (
-                                        <_.Reapply onClick={() => router.push("/reapply")}>
+                                        <_.Reapply onClick={() => router.push(`/reapply?itemId=${item.id}`)}>
                                             재신청하기
                                         </_.Reapply>
                                     )}

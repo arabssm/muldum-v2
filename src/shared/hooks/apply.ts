@@ -4,7 +4,7 @@ import { useState } from "react";
 import { items } from "@/widgets/student/itemList/data";
 
 export function useApplyAndModalState() {
-    const [activeGroup, setActiveGroup] = useState("승인 가능 물품 조회");
+    const [activeGroup, setActiveGroup] = useState("임시신청");
     const [activeClass, setActiveClass] = useState("전체");
     const [openIndex, setOpenIndex] = useState<number | null>(null);
     const [checked, setChecked] = useState<boolean[]>(() => items.map(() => false));
