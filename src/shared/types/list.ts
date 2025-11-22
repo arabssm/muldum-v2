@@ -1,4 +1,5 @@
 export interface ItemData {
+    id?: number;
     state: "승인 대기" | "승인 거부" | "승인 완료";
     color: string;
     name: string;

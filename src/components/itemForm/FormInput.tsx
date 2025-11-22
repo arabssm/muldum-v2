@@ -12,6 +12,8 @@ export function FormInput({
     width,
     height,
     error,
+    onBlur,
+    type = "text",
 }: FormInputProps) {
     return (
         <_.Wrapper>
@@ -20,15 +22,17 @@ export function FormInput({
                 <_.Textarea
                     value={value}
                     onChange={(e) => setValue(e.target.value)}
+                    onBlur={onBlur}
                     placeholder={placeholder}
                     style={{ height }}
                     isError={!!error}
                 />
             ) : (
                 <_.Input
-                    type="text"
+                    type={type}
                     value={value}
                     onChange={(e) => setValue(e.target.value)}
+                    onBlur={onBlur}
                     placeholder={placeholder}
                     inputWidth={width}
                     isError={!!error}

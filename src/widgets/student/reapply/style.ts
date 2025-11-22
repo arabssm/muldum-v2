@@ -74,13 +74,14 @@ export const Box = styled.div<{ bgImage: string }>`
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  width: 15%;
-  aspect-ratio: 1 / 1;
+  width: 200px;
+  height: 200px;
   border-radius: 4px;
   padding: 1rem;
   background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0,0,0,0.5)), url(${props => props.bgImage});
   background-size: cover;
   background-position: center;
+  background-repeat: no-repeat;
   color: #FAFAFA;
   box-sizing: border-box;
 `;
@@ -95,6 +96,10 @@ export const Text = styled.div`
     font-size: 1.25rem;
     font-weight: 500;
     color: #fafafa;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 168px;
 `;
 
 export const Small = styled.div`
@@ -104,6 +109,7 @@ export const Small = styled.div`
 
 export const Group = styled.div`
     display: flex;
+    flex-wrap: wrap;
     gap: 1rem;
     cursor: pointer;
 `;

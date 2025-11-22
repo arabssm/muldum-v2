@@ -20,7 +20,6 @@ export default function Items() {
     setIsMounted(true);
     setIsLoading(true);
     
-    // 초기 로딩 시뮬레이션
     const timer = setTimeout(() => {
       setIsLoading(false);
     }, 1500);

@@ -8,7 +8,21 @@ import { useItemForm } from "@/shared/hooks/items";
 import type { ItemFormProps } from "@/shared/types/group";
 import { useState } from "react";
 
-export default function ItemForm({ handleSubmit }: ItemFormProps) {
+interface ExtendedItemFormProps extends ItemFormProps {
+  hideClubSelect?: boolean;
+  isTemp?: boolean;
+  initialData?: {
+    item?: string;
+    price?: string;
+    link?: string;
+    reason?: string;
+    drivePrice?: string;
+    expectDrive?: string;
+    quantity?: number;
+  };
+}
+
+export default function ItemForm({ handleSubmit, hideClubSelect = false, isTemp = true, initialData }: ExtendedItemFormProps) {
   const {
     item, setItem,
     price, setPrice,
@@ -17,8 +31,9 @@ export default function ItemForm({ handleSubmit }: ItemFormProps) {
     drivePrice, setDrivePrice,
     expectDrive, setExpectDrive,
     quantity, increase, decrease,
-    errors, internalSubmit, handleSecondary
-  } = useItemForm(handleSubmit);
+    errors, internalSubmit, handleSecondary,
+    handleLinkBlur
+  } = useItemForm(handleSubmit, initialData, isTemp);
 
   const [club, setClub] = useState("");
 
@@ -34,21 +49,23 @@ export default function ItemForm({ handleSubmit }: ItemFormProps) {
 
   return (
     <>
-      <_.SelectGroup>
-        <_.SelectWrapper>
-          <_.Select id="club" value={club} onChange={(e) => setClub(e.target.value)}>
-            <option value="">동아리 선택</option>
-            {clubOptions.map((option) => (
-              <option key={option} value={option}>
-                {option}
-              </option>
-            ))}
-          </_.Select>
-          <Image src="/assets/toggle.svg" alt="토글" width={20} height={20}
-            style={{ position: "absolute", right: "0.5rem", top: "50%", transform: "translateY(-50%) rotate(90deg)" }}
-          />
-        </_.SelectWrapper>
-      </_.SelectGroup>
+      {!hideClubSelect && (
+        <_.SelectGroup>
+          <_.SelectWrapper>
+            <_.Select id="club" value={club} onChange={(e) => setClub(e.target.value)}>
+              <option value="">동아리 선택</option>
+              {clubOptions.map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
+            </_.Select>
+            <Image src="/assets/toggle.svg" alt="토글" width={20} height={20}
+              style={{ position: "absolute", right: "0.5rem", top: "50%", transform: "translateY(-50%) rotate(90deg)" }}
+            />
+          </_.SelectWrapper>
+        </_.SelectGroup>
+      )}
       <_.Group>
         <FormInput label="구입할 물품" value={item} setValue={setItem} placeholder="구입할 물품을 입력하세요" width="40rem" error={errors.item} />
         <FormInput label="가격" value={price} setValue={setPrice} placeholder="가격을 입력하세요" width="10rem" error={errors.price} />
@@ -68,8 +85,8 @@ export default function ItemForm({ handleSubmit }: ItemFormProps) {
         </_.Wrapper>
       </_.Group>
       <_.Group>
-        <FormInput label="물품링크" value={link} setValue={setLink} placeholder="링크를 입력하세요" width="54rem" error={errors.link} />
-        <FormInput label="예상 도착일" value={expectDrive} setValue={setExpectDrive} placeholder="예상 도착 시간을 입력하세요" width="15rem" error={errors.expectDrive} />
+        <FormInput label="물품링크" value={link} setValue={setLink} onBlur={handleLinkBlur} placeholder="링크를 입력하세요" width="62rem" error={errors.link} />
+        <FormInput label="예상 도착일" value={expectDrive} setValue={setExpectDrive} type="date" width="15rem" error={errors.expectDrive} />
       </_.Group>
       <FormInput label="신청사유" value={reason} setValue={setReason} placeholder="신청 사유를 10자 이상 입력해주세요" width="100%" height="20vh" error={errors.reason} />
       <_.BtnGroup>
