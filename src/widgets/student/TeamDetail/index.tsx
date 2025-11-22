@@ -67,7 +67,7 @@ export default function Items() {
             />
 
             {active === "월말평가" ? (
-                isOwnTeam ? <MonthlyTest /> : null
+                isOwnTeam ? <MonthlyTest sections={[]} /> : null
             ) : active === "공유캘린더" ? (
                 isOwnTeam ? <Calendar /> : null
             ) : active === "노션" ? (
