@@ -43,3 +43,8 @@ export type Team = {
     teamName: string;
     members: string;
 };
+
+export interface NotionProps {
+    teamId: string;
+    readOnly?: boolean;
+}
