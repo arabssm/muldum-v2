@@ -26,10 +26,40 @@ export function useVideoChat() {
     const peerConnectionsRef = useRef<{ [userId: string]: RTCPeerConnection }>({});
     const remoteVideosRef = useRef<{ [userId: string]: HTMLVideoElement }>({});
     const heartbeatIntervalRef = useRef<NodeJS.Timeout | null>(null);
+    const currentSessionIdRef = useRef<string>("");
+    const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+    const recordedChunksRef = useRef<Blob[]>([]);
+    const audioContextRef = useRef<AudioContext | null>(null);
+    const mixedStreamRef = useRef<MediaStream | null>(null);
+    const joinSoundRef = useRef<HTMLAudioElement | null>(null);
+    const leaveSoundRef = useRef<HTMLAudioElement | null>(null);
 
     const [isScreenSharing, setIsScreenSharing] = useState(false);
+    const [isRecording, setIsRecording] = useState(false);
 
     const pc_config = { "iceServers": [{ "urls": "stun:stun.l.google.com:19302" }] };
+
+    // 효과음 초기화
+    useEffect(() => {
+        joinSoundRef.current = new Audio('/sounds/join.mp3');
+        leaveSoundRef.current = new Audio('/sounds/leave.mp3');
+        
+        // 볼륨 설정
+        if (joinSoundRef.current) joinSoundRef.current.volume = 0.5;
+        if (leaveSoundRef.current) leaveSoundRef.current.volume = 0.5;
+        
+        return () => {
+            // 정리
+            if (joinSoundRef.current) {
+                joinSoundRef.current.pause();
+                joinSoundRef.current = null;
+            }
+            if (leaveSoundRef.current) {
+                leaveSoundRef.current.pause();
+                leaveSoundRef.current = null;
+            }
+        };
+    }, []);
 
     useEffect(() => {
         if (chatScrollRef.current) {
@@ -42,6 +72,24 @@ export function useVideoChat() {
             wsRef.current.send(JSON.stringify(message));
         }
     }, []);
+
+    const playJoinSound = () => {
+        if (joinSoundRef.current) {
+            joinSoundRef.current.currentTime = 0;
+            joinSoundRef.current.play().catch(error => {
+                console.log('Failed to play join sound:', error);
+            });
+        }
+    };
+
+    const playLeaveSound = () => {
+        if (leaveSoundRef.current) {
+            leaveSoundRef.current.currentTime = 0;
+            leaveSoundRef.current.play().catch(error => {
+                console.log('Failed to play leave sound:', error);
+            });
+        }
+    };
 
     const createRoom = async (title: string, teamId: number = 1, maxParticipants: number = 20) => {
         try {
@@ -61,6 +109,19 @@ export function useVideoChat() {
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
             localStreamRef.current = stream;
+            
+            // 로컬 스트림 트랙 확인
+            const audioTracks = stream.getAudioTracks();
+            const videoTracks = stream.getVideoTracks();
+            console.log('Local stream tracks:', {
+                audioTracks: audioTracks.length,
+                videoTracks: videoTracks.length,
+                audioEnabled: audioTracks[0]?.enabled,
+                videoEnabled: videoTracks[0]?.enabled,
+                audioLabel: audioTracks[0]?.label,
+                videoLabel: videoTracks[0]?.label
+            });
+            
             if (videoRef.current) {
                 videoRef.current.srcObject = stream;
             }
@@ -77,34 +138,78 @@ export function useVideoChat() {
         const pc = new RTCPeerConnection(pc_config);
         peerConnectionsRef.current[userId] = pc;
 
+        // ICE 연결 상태 로깅
+        pc.oniceconnectionstatechange = () => {
+            console.log(`ICE connection state for ${userId}:`, pc.iceConnectionState);
+            if (pc.iceConnectionState === 'failed') {
+                console.error(`ICE connection failed for ${userId}. May need TURN server.`);
+            }
+        };
+
+        // 연결 상태 로깅
+        pc.onconnectionstatechange = () => {
+            console.log(`Connection state for ${userId}:`, pc.connectionState);
+        };
+
+        // ICE gathering 상태 로깅
+        pc.onicegatheringstatechange = () => {
+            console.log(`ICE gathering state for ${userId}:`, pc.iceGatheringState);
+        };
+
+        // Signaling 상태 로깅
+        pc.onsignalingstatechange = () => {
+            console.log(`Signaling state for ${userId}:`, pc.signalingState);
+        };
+
         pc.onicecandidate = (event) => {
             if (event.candidate) {
+                console.log(`Sending ICE candidate to ${userId}`);
                 sendWebSocketMessage({ type: 'candidate', to: userId, candidate: event.candidate });
             }
         };
 
         pc.ontrack = (event) => {
-            addRemoteVideo(userId, event.streams[0]);
+            console.log(`ontrack event for ${userId}:`, {
+                kind: event.track.kind,
+                enabled: event.track.enabled,
+                muted: event.track.muted,
+                readyState: event.track.readyState
+            });
+            
+            // 이미 participants에 있는 경우 userName 가져오기
+            const existingParticipant = participants.find(p => p.id === userId);
+            addRemoteVideo(userId, event.streams[0], existingParticipant?.name);
         };
 
         if (localStreamRef.current) {
             localStreamRef.current.getTracks().forEach(track => {
-                pc.addTrack(track, localStreamRef.current!);
+                const sender = pc.addTrack(track, localStreamRef.current!);
+                console.log(`Added ${track.kind} track to peer connection for ${userId}`);
             });
+            
+            // Sender 확인
+            const senders = pc.getSenders();
+            console.log(`Senders for ${userId}:`, senders.map(s => s.track?.kind));
         }
 
         if (isOfferor) {
-            pc.createOffer()
-                .then(offer => pc.setLocalDescription(offer))
-                .then(() => sendWebSocketMessage({ type: 'offer', to: userId, sdp: pc.localDescription }))
-                .catch(e => console.error("Offer creation failed", e));
+            pc.createOffer({ offerToReceiveAudio: true, offerToReceiveVideo: true })
+                .then(offer => {
+                    console.log(`Offer created for ${userId}, SDP:`, offer.sdp?.substring(0, 200));
+                    return pc.setLocalDescription(offer);
+                })
+                .then(() => {
+                    console.log(`Local description set for ${userId}, has m=audio:`, pc.localDescription?.sdp?.includes('m=audio'));
+                    sendWebSocketMessage({ type: 'offer', to: userId, sdp: pc.localDescription });
+                })
+                .catch(e => console.error(`Offer creation failed for ${userId}:`, e));
         }
-    }, [sendWebSocketMessage]);
+    }, [sendWebSocketMessage, participants]);
 
-    const addRemoteVideo = (userId: string, stream: MediaStream) => {
+    const addRemoteVideo = (userId: string, stream: MediaStream, userName?: string) => {
         setParticipants(prev => {
             if (!prev.find(p => p.id === userId)) {
-                return [...prev, { id: userId, name: `User ${userId.substring(0, 8)}` }];
+                return [...prev, { id: userId, name: userName || `User ${userId.substring(0, 8)}` }];
             }
             return prev;
         });
@@ -114,7 +219,28 @@ export function useVideoChat() {
             [userId]: stream
         }));
 
-        console.log(`Remote video added for user ${userId}`);
+        const audioTracks = stream.getAudioTracks();
+        const videoTracks = stream.getVideoTracks();
+        console.log(`Remote stream added for user ${userId} (${userName || 'Unknown'}):`, {
+            audioTracks: audioTracks.length,
+            videoTracks: videoTracks.length,
+            audioEnabled: audioTracks[0]?.enabled,
+            videoEnabled: videoTracks[0]?.enabled
+        });
+
+        // 녹음 중이면 새로운 오디오를 믹싱에 추가
+        if (isRecording && audioContextRef.current && audioTracks.length > 0) {
+            try {
+                const destination = audioContextRef.current.createMediaStreamDestination();
+                const remoteSource = audioContextRef.current.createMediaStreamSource(
+                    new MediaStream([audioTracks[0]])
+                );
+                remoteSource.connect(destination);
+                console.log(`Added new remote audio from ${userId} to ongoing recording`);
+            } catch (error) {
+                console.error('Failed to add new audio to recording:', error);
+            }
+        }
     };
 
     const closePeerConnection = (userId: string) => {
@@ -183,6 +309,19 @@ export function useVideoChat() {
                 setConnectionStatus(`Connected to room ${roomId}`);
                 console.log('WebSocket connected successfully');
                 
+                // 입장 효과음 재생
+                playJoinSound();
+                
+                // 녹음 자동 시작 (약간의 지연 후 - 스트림이 준비될 시간 확보)
+                setTimeout(async () => {
+                    try {
+                        await startRecording();
+                        console.log('Auto-recording started');
+                    } catch (error) {
+                        console.error('Failed to auto-start recording:', error);
+                    }
+                }, 2000);
+                
                 // Heartbeat: 30초마다 ping 메시지 전송
                 heartbeatIntervalRef.current = setInterval(() => {
                     if (ws.readyState === WebSocket.OPEN) {
@@ -199,36 +338,105 @@ export function useVideoChat() {
 
                 console.log('WebSocket message received:', message.type, message);
 
+                // to 필드가 있는 메시지는 해당 사용자만 처리
+                // 단, 내 세션 ID를 아직 모르면 일단 처리 (첫 offer에서 세션 ID 추론)
+                if (message.to && currentSessionIdRef.current && message.to !== currentSessionIdRef.current) {
+                    console.log('Message not for me, ignoring');
+                    return;
+                }
+
                 switch (message.type) {
+                    case 'session_id':
+                        // 서버에서 내 세션 ID를 알려줌
+                        if (message.sessionId) {
+                            currentSessionIdRef.current = message.sessionId;
+                            console.log('My session ID from server:', currentSessionIdRef.current);
+                        }
+                        break;
                     case 'existing_users':
-                        setConnectionStatus(`Found ${data.length} existing users. Connecting...`);
-                        for (const userId of data) {
+                        const existingUsers = message.users || [];
+                        setConnectionStatus(`Found ${existingUsers.length} existing users. Connecting...`);
+                        
+                        // 내 세션 ID 저장 (data에 내 세션 ID가 포함되어 있을 수 있음)
+                        if (message.data && typeof message.data === 'string' && !currentSessionIdRef.current) {
+                            currentSessionIdRef.current = message.data;
+                            console.log('My session ID:', currentSessionIdRef.current);
+                        }
+                        
+                        for (const userInfo of existingUsers) {
+                            const userId = userInfo.sessionId;
+                            const userName = userInfo.userName;
                             createPeerConnection(userId, true);
+                            // 사용자 정보를 미리 저장
+                            setParticipants(prev => {
+                                if (!prev.find(p => p.id === userId)) {
+                                    return [...prev, { id: userId, name: userName }];
+                                }
+                                return prev;
+                            });
                         }
                         break;
                     case 'new_user':
-                        setConnectionStatus(`User ${data} joined. Preparing connection...`);
-                        createPeerConnection(data, false);
+                        const newUserId = message.user?.sessionId || data;
+                        const newUserName = message.user?.userName;
+                        setConnectionStatus(`User ${newUserName || newUserId} joined. Preparing connection...`);
+                        
+                        // 다른 사람이 입장했을 때 효과음 재생
+                        playJoinSound();
+                        
+                        createPeerConnection(newUserId, false);
+                        // 사용자 정보를 미리 저장
+                        if (newUserName) {
+                            setParticipants(prev => {
+                                if (!prev.find(p => p.id === newUserId)) {
+                                    return [...prev, { id: newUserId, name: newUserName }];
+                                }
+                                return prev;
+                            });
+                        }
                         break;
                     case 'offer':
+                        console.log(`Received offer from ${from}, SDP:`, message.sdp?.sdp?.substring(0, 200));
+                        console.log(`Offer has m=audio:`, message.sdp?.sdp?.includes('m=audio'));
+                        
+                        // offer를 받았다는 것은 to가 내 세션 ID
+                        if (message.to && !currentSessionIdRef.current) {
+                            currentSessionIdRef.current = message.to;
+                            console.log('My session ID from offer:', currentSessionIdRef.current);
+                        }
+                        
                         if (!peerConnectionsRef.current[from!]) {
                             createPeerConnection(from!, false);
                         }
+                        
                         await peerConnectionsRef.current[from!].setRemoteDescription(new RTCSessionDescription(message.sdp!));
+                        console.log(`Remote description set for ${from}`);
+                        
                         const answer = await peerConnectionsRef.current[from!].createAnswer();
+                        console.log(`Answer created for ${from}, has m=audio:`, answer.sdp?.includes('m=audio'));
+                        
                         await peerConnectionsRef.current[from!].setLocalDescription(answer);
+                        console.log(`Sending answer to ${from}`);
+                        
                         sendWebSocketMessage({ type: 'answer', to: from, sdp: answer });
                         break;
                     case 'answer':
+                        console.log(`Received answer from ${from}, SDP:`, message.sdp?.sdp?.substring(0, 200));
+                        console.log(`Answer has m=audio:`, message.sdp?.sdp?.includes('m=audio'));
+                        
                         await peerConnectionsRef.current[from!].setRemoteDescription(new RTCSessionDescription(message.sdp!));
+                        console.log(`Remote description (answer) set for ${from}`);
                         break;
                     case 'candidate':
                         if (peerConnectionsRef.current[from!]) {
                             try {
                                 await peerConnectionsRef.current[from!].addIceCandidate(new RTCIceCandidate(message.candidate!));
+                                console.log(`ICE candidate added for ${from}`);
                             } catch (e) {
-                                console.error('Error adding ICE candidate', e);
+                                console.error(`Error adding ICE candidate for ${from}:`, e);
                             }
+                        } else {
+                            console.warn(`Received candidate for ${from} but no peer connection exists`);
                         }
                         break;
                     case 'user_left':
@@ -236,7 +444,21 @@ export function useVideoChat() {
                         const leftUserId = typeof data === 'object' && data !== null ? data.sessionId : data;
                         const leftUserName = typeof data === 'object' && data !== null ? data.userName : '';
                         setConnectionStatus(`User ${leftUserName || leftUserId} left.`);
+                        
+                        // 다른 사람이 퇴장했을 때 효과음 재생
+                        playLeaveSound();
+                        
                         closePeerConnection(leftUserId);
+                        break;
+                    case 'chat':
+                    case 'chat_message':
+                        // 채팅 메시지 수신 (서버가 브로드캐스트하므로 모든 메시지 표시)
+                        if (message.message && message.user?.userName) {
+                            setMessages(prev => [...prev, { 
+                                name: message.user!.userName, 
+                                text: message.message! 
+                            }]);
+                        }
                         break;
                     case 'error':
                         console.error(`Error from server: ${message.message}`);
@@ -273,6 +495,15 @@ export function useVideoChat() {
     };
 
     const leaveRoom = async () => {
+        // 퇴장 효과음 재생
+        playLeaveSound();
+        
+        // 녹음 중지 (자동으로 업로드됨)
+        if (isRecording) {
+            stopRecording();
+            console.log('Auto-stopped recording on leave');
+        }
+
         try {
             if (roomId) {
                 await videoChatAPI.leaveRoom(roomId);
@@ -412,6 +643,208 @@ export function useVideoChat() {
         setIsScreenSharing(false);
     };
 
+    const startRecording = async () => {
+        try {
+            // AudioContext 생성
+            const audioContext = new AudioContext();
+            audioContextRef.current = audioContext;
+
+            // Destination 생성 (모든 오디오를 믹싱할 곳)
+            const destination = audioContext.createMediaStreamDestination();
+
+            // 로컬 마이크 오디오 추가
+            if (localStreamRef.current) {
+                const localAudioTrack = localStreamRef.current.getAudioTracks()[0];
+                if (localAudioTrack) {
+                    const localSource = audioContext.createMediaStreamSource(
+                        new MediaStream([localAudioTrack])
+                    );
+                    localSource.connect(destination);
+                    console.log('Local audio added to recording');
+                }
+            }
+
+            // 모든 원격 오디오 추가
+            Object.entries(remoteStreams).forEach(([userId, stream]) => {
+                const audioTracks = stream.getAudioTracks();
+                if (audioTracks.length > 0) {
+                    const remoteSource = audioContext.createMediaStreamSource(
+                        new MediaStream([audioTracks[0]])
+                    );
+                    remoteSource.connect(destination);
+                    console.log(`Remote audio from ${userId} added to recording`);
+                }
+            });
+
+            // 믹싱된 스트림 저장
+            mixedStreamRef.current = destination.stream;
+
+            // MediaRecorder 생성
+            const mediaRecorder = new MediaRecorder(destination.stream, {
+                mimeType: 'audio/webm;codecs=opus'
+            });
+
+            recordedChunksRef.current = [];
+
+            mediaRecorder.ondataavailable = (event) => {
+                if (event.data.size > 0) {
+                    recordedChunksRef.current.push(event.data);
+                }
+            };
+
+            mediaRecorder.onstop = async () => {
+                console.log('Recording stopped, chunks:', recordedChunksRef.current.length);
+                await uploadRecording();
+            };
+
+            mediaRecorder.start(1000); // 1초마다 데이터 수집
+            mediaRecorderRef.current = mediaRecorder;
+            setIsRecording(true);
+
+            console.log('Recording started');
+        } catch (error) {
+            console.error('Failed to start recording:', error);
+            throw error;
+        }
+    };
+
+    const stopRecording = () => {
+        if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+            mediaRecorderRef.current.stop();
+            setIsRecording(false);
+            console.log('Stopping recording...');
+        }
+
+        // AudioContext 정리
+        if (audioContextRef.current) {
+            audioContextRef.current.close();
+            audioContextRef.current = null;
+        }
+
+        mixedStreamRef.current = null;
+    };
+
+    const uploadRecording = async () => {
+        if (recordedChunksRef.current.length === 0) {
+            console.warn('No recorded data to upload');
+            return;
+        }
+
+        try {
+            const webmBlob = new Blob(recordedChunksRef.current, { type: 'audio/webm' });
+            
+            console.log('Converting webm to wav...');
+            
+            // WebM을 WAV로 변환
+            const audioContext = new AudioContext();
+            const arrayBuffer = await webmBlob.arrayBuffer();
+            const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+            
+            // WAV 파일 생성
+            const wavBlob = await audioBufferToWav(audioBuffer);
+            
+            const formData = new FormData();
+            
+            // 파일명에 roomId와 타임스탬프 포함
+            const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+            const filename = `recording_${roomId}_${timestamp}.wav`;
+            
+            formData.append('file', wavBlob, filename);
+
+            console.log('Uploading recording to AI server:', {
+                size: wavBlob.size,
+                filename,
+                roomId
+            });
+
+            // AI 서버로 업로드
+            const response = await fetch('http://localhost:8000/analyze', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (!response.ok) {
+                throw new Error(`Upload failed: ${response.statusText}`);
+            }
+
+            const result = await response.json();
+            console.log('Recording analyzed successfully:', result);
+
+            // 업로드 후 청크 초기화
+            recordedChunksRef.current = [];
+        } catch (error) {
+            console.error('Failed to upload recording:', error);
+        }
+    };
+
+    // AudioBuffer를 WAV Blob으로 변환하는 헬퍼 함수
+    const audioBufferToWav = async (audioBuffer: AudioBuffer): Promise<Blob> => {
+        const numberOfChannels = audioBuffer.numberOfChannels;
+        const sampleRate = audioBuffer.sampleRate;
+        const format = 1; // PCM
+        const bitDepth = 16;
+
+        const bytesPerSample = bitDepth / 8;
+        const blockAlign = numberOfChannels * bytesPerSample;
+
+        const data = [];
+        for (let i = 0; i < audioBuffer.numberOfChannels; i++) {
+            data.push(audioBuffer.getChannelData(i));
+        }
+
+        const interleaved = interleave(data);
+        const dataLength = interleaved.length * bytesPerSample;
+        const buffer = new ArrayBuffer(44 + dataLength);
+        const view = new DataView(buffer);
+
+        // WAV 헤더 작성
+        writeString(view, 0, 'RIFF');
+        view.setUint32(4, 36 + dataLength, true);
+        writeString(view, 8, 'WAVE');
+        writeString(view, 12, 'fmt ');
+        view.setUint32(16, 16, true);
+        view.setUint16(20, format, true);
+        view.setUint16(22, numberOfChannels, true);
+        view.setUint32(24, sampleRate, true);
+        view.setUint32(28, sampleRate * blockAlign, true);
+        view.setUint16(32, blockAlign, true);
+        view.setUint16(34, bitDepth, true);
+        writeString(view, 36, 'data');
+        view.setUint32(40, dataLength, true);
+
+        // PCM 데이터 작성
+        floatTo16BitPCM(view, 44, interleaved);
+
+        return new Blob([buffer], { type: 'audio/wav' });
+    };
+
+    const interleave = (channelData: Float32Array[]): Float32Array => {
+        const length = channelData[0].length;
+        const numberOfChannels = channelData.length;
+        const result = new Float32Array(length * numberOfChannels);
+
+        let inputIndex = 0;
+        for (let i = 0; i < length; i++) {
+            for (let channel = 0; channel < numberOfChannels; channel++) {
+                result[inputIndex++] = channelData[channel][i];
+            }
+        }
+        return result;
+    };
+
+    const writeString = (view: DataView, offset: number, string: string) => {
+        for (let i = 0; i < string.length; i++) {
+            view.setUint8(offset + i, string.charCodeAt(i));
+        }
+    };
+
+    const floatTo16BitPCM = (view: DataView, offset: number, input: Float32Array) => {
+        for (let i = 0; i < input.length; i++, offset += 2) {
+            const s = Math.max(-1, Math.min(1, input[i]));
+            view.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7FFF, true);
+        }
+    };
+
     const handleResize = (e: React.MouseEvent) => {
         const startX = e.clientX;
         const startWidth = chatWidth;
@@ -428,16 +861,27 @@ export function useVideoChat() {
         document.addEventListener("mouseup", onMouseUp);
     };
 
-    const handleSendMessage = () => {
+    const handleSendMessage = async () => {
         if (!message.trim()) return;
-        setMessages([...messages, { name: "김예빈", text: message }]);
-        setMessage("");
+        
+        const messageText = message;
+        setMessage(""); // 먼저 입력창 비우기
+        
+        try {
+            // WebSocket으로 채팅 메시지 전송 (서버 스펙에 맞춰 message 필드 사용)
+            sendWebSocketMessage({
+                type: 'chat',
+                message: messageText
+            });
+        } catch (error) {
+            console.error('Failed to send message:', error);
+        }
     };
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-        if (e.key === "Enter") {
+        if (e.key === "Enter" && !e.nativeEvent.isComposing) {
             e.preventDefault();
-            setTimeout(() => handleSendMessage(), 0);
+            handleSendMessage();
         }
     };
 
@@ -465,6 +909,7 @@ export function useVideoChat() {
         isConnected,
         connectionStatus,
         isScreenSharing,
+        isRecording,
         handleResize,
         handleSendMessage,
         handleKeyDown,
@@ -477,5 +922,7 @@ export function useVideoChat() {
         toggleMicrophone,
         startScreenShare,
         stopScreenShare,
+        startRecording,
+        stopRecording,
     };
 }

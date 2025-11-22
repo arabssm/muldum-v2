@@ -14,9 +14,9 @@ export default function VideoChat() {
         showParticipants, setShowParticipants, chatWidth, chatScrollRef,
         videoRef, message, setMessage, messages, participants, remoteStreams,
         selectedParticipant, setSelectedParticipant, localStream, roomId,
-        isConnected, connectionStatus, isScreenSharing, handleResize,
+        isConnected, connectionStatus, isScreenSharing, isRecording, handleResize,
         handleKeyDown, createRoom, joinRoom, leaveRoom, findOrCreateTeamRoom, toggleCamera,
-        toggleMicrophone, startScreenShare, stopScreenShare
+        toggleMicrophone, startScreenShare, stopScreenShare, startRecording, stopRecording
     } = useVideoChat();
 
     const [camOn, setCamOn] = useState(true);
@@ -28,6 +28,7 @@ export default function VideoChat() {
 
     const remoteVideoRef = useRef<HTMLVideoElement>(null);
     const localPipVideoRef = useRef<HTMLVideoElement>(null);
+    const remoteAudioRefs = useRef<{ [userId: string]: HTMLAudioElement }>({});
 
     const handleToggleCall = async () => {
         if (isCallActive) {
@@ -68,18 +69,55 @@ export default function VideoChat() {
     useEffect(() => {
         if (selectedParticipant && remoteStreams[selectedParticipant] && remoteVideoRef.current) {
             remoteVideoRef.current.srcObject = remoteStreams[selectedParticipant];
-            // 헤드셋 상태 적용
-            remoteVideoRef.current.muted = !headsetOn;
         } else if (remoteVideoRef.current) {
             remoteVideoRef.current.srcObject = null;
         }
-    }, [selectedParticipant, remoteStreams, headsetOn]);
+    }, [selectedParticipant, remoteStreams]);
 
     useEffect(() => {
         if (selectedParticipant && localStream && localPipVideoRef.current) {
             localPipVideoRef.current.srcObject = localStream;
         }
     }, [selectedParticipant, localStream]);
+
+    // 모든 원격 스트림의 오디오를 재생하는 useEffect
+    useEffect(() => {
+        // 새로운 스트림에 대한 audio 요소 생성
+        Object.entries(remoteStreams).forEach(([userId, stream]) => {
+            if (!remoteAudioRefs.current[userId]) {
+                const audio = new Audio();
+                audio.autoplay = true;
+                audio.srcObject = stream;
+                audio.muted = !headsetOn;
+                remoteAudioRefs.current[userId] = audio;
+                
+                // 명시적으로 재생 시도
+                audio.play().then(() => {
+                    console.log(`Audio playing for user ${userId}`);
+                }).catch(error => {
+                    console.error(`Failed to play audio for user ${userId}:`, error);
+                });
+            }
+        });
+
+        // 제거된 스트림의 audio 요소 정리
+        Object.keys(remoteAudioRefs.current).forEach(userId => {
+            if (!remoteStreams[userId]) {
+                const audio = remoteAudioRefs.current[userId];
+                audio.pause();
+                audio.srcObject = null;
+                delete remoteAudioRefs.current[userId];
+                console.log(`Audio element removed for user ${userId}`);
+            }
+        });
+    }, [remoteStreams, headsetOn]);
+
+    // headsetOn 상태 변경 시 모든 audio 요소의 muted 상태 업데이트
+    useEffect(() => {
+        Object.values(remoteAudioRefs.current).forEach(audio => {
+            audio.muted = !headsetOn;
+        });
+    }, [headsetOn]);
 
     const handleCreateRoom = async () => {
         try {
@@ -110,17 +148,8 @@ export default function VideoChat() {
         const newHeadsetState = !headsetOn;
         setHeadsetOn(newHeadsetState);
         
-        // 모든 원격 비디오 요소의 오디오 음소거/해제
-        if (remoteVideoRef.current) {
-            remoteVideoRef.current.muted = !newHeadsetState;
-        }
-        
-        // 모든 원격 스트림의 오디오 트랙 활성화/비활성화
-        Object.values(remoteStreams).forEach(stream => {
-            stream.getAudioTracks().forEach(track => {
-                track.enabled = newHeadsetState;
-            });
-        });
+        // 모든 숨겨진 audio 요소들의 음소거 상태 업데이트
+        // (audio 요소들은 headsetOn 상태에 따라 자동으로 업데이트됨)
     };
 
     const handleScreenShare = async () => {
@@ -134,6 +163,8 @@ export default function VideoChat() {
             console.error('Screen share error:', error);
         }
     };
+
+
 
     const icons = [
         { on: "/assets/videoChat/cam.svg", off: "/assets/videoChat/noncam.svg", state: camOn, handler: handleCameraToggle, alt: "캠" },
@@ -189,6 +220,7 @@ export default function VideoChat() {
                         <video
                             ref={remoteVideoRef}
                             autoPlay
+                            muted
                             playsInline
                             style={{
                                 width: "100%",
