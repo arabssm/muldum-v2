@@ -59,7 +59,7 @@ export default function Apply() {
                     </_.Group>
                     <_.GrayBtn onClick={() => setIsNoticeOpen(true)}>주의사항 작성</_.GrayBtn>
                     <_.GrayBtn>규칙 추가</_.GrayBtn>
-                    <_.GrayBtn onClick={() => setIsOpen(true)}>n차 물품 열기</_.GrayBtn>
+                    <_.GrayBtn>n차 물품 열기</_.GrayBtn>
                     <_.GrayBtn>전체선택</_.GrayBtn>
                     <_.GrayBtn>승인 항목 다운로드</_.GrayBtn>
                 </_.TopWrapper>
@@ -109,18 +109,6 @@ export default function Apply() {
                 <BtnSecondary>거절</BtnSecondary>
                 <BtnPrimary>승인</BtnPrimary>
             </_.BtnWrapper>
-            <Modal isOpen={isOpen} closeModal={() => setIsOpen(false)}>
-                <_.ModalInner>
-                    <Image src="/assets/n.svg" alt="플러스 아이콘" width={48} height={48} />
-                    <_.ModalTitle>
-                        n차 물품 신청 기간 열기 <br /> 차수를 입력해주세요
-                    </_.ModalTitle>
-                    <_.Row>
-                        <_.NoBtn onClick={() => setIsOpen(false)}>닫기</_.NoBtn>
-                        <_.SaveBtn onClick={handleSave}>열기</_.SaveBtn>
-                    </_.Row>
-                </_.ModalInner>
-            </Modal>
 
             <Modal isOpen={isNoticeOpen} closeModal={() => setIsNoticeOpen(false)}>
                 <_.ModalInner>

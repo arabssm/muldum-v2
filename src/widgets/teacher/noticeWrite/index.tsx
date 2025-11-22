@@ -4,7 +4,6 @@ import * as _ from './style';
 import { BtnPrimary, BtnSecondary } from '@/shared/ui/button';
 import BlockNoteEditor from '@/shared/ui/tag';
 import { useNoticeWrite } from '@/shared/hooks/useFilePreviews';
-import { useState } from 'react';
 
 export default function NoticeWrite() {
     const {
