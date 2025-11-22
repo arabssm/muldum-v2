@@ -3,5 +3,5 @@
 import MonthlyTest from '@/widgets/student/monthlyTest';
 
 export default function MonthlyTestPage() {
-  return <MonthlyTest />
+  return <MonthlyTest sections={[]} />
 }
