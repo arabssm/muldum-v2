@@ -71,7 +71,7 @@ export default function Items() {
             ) : active === "공유캘린더" ? (
                 isOwnTeam ? <Calendar /> : null
             ) : active === "노션" ? (
-                <Notion readOnly={!isOwnTeam} />
+                <Notion readOnly={!isOwnTeam} teamId={teamId} />
             ) : active === "화상통화" ? (
                 isOwnTeam ? <VideoChat /> : null
             ) : (
