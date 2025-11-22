@@ -17,7 +17,7 @@ export default function Apply() {
         openIndex, checked, setActiveGroup,
         setActiveClass, handleToggle, handleCheckboxClick,
         getCheckboxIcon, isOpen,
-        setIsOpen, handleSave, isNoticeOpen,
+        setIsOpen, handleSave, isNoticeOpen, toggleAll,
         noticeText, setIsNoticeOpen,
         setNoticeText, handleSaveNotice, searchQuery,
         handleSearchChange,
@@ -62,7 +62,7 @@ export default function Apply() {
                     <_.GrayBtn onClick={() => router.push('/caution')}>주의사항 작성</_.GrayBtn>
                     <_.GrayBtn>규칙 추가</_.GrayBtn>
                     <_.GrayBtn>n차 물품 열기</_.GrayBtn>
-                    <_.GrayBtn>전체선택</_.GrayBtn>
+                    <_.GrayBtn onClick={toggleAll}>전체선택</_.GrayBtn>
                     <_.GrayBtn>승인 항목 다운로드</_.GrayBtn>
                 </_.TopWrapper>
             </_.Wrapper>
