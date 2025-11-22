@@ -36,17 +36,21 @@ export default function Tteamspace() {
     return (
         <_.Container>
             <_.TabWrapper>
-                {Groups.map((group) => (
-                    <_.ClassText
-                        key={group}
-                        isActive={activeGroup === group}
-                        onClick={() => setActiveGroup(group)}
-                    >
-                        {group}
-                    </_.ClassText>
-                ))}
+                <_.LeftGroup>
+                    {Groups.map((group) => (
+                        <_.ClassText
+                            key={group}
+                            isActive={activeGroup === group}
+                            onClick={() => setActiveGroup(group)}
+                        >
+                            {group}
+                        </_.ClassText>
+                    ))}
+                </_.LeftGroup>
+                <_.GrayBtn>
+                    구글시트 첨부
+                </_.GrayBtn>
             </_.TabWrapper>
-
             {activeGroup === "월말평가" && <MonthCheck />}
             {activeGroup === "학생추가" && (
                 <>
