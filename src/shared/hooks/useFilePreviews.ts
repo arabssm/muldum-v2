@@ -1,11 +1,14 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { createNoticeGeneral } from '@/shared/api/admin/notice';
+import { useRouter } from 'next/navigation';
+import { createNoticeGeneral, getPresignedUrl, uploadFileToS3 } from '@/shared/api/admin/notice';
+import { showToast } from '@/shared/ui/toast';
 
 export type Preview = { file: File; url: string };
 
 export function useNoticeWrite() {
+    const router = useRouter();
     const [files, setFiles] = useState<Preview[]>([]);
     const fileInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -51,14 +54,47 @@ export function useNoticeWrite() {
 
     const [title, setTitle] = useState('');
     const [deadlineDate, setDeadlineDate] = useState('');
+    const [content, setContent] = useState('');
 
     const handleSubmit = async () => {
         try {
-            const payloadFiles = files.map(f => ({ name: f.file.name, url: f.url }));
-            const content = getContent();
+            // 파일 업로드
+            const uploadedFiles = await Promise.all(
+                files.map(async (f) => {
+                    try {
+                        const presignedData = await getPresignedUrl(f.file.name);
+                        const s3Url = await uploadFileToS3(presignedData, f.file);
+                        return { name: f.file.name, url: s3Url };
+                    } catch (error) {
+                        console.error('파일 업로드 실패:', f.file.name, error);
+                        throw error;
+                    }
+                })
+            );
 
-            await createNoticeGeneral(title, content, payloadFiles, deadlineDate);
+            // 빈 블록 제거
+            let filteredContent = content;
+            try {
+                const blocks = JSON.parse(content);
+                const nonEmptyBlocks = blocks.filter((block: any) => {
+                    // content가 있거나 children이 있는 블록만 유지
+                    return (block.content && block.content.length > 0) || 
+                           (block.children && block.children.length > 0);
+                });
+                filteredContent = JSON.stringify(nonEmptyBlocks);
+            } catch (e) {
+                // JSON 파싱 실패시 원본 사용
+                filteredContent = content;
+            }
+
+            await createNoticeGeneral(title, filteredContent, uploadedFiles, deadlineDate);
+            showToast.success('공지가 등록되었습니다!');
+            setTimeout(() => {
+                router.push('/notice');
+            }, 500);
         } catch (err) {
+            console.error('공지 작성 실패:', err);
+            showToast.error('공지 등록에 실패했습니다!');
         }
     };
 
@@ -78,5 +114,7 @@ export function useNoticeWrite() {
         deadlineDate,
         setDeadlineDate,
         handleSubmit,
+        content,
+        setContent,
     } as const;
 }

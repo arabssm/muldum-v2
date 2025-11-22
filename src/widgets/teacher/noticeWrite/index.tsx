@@ -7,8 +7,6 @@ import { useNoticeWrite } from '@/shared/hooks/useFilePreviews';
 import { useState } from 'react';
 
 export default function NoticeWrite() {
-    const [content, setContent] = useState('');
-
     const {
         files,
         fileInputRef,
@@ -23,6 +21,8 @@ export default function NoticeWrite() {
         deadlineDate,
         setDeadlineDate,
         handleSubmit,
+        content,
+        setContent,
     } = useNoticeWrite();
 
     return (

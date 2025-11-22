@@ -4,12 +4,12 @@ import { useCallback } from 'react';
 import axiosInstance from '@/shared/lib/axiosInstance';
 import { setCookie } from '@/shared/lib/cookieUtils';
 import { GoogleLoginResponse, ErrorResponse } from '@/shared/types/auth'
+import { showToast } from '@/shared/ui/toast';
 
 export default function useGoogleLogin() {
     const startGoogleLogin = useCallback((): void => {
-        const redirectUri = process.env.NEXT_REDIRECT_URI || window.location.origin;
+        const redirectUri = process.env.NEXT_PUBLIC_REDIRECT_URI || window.location.origin;
         const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
-
         if (!clientId) {
             console.error('Google Client ID가 설정되지 않았습니다.');
             return;
@@ -30,16 +30,10 @@ export default function useGoogleLogin() {
                 if (data.accessToken && data.refreshToken) {
                     setCookie('access_token', data.accessToken);
                     setCookie('refresh_token', data.refreshToken);
-                    localStorage.setItem(
-                        'user',
-                        JSON.stringify({
-                            userId: data.userId,
-                            name: data.name,
-                            userType: data.userType,
-                            role: data.role,
-                            teamId: data.teamId ?? null,
-                        })
-                    );
+                    showToast.success("로그인되었습니다!");
+                    
+                    // 다른 컴포넌트에 로그인 상태 변경 알림
+                    window.dispatchEvent(new Event('auth-change'));
                 }
 
                 return data;
@@ -47,11 +41,11 @@ export default function useGoogleLogin() {
                 const err: ErrorResponse | undefined = error.response?.data;
 
                 if (err?.error === 'UNREGISTERED_USER') {
-                    alert('등록되지 않은 사용자입니다.');
+                    showToast.error('등록되지 않은 사용자입니다.');
                 } else if (err?.message?.includes('인증 코드')) {
-                    alert('잘못된 인증 코드입니다.');
+                    showToast.error('잘못된 인증 코드입니다.');
                 } else {
-                    alert('로그인 중 오류가 발생했습니다.');
+                    showToast.error('로그인 중 오류가 발생했습니다.');
                 }
 
                 throw error;

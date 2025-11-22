@@ -1,17 +1,21 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { useParams } from "next/navigation";
 import Image from "next/image";
 import * as _ from "./style";
 import { useVideoChat } from "@/shared/hooks/useVideoChat";
 
 export default function VideoChat() {
+    const params = useParams();
+    const teamId = params?.id ? parseInt(params.id as string, 10) : null;
+
     const {
         showParticipants, setShowParticipants, chatWidth, chatScrollRef,
         videoRef, message, setMessage, messages, participants, remoteStreams,
         selectedParticipant, setSelectedParticipant, localStream, roomId,
         isConnected, connectionStatus, isScreenSharing, handleResize,
-        handleKeyDown, createRoom, joinRoom, leaveRoom, toggleCamera,
+        handleKeyDown, createRoom, joinRoom, leaveRoom, findOrCreateTeamRoom, toggleCamera,
         toggleMicrophone, startScreenShare, stopScreenShare
     } = useVideoChat();
 
@@ -25,17 +29,51 @@ export default function VideoChat() {
     const remoteVideoRef = useRef<HTMLVideoElement>(null);
     const localPipVideoRef = useRef<HTMLVideoElement>(null);
 
-    const handleToggleCall = () => {
-        setIsCallActive((prev) => !prev);
+    const handleToggleCall = async () => {
+        if (isCallActive) {
+            // 화상통화 종료
+            await leaveRoom();
+            setIsCallActive(false);
+        } else {
+            // 화상통화 시작
+            if (!teamId) {
+                alert("팀 정보를 찾을 수 없습니다.");
+                return;
+            }
+
+            try {
+                console.log('Starting video chat for team:', teamId);
+                
+                // 팀 방 찾거나 생성
+                const room = await findOrCreateTeamRoom(teamId);
+                console.log('Room found/created:', room);
+                
+                setInputRoomId(room.roomId);
+                
+                // 잠시 대기 후 방 입장 (방 생성이 완료될 시간 확보)
+                console.log('Waiting before joining room...');
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                
+                // 방 입장
+                console.log('Now joining room:', room.roomId);
+                await joinRoom(room.roomId);
+                setIsCallActive(true);
+            } catch (error) {
+                console.error("Failed to start video chat:", error);
+                alert(`화상통화를 시작할 수 없습니다: ${error instanceof Error ? error.message : '알 수 없는 오류'}`);
+            }
+        }
     };
 
     useEffect(() => {
         if (selectedParticipant && remoteStreams[selectedParticipant] && remoteVideoRef.current) {
             remoteVideoRef.current.srcObject = remoteStreams[selectedParticipant];
+            // 헤드셋 상태 적용
+            remoteVideoRef.current.muted = !headsetOn;
         } else if (remoteVideoRef.current) {
             remoteVideoRef.current.srcObject = null;
         }
-    }, [selectedParticipant, remoteStreams]);
+    }, [selectedParticipant, remoteStreams, headsetOn]);
 
     useEffect(() => {
         if (selectedParticipant && localStream && localPipVideoRef.current) {
@@ -68,6 +106,23 @@ export default function VideoChat() {
         setMicOn(!micOn);
     };
 
+    const handleHeadsetToggle = () => {
+        const newHeadsetState = !headsetOn;
+        setHeadsetOn(newHeadsetState);
+        
+        // 모든 원격 비디오 요소의 오디오 음소거/해제
+        if (remoteVideoRef.current) {
+            remoteVideoRef.current.muted = !newHeadsetState;
+        }
+        
+        // 모든 원격 스트림의 오디오 트랙 활성화/비활성화
+        Object.values(remoteStreams).forEach(stream => {
+            stream.getAudioTracks().forEach(track => {
+                track.enabled = newHeadsetState;
+            });
+        });
+    };
+
     const handleScreenShare = async () => {
         try {
             if (isScreenSharing) {
@@ -83,64 +138,12 @@ export default function VideoChat() {
     const icons = [
         { on: "/assets/videoChat/cam.svg", off: "/assets/videoChat/noncam.svg", state: camOn, handler: handleCameraToggle, alt: "캠" },
         { on: "/assets/videoChat/mic.svg", off: "/assets/videoChat/nonmic.svg", state: micOn, handler: handleMicToggle, alt: "마이크" },
-        { on: "/assets/videoChat/headset.svg", off: "/assets/videoChat/nonheadset.svg", state: headsetOn, handler: () => setHeadsetOn(!headsetOn), alt: "헤드셋" },
+        { on: "/assets/videoChat/headset.svg", off: "/assets/videoChat/nonheadset.svg", state: headsetOn, handler: handleHeadsetToggle, alt: "헤드셋" },
         { on: "/assets/videoChat/share.svg", off: null, state: isScreenSharing, handler: handleScreenShare, alt: "공유" },
     ];
 
     return (
         <_.TopContainer>
-            <div style={{ padding: "1rem", background: "#f8f9fa", borderBottom: "1px solid #dee2e6" }}>
-                <div style={{ display: "flex", gap: "1rem", marginBottom: "0.5rem" }}>
-                    <input
-                        type="text"
-                        placeholder="방 제목"
-                        value={roomTitle}
-                        onChange={(e) => setRoomTitle(e.target.value)}
-                        style={{ padding: "0.5rem", border: "1px solid #ccc", borderRadius: "4px" }}
-                    />
-                    <button
-                        onClick={handleCreateRoom}
-                        style={{ padding: "0.5rem 1rem", background: "#28a745", color: "white", border: "none", borderRadius: "4px", cursor: "pointer" }}
-                    >
-                        방 생성
-                    </button>
-                </div>
-                <div style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
-                    <input
-                        type="text"
-                        placeholder="방 ID 입력"
-                        value={inputRoomId}
-                        onChange={(e) => setInputRoomId(e.target.value)}
-                        style={{ padding: "0.5rem", border: "1px solid #ccc", borderRadius: "4px" }}
-                    />
-                    <button
-                        onClick={handleJoinRoom}
-                        disabled={!inputRoomId.trim() || isConnected}
-                        style={{
-                            padding: "0.5rem 1rem",
-                            background: isConnected ? "#6c757d" : "#007bff",
-                            color: "white",
-                            border: "none",
-                            borderRadius: "4px",
-                            cursor: isConnected ? "not-allowed" : "pointer"
-                        }}
-                    >
-                        {isConnected ? "연결됨" : "방 참가"}
-                    </button>
-                    {isConnected && (
-                        <button
-                            onClick={leaveRoom}
-                            style={{ padding: "0.5rem 1rem", background: "#dc3545", color: "white", border: "none", borderRadius: "4px", cursor: "pointer" }}
-                        >
-                            방 나가기
-                        </button>
-                    )}
-                </div>
-                <div style={{ marginTop: "0.5rem", fontSize: "0.9rem", color: "#6c757d" }}>
-                    상태: {connectionStatus}
-                    {roomId && <span> | 방 ID: {roomId}</span>}
-                </div>
-            </div>
             <_.IconGroup onClick={handleToggleCall} style={{ cursor: "pointer" }}>
                 <Image
                     src={isCallActive ? "/assets/nonopen.svg" : "/assets/open.svg"}

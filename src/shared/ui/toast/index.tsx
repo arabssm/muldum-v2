@@ -3,18 +3,12 @@
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-export const handleSuccess = () => {
-  toast.success("성공했습니다!");
+export const showToast = {
+  success: (message: string) => toast.success(message),
+  error: (message: string) => toast.error(message),
+  warning: (message: string) => toast.warning(message),
+  info: (message: string) => toast.info(message),
 };
-
-export const handleError = () => {
-  toast.error("에러가 발생했습니다!");
-};
-
-export const handlenoaccess = () => {
-  toast.warning("권한이 부족합니다!")
-};
-
 
 export default function Toast() {
   return (

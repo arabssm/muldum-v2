@@ -5,6 +5,7 @@ import { majorClubs, freeClubs } from './data';
 import { useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import TeamSkeleton from './skeleton';
+import { getNetworkTeams, Team as ApiTeam } from '@/shared/api/team';
 
 type GroupType = "전공동아리" | "네트워크" | "자율동아리" | "졸업작품";
 type ClassType = "전체" | "1반" | "2반" | "3반" | "4반";
@@ -19,6 +20,7 @@ export default function Team() {
     const [activeClass, setActiveClass] = useState<ClassType>("전체");
     const [isLoading, setIsLoading] = useState(true);
     const [isMounted, setIsMounted] = useState(false);
+    const [networkTeams, setNetworkTeams] = useState<ApiTeam[]>([]);
 
     useEffect(() => {
         setIsMounted(true);
@@ -26,17 +28,43 @@ export default function Team() {
         return () => clearTimeout(timer);
     }, []);
 
+    useEffect(() => {
+        const fetchNetworkTeams = async () => {
+            if (activeGroup === "네트워크") {
+                setIsLoading(true);
+                try {
+                    const response = await getNetworkTeams();
+                    // API 응답이 배열인지 확인하고 안전하게 처리
+                    const teams = Array.isArray(response) ? response : [];
+                    setNetworkTeams(teams);
+                } catch (error) {
+                    console.error("Failed to fetch network teams:", error);
+                    setNetworkTeams([]);
+                } finally {
+                    setIsLoading(false);
+                }
+            }
+        };
+
+        fetchNetworkTeams();
+    }, [activeGroup]);
+
     const clubs =
         activeGroup === "전공동아리"
             ? majorClubs
             : activeGroup === "자율동아리"
                 ? freeClubs
-                : majorClubs;
+                : activeGroup === "네트워크"
+                    ? networkTeams
+                    : majorClubs;
+
+    // clubs가 배열인지 확인
+    const clubsArray = Array.isArray(clubs) ? clubs : [];
 
     const filteredClubs =
         activeClass === "전체"
-            ? clubs
-            : clubs.filter((club) => club.class === activeClass);
+            ? clubsArray
+            : clubsArray.filter((club) => club.class === activeClass);
 
     if (!isMounted) return null;
 

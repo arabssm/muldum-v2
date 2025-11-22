@@ -5,7 +5,11 @@ import BlockNoteEditor from "@/shared/ui/tag";
 import Picker from "@emoji-mart/react";
 import data from "@emoji-mart/data";
 
-export default function Notion() {
+interface NotionProps {
+    readOnly?: boolean;
+}
+
+export default function Notion({ readOnly = false }: NotionProps) {
     const [icon, setIcon] = useState("🌿");
     const [cover, setCover] = useState<string | null>(null);
     const [title, setTitle] = useState("동아리이름");
@@ -46,28 +50,40 @@ export default function Notion() {
                 <_.CoverContainer>
                     <_.Cover>
                         {cover ? (
-                            <label htmlFor="cover-upload">
+                            readOnly ? (
                                 <img
                                     src={cover}
                                     alt="cover"
-                                    style={{ cursor: "pointer" }}
-                                    title="클릭하여 커버 변경"
+                                    style={{ cursor: "default" }}
                                 />
-                            </label>
-                        ) : (
-                            <_.CoverPlaceholder>
+                            ) : (
                                 <label htmlFor="cover-upload">
-                                    <span>커버 추가</span>
+                                    <img
+                                        src={cover}
+                                        alt="cover"
+                                        style={{ cursor: "pointer" }}
+                                        title="클릭하여 커버 변경"
+                                    />
                                 </label>
-                            </_.CoverPlaceholder>
+                            )
+                        ) : (
+                            !readOnly && (
+                                <_.CoverPlaceholder>
+                                    <label htmlFor="cover-upload">
+                                        <span>커버 추가</span>
+                                    </label>
+                                </_.CoverPlaceholder>
+                            )
                         )}
-                        <input
-                            id="cover-upload"
-                            type="file"
-                            accept="image/*"
-                            onChange={handleCoverChange}
-                            hidden
-                        />
+                        {!readOnly && (
+                            <input
+                                id="cover-upload"
+                                type="file"
+                                accept="image/*"
+                                onChange={handleCoverChange}
+                                hidden
+                            />
+                        )}
                     </_.Cover>
                     <_.IconWrapper>
                         {icon.startsWith("data:image") ? (
@@ -75,20 +91,24 @@ export default function Notion() {
                                 <_.IconImage
                                     src={icon}
                                     alt="icon"
-                                    onClick={() =>
+                                    onClick={readOnly ? undefined : () =>
                                         document.getElementById("icon-upload")?.click()
                                     }
+                                    style={{ cursor: readOnly ? "default" : "pointer" }}
                                 />
-                                <_.ResetButton onClick={handleResetIcon}>✕</_.ResetButton>
+                                {!readOnly && (
+                                    <_.ResetButton onClick={handleResetIcon}>✕</_.ResetButton>
+                                )}
                             </_.IconImageWrapper>
                         ) : (
                             <_.EmojiWrapper>
                                 <_.IconDisplay
-                                    onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                                    onClick={readOnly ? undefined : () => setShowEmojiPicker(!showEmojiPicker)}
+                                    style={{ cursor: readOnly ? "default" : "pointer" }}
                                 >
                                     {icon}
                                 </_.IconDisplay>
-                                {showEmojiPicker && (
+                                {!readOnly && showEmojiPicker && (
                                     <_.EmojiPickerWrapper>
                                         <Picker
                                             data={data}
@@ -105,31 +125,36 @@ export default function Notion() {
                                 )}
                             </_.EmojiWrapper>
                         )}
-                        <input
-                            id="icon-upload"
-                            type="file"
-                            accept="image/*"
-                            hidden
-                            onChange={handleIconImage}
-                        />
+                        {!readOnly && (
+                            <input
+                                id="icon-upload"
+                                type="file"
+                                accept="image/*"
+                                hidden
+                                onChange={handleIconImage}
+                            />
+                        )}
                     </_.IconWrapper>
                 </_.CoverContainer>
                 <_.HeaderSection>
                     <_.Title
                         type="text"
                         value={title}
-                        onChange={(e) => setTitle(e.target.value)}
+                        onChange={readOnly ? undefined : (e) => setTitle(e.target.value)}
                         placeholder="동아리 이름을 입력하세요"
+                        readOnly={readOnly}
+                        style={{ cursor: readOnly ? "default" : "text" }}
                     />
                 </_.HeaderSection>
                 <_.EditorWrapper>
                     <BlockNoteEditor
                         initialContent={content}
-                        onChange={(value) => setContent(value)}
+                        onChange={readOnly ? undefined : (value) => setContent(value)}
+                        editable={!readOnly}
                     />
                 </_.EditorWrapper>
             </_.Page>
-            <BtnPrimary onClick={handleSave}>저장</BtnPrimary>
+            {!readOnly && <BtnPrimary onClick={handleSave}>저장</BtnPrimary>}
         </_.Container>
     );
 }

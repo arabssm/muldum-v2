@@ -4,7 +4,7 @@ import { getCookie, setCookie, deleteCookie } from './cookieUtils';
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 const axiosInstance = axios.create({
-    baseURL: API_BASE_URL,
+    baseURL: `${API_BASE_URL}/api`,
     headers: { 'Content-Type': 'application/json' },
     withCredentials: true,
 });
@@ -42,14 +42,26 @@ const processQueue = (token: string | null, error: any) => {
 };
 
 const refreshAccessToken = async (): Promise<string> => {
-    const { data } = await refreshClient.post('/ara/auth/refresh', {
-        refreshToken: getCookie('refresh_token'),
-    });
+    const refreshToken = getCookie('refresh_token');
+    if (!refreshToken) throw new Error('No refresh token available');
 
-    const token: string = data.access_token;
+    const { data } = await refreshClient.post('/api/ara/auth/refresh', 
+        { refreshToken },
+        {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${refreshToken}`,
+            },
+        }
+    );
+
+    const token: string = data.access_token || data.accessToken;
     if (!token) throw new Error('No access_token in refresh response');
 
     setCookie('access_token', token);
+    if (data.refresh_token || data.refreshToken) {
+        setCookie('refresh_token', data.refresh_token || data.refreshToken);
+    }
     return token;
 };
 

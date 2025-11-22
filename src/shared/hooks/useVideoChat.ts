@@ -4,9 +4,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { videoChatAPI } from "../api/videoChat";
 import type { Participant, WebRTCMessage } from "@/shared/types/video";
 
-const API_BASE_URL = 'http://localhost:8001';
-const MOCK_USER_ID = '1';
-const MOCK_USER_ROLE = 'mentor';
+
 
 export function useVideoChat() {
     const [showParticipants, setShowParticipants] = useState(true);
@@ -27,6 +25,7 @@ export function useVideoChat() {
     const screenStreamRef = useRef<MediaStream | null>(null);
     const peerConnectionsRef = useRef<{ [userId: string]: RTCPeerConnection }>({});
     const remoteVideosRef = useRef<{ [userId: string]: HTMLVideoElement }>({});
+    const heartbeatIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
     const [isScreenSharing, setIsScreenSharing] = useState(false);
 
@@ -44,9 +43,9 @@ export function useVideoChat() {
         }
     }, []);
 
-    const createRoom = async (title: string, teamId: number = 1) => {
+    const createRoom = async (title: string, teamId: number = 1, maxParticipants: number = 20) => {
         try {
-            const result = await videoChatAPI.createRoom({ title, teamId });
+            const result = await videoChatAPI.createRoom({ title, teamId, maxParticipants });
             if (result.roomId) {
                 setRoomId(result.roomId);
                 return result.roomId;
@@ -142,22 +141,63 @@ export function useVideoChat() {
     const joinRoom = async (roomId: string) => {
         try {
             setConnectionStatus(`Connecting to room ${roomId}...`);
+            console.log('Attempting to join room:', roomId);
 
             await startLocalMedia();
 
-            const wsUrl = `ws://localhost:8001/ws/signal?roomId=${roomId}`;
+            // 사용자 정보 가져오기
+            const { getUserInfo } = await import('../api/user');
+            const userInfo = await getUserInfo();
+            console.log('User info for WebSocket:', { userId: userInfo.id, userName: userInfo.name });
+
+            // 환경 변수 또는 현재 도메인 기반으로 API URL 결정
+            let apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+            
+            if (!apiBaseUrl && typeof window !== 'undefined') {
+                // 배포 환경에서 환경 변수가 없으면 현재 도메인 기반으로 추론
+                const hostname = window.location.hostname;
+                if (hostname.includes('muldum.com')) {
+                    apiBaseUrl = 'https://backend.muldum.com';
+                } else {
+                    apiBaseUrl = 'http://localhost:8080';
+                }
+            }
+            
+            apiBaseUrl = apiBaseUrl || 'http://localhost:8080';
+            console.log('API Base URL from env:', process.env.NEXT_PUBLIC_API_BASE_URL);
+            console.log('Using API Base URL:', apiBaseUrl);
+            
+            const wsProtocol = apiBaseUrl.startsWith('https') ? 'wss' : 'ws';
+            const wsHost = apiBaseUrl.replace(/^https?:\/\//, '');
+            
+            // WebSocket URL에 roomId, userId, userName 파라미터 추가
+            const wsUrl = `${wsProtocol}://${wsHost}/api/ws/signal?roomId=${roomId}&userId=${userInfo.id}&userName=${encodeURIComponent(userInfo.name)}`;
+            
+            console.log('WebSocket URL:', wsUrl);
+            
             const ws = new WebSocket(wsUrl);
             wsRef.current = ws;
 
             ws.onopen = () => {
                 setIsConnected(true);
                 setConnectionStatus(`Connected to room ${roomId}`);
+                console.log('WebSocket connected successfully');
+                
+                // Heartbeat: 30초마다 ping 메시지 전송
+                heartbeatIntervalRef.current = setInterval(() => {
+                    if (ws.readyState === WebSocket.OPEN) {
+                        ws.send(JSON.stringify({ type: 'ping' }));
+                        console.log('Sent ping to keep connection alive');
+                    }
+                }, 30000); // 30초
             };
 
             ws.onmessage = async (event) => {
                 const message: WebRTCMessage = JSON.parse(event.data);
                 const from = message.from;
                 const data = message.data;
+
+                console.log('WebSocket message received:', message.type, message);
 
                 switch (message.type) {
                     case 'existing_users':
@@ -192,19 +232,31 @@ export function useVideoChat() {
                         }
                         break;
                     case 'user_left':
-                        setConnectionStatus(`User ${data} left.`);
-                        closePeerConnection(data);
+                        // data가 객체인 경우 sessionId 추출
+                        const leftUserId = typeof data === 'object' && data !== null ? data.sessionId : data;
+                        const leftUserName = typeof data === 'object' && data !== null ? data.userName : '';
+                        setConnectionStatus(`User ${leftUserName || leftUserId} left.`);
+                        closePeerConnection(leftUserId);
                         break;
                     case 'error':
                         console.error(`Error from server: ${message.message}`);
+                        alert(`화상통화 오류: ${message.message}`);
                         leaveRoom();
                         break;
                 }
             };
 
-            ws.onclose = () => {
+            ws.onclose = (event) => {
                 setIsConnected(false);
                 setConnectionStatus('Disconnected');
+                console.log('WebSocket disconnected', { code: event.code, reason: event.reason });
+                
+                // Heartbeat 정리
+                if (heartbeatIntervalRef.current) {
+                    clearInterval(heartbeatIntervalRef.current);
+                    heartbeatIntervalRef.current = null;
+                }
+                
                 stopLocalMedia();
             };
 
@@ -216,6 +268,7 @@ export function useVideoChat() {
         } catch (error) {
             console.error('Error joining room:', error);
             setConnectionStatus('Failed to join room');
+            alert('화상통화 연결에 실패했습니다.');
         }
     };
 
@@ -226,6 +279,12 @@ export function useVideoChat() {
             }
         } catch (error) {
             console.error('Error leaving room via API:', error);
+        }
+
+        // Heartbeat 정리
+        if (heartbeatIntervalRef.current) {
+            clearInterval(heartbeatIntervalRef.current);
+            heartbeatIntervalRef.current = null;
         }
 
         if (wsRef.current) {
@@ -242,6 +301,18 @@ export function useVideoChat() {
             return await videoChatAPI.listRooms();
         } catch (error) {
             console.error('Error listing rooms:', error);
+            throw error;
+        }
+    };
+
+    const findOrCreateTeamRoom = async (teamId: number) => {
+        try {
+            const room = await videoChatAPI.findOrCreateTeamRoom(teamId);
+            console.log('Team room:', room);
+            setRoomId(room.roomId);
+            return room;
+        } catch (error) {
+            console.error('Error finding or creating team room:', error);
             throw error;
         }
     };
@@ -284,21 +355,22 @@ export function useVideoChat() {
 
     const startScreenShare = async () => {
         try {
-            if (Object.keys(peerConnectionsRef.current).length === 0) {
-                throw new Error('Join a room and connect to a peer before sharing screen');
-            }
-
             const screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true });
             screenStreamRef.current = screenStream;
             const screenTrack = screenStream.getVideoTracks()[0];
 
-            // Replace video track in all peer connections
+            // Replace video track in all peer connections (if any)
             for (const userId in peerConnectionsRef.current) {
                 const pc = peerConnectionsRef.current[userId];
                 const videoSender = pc.getSenders().find(sender => sender.track?.kind === 'video');
                 if (videoSender) {
                     await videoSender.replaceTrack(screenTrack);
                 }
+            }
+
+            // 로컬 비디오도 화면 공유로 변경
+            if (videoRef.current) {
+                videoRef.current.srcObject = screenStream;
             }
 
             setIsScreenSharing(true);
@@ -317,6 +389,7 @@ export function useVideoChat() {
 
         const cameraTrack = localStreamRef.current.getVideoTracks()[0];
 
+        // 모든 피어 연결의 비디오 트랙을 카메라로 복원
         for (const userId in peerConnectionsRef.current) {
             const pc = peerConnectionsRef.current[userId];
             const videoSender = pc.getSenders().find(sender => sender.track?.kind === 'video');
@@ -325,6 +398,12 @@ export function useVideoChat() {
             }
         }
 
+        // 로컬 비디오도 카메라로 복원
+        if (videoRef.current && localStreamRef.current) {
+            videoRef.current.srcObject = localStreamRef.current;
+        }
+
+        // 화면 공유 스트림 정리
         if (screenStreamRef.current) {
             screenStreamRef.current.getTracks().forEach(track => track.stop());
             screenStreamRef.current = null;
@@ -393,6 +472,7 @@ export function useVideoChat() {
         joinRoom,
         leaveRoom,
         listRooms,
+        findOrCreateTeamRoom,
         toggleCamera,
         toggleMicrophone,
         startScreenShare,

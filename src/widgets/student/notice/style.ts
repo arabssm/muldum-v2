@@ -40,6 +40,28 @@ export const Group = styled.div`
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 2rem;
+`;
+
+export const TitleGroup = styled.div`
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+`;
+
+export const Btn = styled.button`
+    padding: 0.75rem 1.5rem;
+    border-radius: 4px;
+    background-color: #707070;
+    color: #fff;
+    border: none;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+
+    &:hover {
+        background-color: #565454ff;
+    }
 `;
 
 export const SearchWrapper = styled.div`
