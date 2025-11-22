@@ -16,3 +16,12 @@ export const getClubs = async () => {
   const res = await axiosInstance.get(`/ara/major/teamspace`);
   return res.data;
 };
+
+// 팀 페이지 노션 부분
+export const getNotion = async (team_id: string) => {
+  const res = await axiosInstance.get(`/std/teamspace/${team_id}`);
+  return res.data;
+};
+
+export const editNotion = (team_id: string, data: { name: string; content: string }) =>
+  axiosInstance.patch(`/std/teamspace?type=${team_id}`, data).then(res => res.data);
