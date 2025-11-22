@@ -21,9 +21,9 @@ export default function AuthConfirm({ roles, children, fallback = null }: PropsW
                 }
 
                 const userInfo = await getUserInfo();
-                const role = userInfo?.user_type;
+                const role = userInfo?.user_type as 'student' | 'teacher';
 
-                const allowedRoles = roles.map((r) => {
+                const allowedRoles: ('student' | 'teacher')[] = roles.map((r) => {
                     if (r === 'STUDENT') return 'student';
                     return 'teacher';
                 });
