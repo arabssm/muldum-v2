@@ -6,6 +6,7 @@ import { BtnPrimary, BtnSecondary } from "@/shared/ui/button";
 import Image from "next/image";
 import { Modal } from "@/components/modal/modal";
 import { useApplyAndModalState } from "@/shared/hooks/apply";
+import { useRouter } from "next/navigation";
 
 const Groups = ["승인 가능 물품 조회", "승인된 물품 조회", "거절된 물품 조회"] as const;
 const Classes = ["전체", "전공동아리", "1반", "2반", "3반", "4반"] as const;
@@ -21,6 +22,7 @@ export default function Apply() {
         setNoticeText, handleSaveNotice, searchQuery,
         handleSearchChange,
     } = useApplyAndModalState();
+    const router = useRouter()
 
     return (
         <_.Container>
@@ -57,7 +59,7 @@ export default function Apply() {
                             </_.ClassText>
                         ))}
                     </_.Group>
-                    <_.GrayBtn onClick={() => setIsNoticeOpen(true)}>주의사항 작성</_.GrayBtn>
+                    <_.GrayBtn onClick={() => router.push('/caution')}>주의사항 작성</_.GrayBtn>
                     <_.GrayBtn>규칙 추가</_.GrayBtn>
                     <_.GrayBtn>n차 물품 열기</_.GrayBtn>
                     <_.GrayBtn>전체선택</_.GrayBtn>
