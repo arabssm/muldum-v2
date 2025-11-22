@@ -3,8 +3,8 @@
 import * as _ from './style';
 import { BtnPrimary, BtnSecondary } from "@/shared/ui/button";
 import FormSection from './FormSection';
-import { sections } from './data';
 import { useRouter, usePathname } from 'next/navigation';
+import type { MonthlyTestProps } from "@/shared/types";
 
 function ActionButtons() {
   const router = useRouter();
@@ -31,7 +31,7 @@ function ActionButtons() {
   return null;
 }
 
-export default function MonthlyTest() {
+export default function MonthlyTest({ sections = [] }: MonthlyTestProps) {
   return (
     <_.Container>
       {sections.map((section, i) => (

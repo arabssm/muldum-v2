@@ -43,3 +43,7 @@ export interface Event {
     to: number;
     color: string;
 }
+
+export interface MonthlyTestProps {
+  sections: any[];
+}
