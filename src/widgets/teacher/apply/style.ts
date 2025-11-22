@@ -214,6 +214,7 @@ export const SaveBtn = styled.button`
   color: #fff;
   border: none;
   border-radius: 8px;
+  margin-top: 1rem;
   cursor: pointer;
   
   &:hover {
@@ -228,9 +229,18 @@ export const NoBtn = styled.button`
   color: #ff9b62;
   border: 1px solid #ff9b62;
   border-radius: 8px;
+  margin-top: 1rem;
   cursor: pointer;
   
   &:hover {
     background: #ff864025;
   }
+`;
+
+export const Input = styled.input`
+  width: 100%;
+  padding: 1rem;
+  border-radius: 4px;
+  border: 1px solid #D1D1D1;
+  outline: none;
 `;
