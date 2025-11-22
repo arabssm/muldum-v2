@@ -3,14 +3,14 @@
 import * as _ from './style';
 import { BtnPrimary, BtnSecondary } from "@/shared/ui/button";
 import FormSection from './FormSection';
-import { sections } from './data';
 import { useRouter, usePathname } from 'next/navigation';
+import type { MonthlyTestProps } from "@/shared/types";
 
 function ActionButtons() {
   const router = useRouter();
   const pathname = usePathname();
 
-  if (pathname.startsWith("/team/")) {
+  if (pathname.startsWith("/monthlyTest")) {
     return (
       <_.BtnGroup>
         <BtnSecondary onClick={() => router.push('/MonthlyList')}>이때동안 작성한 월말평가 보러가기</BtnSecondary>
@@ -31,7 +31,7 @@ function ActionButtons() {
   return null;
 }
 
-export default function MonthlyTest() {
+export default function MonthlyTest({ sections = [] }: MonthlyTestProps) {
   return (
     <_.Container>
       {sections.map((section, i) => (

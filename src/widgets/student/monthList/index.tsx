@@ -1,18 +1,35 @@
+"use client";
+
 import { useState } from 'react';
 import * as _ from './style';
 import Image from 'next/image';
 import FormSection from '../monthlyTest/FormSection';
-import { sections } from '../monthlyTest/data';
+import { useMonthReports } from '@/shared/hooks/useMonthReports';
+import Loading from '@/shared/ui/loading';
 
 export default function MonthlyList() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
-  const months = ['3월', '5월', '4월'];
+
+  const initialReports = [
+    { id: 'report_3', month: '3월', sections: [] },
+    { id: 'report_4', month: '4월', sections: [] },
+    { id: 'report_5', month: '5월', sections: [] },
+  ];
+
+  const { reports, loading, error, fetchReport } = useMonthReports(initialReports);
+
+  const handleToggle = async (index: number) => {
+    await fetchReport(index);
+    setOpenIndex(openIndex === index ? null : index);
+  };
+
+  if (error) return <div>{error}</div>;
 
   return (
     <_.Container>
-      {months.map((month, i) => (
+      {reports.map((monthReport, i) => (
         <_.MonthBlock key={i}>
-          <_.MonthHeader onClick={() => setOpenIndex(openIndex === i ? null : i)}>
+          <_.MonthHeader onClick={() => handleToggle(i)}>
             <Image
               src="/assets/toggle.svg"
               alt="토글"
@@ -24,10 +41,11 @@ export default function MonthlyList() {
                 marginRight: '8px',
               }}
             />
-            <_.Month>{month}</_.Month>
+            <_.Month>{monthReport.month}</_.Month>
           </_.MonthHeader>
           <_.Content isOpen={openIndex === i}>
-            {sections.map((section, j) => (
+            {loading && <Loading />}
+            {monthReport.sections.map((section, j) => (
               <FormSection key={j} {...section} />
             ))}
           </_.Content>

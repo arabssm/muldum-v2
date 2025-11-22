@@ -1,19 +1,24 @@
+"use client";
+
 import * as _ from "./style";
 import { BtnPrimary } from "@/shared/ui/button";
-import { useState } from "react";
 import BlockNoteEditor from "@/shared/ui/tag";
 import Picker from "@emoji-mart/react";
 import data from "@emoji-mart/data";
+import { useNotion } from "@/shared/hooks/useNotion";
+import { useState } from "react";
+import type { NotionProps } from "@/shared/types/team"
+import Loading from "@/shared/ui/loading";
 
-interface NotionProps {
-    readOnly?: boolean;
-}
+export default function Notion({ teamId, readOnly = false }: NotionProps) {
+    const {
+        title, setTitle,
+        content, setContent,
+        icon, setIcon,
+        cover, setCover,
+        loading, saveNotion,
+    } = useNotion(teamId);
 
-export default function Notion({ readOnly = false }: NotionProps) {
-    const [icon, setIcon] = useState("🌿");
-    const [cover, setCover] = useState<string | null>(null);
-    const [title, setTitle] = useState("동아리이름");
-    const [content, setContent] = useState<string>("");
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
     const handleCoverChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -40,9 +45,7 @@ export default function Notion({ readOnly = false }: NotionProps) {
         setShowEmojiPicker(false);
     };
 
-    const handleSave = () => {
-        alert("저장되었습니다");
-    };
+    if (loading) return <><Loading /></>;
 
     return (
         <_.Container>
@@ -51,11 +54,7 @@ export default function Notion({ readOnly = false }: NotionProps) {
                     <_.Cover>
                         {cover ? (
                             readOnly ? (
-                                <img
-                                    src={cover}
-                                    alt="cover"
-                                    style={{ cursor: "default" }}
-                                />
+                                <img src={cover} alt="cover" style={{ cursor: "default" }} />
                             ) : (
                                 <label htmlFor="cover-upload">
                                     <img
@@ -154,7 +153,7 @@ export default function Notion({ readOnly = false }: NotionProps) {
                     />
                 </_.EditorWrapper>
             </_.Page>
-            {!readOnly && <BtnPrimary onClick={handleSave}>저장</BtnPrimary>}
+            {!readOnly && <BtnPrimary onClick={saveNotion}>저장</BtnPrimary>}
         </_.Container>
     );
 }

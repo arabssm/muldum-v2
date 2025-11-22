@@ -1,11 +1,13 @@
 "use client";
 
 import * as _ from './style';
-import { majorClubs, freeClubs } from './data';
+import { freeClubs } from './data';
 import { useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import TeamSkeleton from './skeleton';
-import { getNetworkTeams, Team as ApiTeam } from '@/shared/api/team';
+import { Team as ApiTeam } from '@/shared/api/team';
+import { useTeams } from '@/shared/hooks/team';
+import { showToast } from '@/shared/ui/toast';
 
 type GroupType = "전공동아리" | "네트워크" | "자율동아리" | "졸업작품";
 type ClassType = "전체" | "1반" | "2반" | "3반" | "4반";
@@ -16,55 +18,45 @@ const Classes: ClassType[] = ["전체", "1반", "2반", "3반", "4반"];
 export default function Team() {
     const router = useRouter();
     const pathname = usePathname();
+
     const [activeGroup, setActiveGroup] = useState<GroupType>("전공동아리");
     const [activeClass, setActiveClass] = useState<ClassType>("전체");
-    const [isLoading, setIsLoading] = useState(true);
     const [isMounted, setIsMounted] = useState(false);
-    const [networkTeams, setNetworkTeams] = useState<ApiTeam[]>([]);
+    const [initialLoading, setInitialLoading] = useState(true);
+
+    const { teams, isLoading: apiLoading } = useTeams(
+        activeGroup === "전공동아리" || activeGroup === "네트워크"
+            ? activeGroup
+            : "전공동아리"
+    );
 
     useEffect(() => {
         setIsMounted(true);
-        const timer = setTimeout(() => setIsLoading(false), 1500);
+        const timer = setTimeout(() => setInitialLoading(false), 1000);
         return () => clearTimeout(timer);
     }, []);
 
-    useEffect(() => {
-        const fetchNetworkTeams = async () => {
-            if (activeGroup === "네트워크") {
-                setIsLoading(true);
-                try {
-                    const response = await getNetworkTeams();
-                    // API 응답이 배열인지 확인하고 안전하게 처리
-                    const teams = Array.isArray(response) ? response : [];
-                    setNetworkTeams(teams);
-                } catch (error) {
-                    console.error("Failed to fetch network teams:", error);
-                    setNetworkTeams([]);
-                } finally {
-                    setIsLoading(false);
-                }
-            }
-        };
+    const isLoading = apiLoading || initialLoading;
 
-        fetchNetworkTeams();
-    }, [activeGroup]);
+    const handleGroupClick = (group: GroupType) => {
+        if (group === "자율동아리" || group === "졸업작품") {
+            showToast.error('접근할 수 없습니다');
+            return;
+        }
+        setActiveGroup(group);
+    };
 
-    const clubs =
-        activeGroup === "전공동아리"
-            ? majorClubs
+    const clubs: ApiTeam[] =
+        activeGroup === "전공동아리" || activeGroup === "네트워크"
+            ? teams
             : activeGroup === "자율동아리"
                 ? freeClubs
-                : activeGroup === "네트워크"
-                    ? networkTeams
-                    : majorClubs;
-
-    // clubs가 배열인지 확인
-    const clubsArray = Array.isArray(clubs) ? clubs : [];
+                : [];
 
     const filteredClubs =
         activeClass === "전체"
-            ? clubsArray
-            : clubsArray.filter((club) => club.class === activeClass);
+            ? clubs
+            : clubs.filter((club) => club.class === activeClass);
 
     if (!isMounted) return null;
 
@@ -76,7 +68,7 @@ export default function Team() {
                         <_.ClassText
                             key={label}
                             isActive={activeGroup === label}
-                            onClick={() => setActiveGroup(label)}
+                            onClick={() => handleGroupClick(label)}
                         >
                             {label}
                         </_.ClassText>
