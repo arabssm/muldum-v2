@@ -25,3 +25,9 @@ export const getNotion = async (team_id: string) => {
 
 export const editNotion = (team_id: string, data: { name: string; content: string }) =>
   axiosInstance.patch(`/std/teamspace?type=${team_id}`, data).then(res => res.data);
+
+// 월말평가 학생 목록 조회 부분
+export const getUserMonth = async (report_id: string) => {
+  const res = await axiosInstance.get(`/std/month_report/${report_id}`);
+  return res.data;
+};
