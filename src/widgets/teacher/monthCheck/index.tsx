@@ -1,29 +1,36 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import * as _ from "./style";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { BtnPrimary, BtnSecondary } from "@/shared/ui/button";
+import { useAdminMonthReports } from "@/shared/hooks/useAdminMonthReports";
+import Loading from "@/shared/ui/loading";
 
 export default function MonthCheck() {
     const router = useRouter();
-    const [club, setClub] = useState("");
     const clubOptions = ["3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"];
+    const [club, setClub] = useState("");
+    const [openIndex, setOpenIndex] = useState<number | null>(null);
+    const [checked, setChecked] = useState<boolean[]>(new Array(clubOptions.length).fill(false));
 
-    const [checked, setChecked] = useState<boolean[]>(
-        new Array(clubOptions.length).fill(false)
-    );
+    const { reports, loading, error, fetchReport } = useAdminMonthReports(clubOptions);
 
     const getCheckboxIcon = (isChecked: boolean) =>
         isChecked ? "/assets/checkbox.svg" : "/assets/nonCheck.svg";
 
-    const handleCheckboxClick = (index: number, e: React.MouseEvent) => {
+    const handleCheckboxClick = async (index: number, e: React.MouseEvent) => {
         e.stopPropagation();
-        setChecked((prev) =>
-            prev.map((v, i) => (i === index ? !v : v))
-        );
+        setChecked((prev) => prev.map((v, i) => (i === index ? !v : v)));
+
+        if (!reports[index].sections.length) {
+            await fetchReport(index);
+        }
+        setOpenIndex(openIndex === index ? null : index);
     };
+
+    if (error) return <div>{error}</div>;
 
     return (
         <_.Container>
@@ -59,32 +66,41 @@ export default function MonthCheck() {
                     }}
                 />
             </_.SelectWrapper>
+
             <_.Wrapper>
-                {clubOptions.map((month, index) => (
-                    <div
-                        key={month}
-                        style={{
-                            display: "flex",
-                            alignItems: "center",
-                            marginBottom: "0.5rem",
-                            cursor: "pointer",
-                            gap: "0.5rem"
-                        }}
-                        onClick={(e) => handleCheckboxClick(index, e)}
-                    >
-                        <Image
-                            src={getCheckboxIcon(checked[index])}
-                            alt="체크박스"
-                            width={20}
-                            height={20}
-                            style={{ marginRight: "0.5rem" }}
-                        />
-                        <span>{month} 월말평가</span>
-                        <_.Gray onClick={() => router.push('/monthWatch')}
-                            style={{ cursor: "pointer" }}> 클릭하여 보기 </_.Gray>
-                    </div>
-                ))}
+                {clubOptions
+                    .filter((month) => !club || club === month)
+                    .map((month, index) => (
+                        <div
+                            key={month}
+                            style={{ display: "flex", flexDirection: "column", marginBottom: "0.5rem", cursor: "pointer" }}
+                        >
+                            <div
+                                style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}
+                                onClick={(e) => handleCheckboxClick(index, e)}
+                            >
+                                <Image src={getCheckboxIcon(checked[index])} alt="체크박스" width={20} height={20} />
+                                <span>{month} 월말평가</span>
+                                <_.Gray onClick={() => router.push("/monthWatch")} style={{ cursor: "pointer" }}>
+                                    클릭하여 보기
+                                </_.Gray>
+                            </div>
+
+                            {openIndex === index && (
+                                <div style={{ paddingLeft: "2rem", marginTop: "0.5rem" }}>
+                                    {loading[index] ? (
+                                        <Loading />
+                                    ) : (
+                                        reports[index].sections.map((section, i) => (
+                                            <div key={i}>{/* FormSection 렌더 */}</div>
+                                        ))
+                                    )}
+                                </div>
+                            )}
+                        </div>
+                    ))}
             </_.Wrapper>
+
             <_.BtnGroup>
                 <BtnSecondary>거절</BtnSecondary>
                 <BtnPrimary>승인</BtnPrimary>

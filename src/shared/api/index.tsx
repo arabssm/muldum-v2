@@ -31,3 +31,9 @@ export const getUserMonth = async (report_id: string) => {
   const res = await axiosInstance.get(`/std/month_report/${report_id}`);
   return res.data;
 };
+
+// 월말평가 선생님 목록 조회 부분
+export const getAdminMonth = async (report_id: string) => {
+  const res = await axiosInstance.get(`/tch/month_report/${report_id}`);
+  return res.data;
+};
