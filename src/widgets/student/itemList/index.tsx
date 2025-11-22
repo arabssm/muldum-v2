@@ -6,9 +6,13 @@ import { useState } from "react";
 import { items } from "./data";
 import { BtnPrimary, BtnSecondary } from "@/shared/ui/button";
 import { useRouter } from "next/navigation";
+import { useApplyAndModalState } from "@/shared/hooks/apply";
+
+const Groups = ["임시신청", "최종신청"] as const;
 
 export default function ItemList() {
     const [openIndex, setOpenIndex] = useState<number | null>(null);
+    const { activeGroup, setActiveGroup } = useApplyAndModalState();
     const [club, setClub] = useState("");
     const [checked, setChecked] = useState<boolean[]>(() =>
         items.map(() => false)
@@ -33,7 +37,17 @@ export default function ItemList() {
 
     return (
         <_.Container>
-            <_.Title>우리 팀이 신청한 물품항목</_.Title>
+            <_.BarGroup>
+                {Groups.map((label) => (
+                    <_.ClassText
+                        key={label}
+                        isActive={activeGroup === label}
+                        onClick={() => setActiveGroup(label)}
+                    >
+                        {label}
+                    </_.ClassText>
+                ))}
+            </_.BarGroup>
             <_.SelectGroup>
                 <_.SelectWrapper>
                     <_.Select

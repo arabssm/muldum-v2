@@ -68,7 +68,7 @@ export default function ItemForm({ handleSubmit }: ItemFormProps) {
         </_.Wrapper>
       </_.Group>
       <_.Group>
-        <FormInput label="물품링크" value={link} setValue={setLink} placeholder="링크를 입력하세요" width="62rem" error={errors.link} />
+        <FormInput label="물품링크" value={link} setValue={setLink} placeholder="링크를 입력하세요" width="54rem" error={errors.link} />
         <FormInput label="예상 도착일" value={expectDrive} setValue={setExpectDrive} placeholder="예상 도착 시간을 입력하세요" width="15rem" error={errors.expectDrive} />
       </_.Group>
       <FormInput label="신청사유" value={reason} setValue={setReason} placeholder="신청 사유를 10자 이상 입력해주세요" width="100%" height="20vh" error={errors.reason} />

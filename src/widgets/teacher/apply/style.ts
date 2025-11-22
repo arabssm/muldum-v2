@@ -9,6 +9,36 @@ export const Container = styled.div`
     gap: 3rem;
 `;
 
+export const SearchWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  font-size: 1rem;
+  background-color: #FAFAFA;
+  border: none;
+  border-radius: 4px;
+  padding: 0.75rem;
+  gap: 0.5rem;
+  background-color: #FAFAFA;
+  width: fit-content;
+  margin-left: auto;
+
+  input {
+    background-color: #FAFAFA;
+    border: none;
+    outline: none;
+    font-size: 0.9rem;
+    width: 20rem;
+  }
+
+  ::placeholder {
+    color: #D1D1D1;
+  }
+
+  &:focus {
+    outline: none;
+  }
+`;
+
 export const Wrapper = styled.div`
     display: flex;
     flex-direction: column;
@@ -114,7 +144,7 @@ export const InfoGroup = styled.div`
 
 export const GrayBtn = styled.button`
   padding: 0;
-  width: 10rem;
+  width: 11rem;
   color: #909090;
   font-size: 0.95rem;
   background-color: transparent;
@@ -184,6 +214,7 @@ export const SaveBtn = styled.button`
   color: #fff;
   border: none;
   border-radius: 8px;
+  margin-top: 1rem;
   cursor: pointer;
   
   &:hover {
@@ -198,9 +229,18 @@ export const NoBtn = styled.button`
   color: #ff9b62;
   border: 1px solid #ff9b62;
   border-radius: 8px;
+  margin-top: 1rem;
   cursor: pointer;
   
   &:hover {
     background: #ff864025;
   }
+`;
+
+export const Input = styled.input`
+  width: 100%;
+  padding: 1rem;
+  border-radius: 4px;
+  border: 1px solid #D1D1D1;
+  outline: none;
 `;

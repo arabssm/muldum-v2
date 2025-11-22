@@ -9,10 +9,6 @@ export const Container = styled.div`
     padding: 1rem 0;
 `;
 
-export const TabWrapper = styled.div`
-  display: flex;
-`;
-
 export const ClassText = styled.div<Bar>`
   display: flex;
   padding: 0.75rem;
@@ -122,4 +118,33 @@ export const AddBtn = styled.button`
     &:hover {
         color: #545454;
     }
+`;
+
+export const GrayBtn = styled.button`
+  display: flex;
+  justify-content: end;
+  align-items: center;
+  width: 11rem;
+  color: #909090;
+  font-size: 0.95rem;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+
+  :hover {
+    color: #3F3F3F;
+  }
+`;
+
+export const TabWrapper = styled.div`
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+
+export const LeftGroup = styled.div`
+  display: flex; 
+  align-items: center;
 `;
