@@ -11,6 +11,7 @@ import { useState } from "react";
 interface ExtendedItemFormProps extends ItemFormProps {
   hideClubSelect?: boolean;
   isTemp?: boolean;
+  isEdit?: boolean;
   initialData?: {
     item?: string;
     price?: string;
@@ -22,7 +23,7 @@ interface ExtendedItemFormProps extends ItemFormProps {
   };
 }
 
-export default function ItemForm({ handleSubmit, hideClubSelect = false, isTemp = true, initialData }: ExtendedItemFormProps) {
+export default function ItemForm({ handleSubmit, hideClubSelect = false, isTemp = true, isEdit = false, initialData }: ExtendedItemFormProps) {
   const {
     item, setItem,
     price, setPrice,
@@ -91,7 +92,7 @@ export default function ItemForm({ handleSubmit, hideClubSelect = false, isTemp 
       <FormInput label="신청사유" value={reason} setValue={setReason} placeholder="신청 사유를 10자 이상 입력해주세요" width="100%" height="20vh" error={errors.reason} />
       <_.BtnGroup>
         <BtnSecondary onClick={handleSecondary}>신청내역 보러가기</BtnSecondary>
-        <BtnPrimary onClick={internalSubmit}>신청하기</BtnPrimary>
+        <BtnPrimary onClick={internalSubmit}>{isEdit ? "수정하기" : "신청하기"}</BtnPrimary>
       </_.BtnGroup>
     </>
   );

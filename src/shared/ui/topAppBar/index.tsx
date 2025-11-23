@@ -8,19 +8,38 @@ import { useModal } from '@/components/modal/useModal';
 import LoginModal from '@/shared/ui/modal/loginModal';
 import { showToast } from '../toast/index'
 import { useAuth } from '@/shared/hooks/useAuth';
-
-const Menu: { label: string; path: string }[] = [
-  { label: '홈화면', path: '/' },
-  { label: '역대 동아리', path: '/clubs' },
-  { label: '물품 관리', path: '/items' },
-  { label: '팀스페이스', path: '/team' },
-  { label: '공지사항', path: '/notice' },
-];
+import { useState, useEffect } from 'react';
+import { getUserInfo } from '@/shared/api/user';
 
 export default function TopAppBar() {
   const pathname = usePathname();
   const { isLoggedIn, logout } = useAuth();
   const { Modal, openModal } = useModal();
+  const [userType, setUserType] = useState<'student' | 'teacher' | null>(null);
+
+  useEffect(() => {
+    const fetchUserType = async () => {
+      if (isLoggedIn) {
+        try {
+          const userInfo = await getUserInfo();
+          const type = userInfo.user_type.toLowerCase() as 'student' | 'teacher';
+          setUserType(type);
+          console.log('User type:', type);
+        } catch (error) {
+          console.error('Failed to fetch user type:', error);
+        }
+      }
+    };
+    fetchUserType();
+  }, [isLoggedIn]);
+
+  const Menu: { label: string; path: string }[] = [
+    { label: '홈화면', path: '/' },
+    { label: '역대 동아리', path: '/clubs' },
+    { label: '물품 관리', path: userType === 'teacher' ? '/apply' : '/items' },
+    { label: '팀스페이스', path: '/team' },
+    { label: '공지사항', path: '/notice' },
+  ];
 
   const isActive = (path: string) => {
     if (path === '/') {
@@ -33,7 +52,7 @@ export default function TopAppBar() {
     <_.Container>
       <_.Wrapper>
         {Menu.map((item) => (
-          <Link key={item.path} href={item.path}>
+          <Link key={item.label} href={item.path}>
             {item.label === '홈화면' ? (
               <Image
                 src="/assets/araLogo.svg"

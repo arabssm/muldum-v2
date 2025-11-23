@@ -48,3 +48,35 @@ export const Content = styled.div`
     font-size: 1.075rem;
     color: #B2B2B2;
 `;
+
+export const SelectWrapper = styled.div`
+    width: 100%;
+    margin-bottom: 1.5rem;
+    display: flex;
+    justify-content: flex-end;
+`;
+
+export const Select = styled.select`
+    padding: 0.75rem 3.5rem 0.75rem 1rem;
+    font-size: 1.125rem;
+    border: 1px solid #E0E0E0;
+    border-radius: 0.5rem;
+    background-color: white;
+    cursor: pointer;
+    outline: none;
+    min-width: 120px;
+    
+    &:hover {
+        border-color: #FF9B62;
+    }
+    
+    &:focus {
+        border-color: #FF9B62;
+    }
+`;
+
+export const LogoWrapper = styled.div`
+    display: flex;
+    justify-content: center;
+    margin: 1rem 0;
+`;

@@ -13,7 +13,7 @@ export const deleteNotice = async (notice_id: string) => {
 
 // 팀스페이스 부분
 export const getClubs = async () => {
-  const res = await axiosInstance.get(`/ara/major/teamspace`);
+  const res = await axiosInstance.get(`/ara/teamspace/major`);
   return res.data;
 };
 

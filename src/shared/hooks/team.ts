@@ -16,7 +16,16 @@ export const useTeams = (activeGroup: GroupType) => {
 
         if (activeGroup === "전공동아리") {
           const res = await getClubs();
-          response = Array.isArray(res) ? res : [];
+          // API 응답: { teams: [...] }
+          const teams = res.teams || [];
+          response = teams.map((team: any) => ({
+            id: team.teamId,
+            name: team.teamName,
+            members: team.members?.map((m: any) => 
+              m.studentId ? `${m.studentId} ${m.userName}` : m.userName
+            ) || [],
+            class: team.class || undefined,
+          }));
         } else if (activeGroup === "네트워크") {
           const res = await getNetworkTeams();
           response = Array.isArray(res) ? res : [];

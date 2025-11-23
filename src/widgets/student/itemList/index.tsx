@@ -9,18 +9,26 @@ import { useRouter } from "next/navigation";
 import { useApplyAndModalState } from "@/shared/hooks/apply";
 
 const Groups = ["임시신청", "최종신청"] as const;
-import { getItemList } from "@/shared/api/items";
+import { getItemList, submitFinalItems, deleteTempItems, deleteItem } from "@/shared/api/items";
+import { showToast } from "@/shared/ui/toast";
 
 export default function ItemList() {
     const [openIndex, setOpenIndex] = useState<number | null>(null);
     const { activeGroup, setActiveGroup } = useApplyAndModalState();
-    const [club, setClub] = useState("");
     const [itemsData, setItemsData] = useState<any[]>(items);
+    const [originalData, setOriginalData] = useState<any[]>([]); // 원본 API 데이터 저장
     const [checked, setChecked] = useState<boolean[]>(() =>
         items.map(() => false)
     );
     const [isLoading, setIsLoading] = useState(true);
     const router = useRouter();
+
+    // 페이지 진입 시 임시신청 탭으로 설정
+    useEffect(() => {
+        if (activeGroup !== "임시신청") {
+            setActiveGroup("임시신청");
+        }
+    }, []);
 
     useEffect(() => {
         const fetchItems = async () => {
@@ -30,9 +38,12 @@ export default function ItemList() {
                 console.log('물품 목록:', data);
                 
                 // API 데이터를 UI 형식에 맞게 변환
+                // 원본 데이터 저장
+                setOriginalData(data);
+                
                 const transformedData = data.map((item: any) => {
-                    let state = "승인 대기";
-                    let color = "#B2B2B2";
+                    let state = "임시 신청";
+                    let color = "#FFA500";
                     
                     if (item.status === "APPROVED") {
                         state = "승인 완료";
@@ -40,6 +51,12 @@ export default function ItemList() {
                     } else if (item.status === "REJECTED") {
                         state = "승인 거부";
                         color = "#DF3636";
+                    } else if (item.status === "PENDING") {
+                        state = "승인 대기";
+                        color = "#B2B2B2";
+                    } else if (item.status === "INTEMP") {
+                        state = "임시 신청";
+                        color = "#FFA500";
                     }
                     
                     // 날짜 포맷 변환 (2025-11-19T00:00:00 -> 11/19(화))
@@ -57,13 +74,15 @@ export default function ItemList() {
                         id: item.id,
                         state,
                         color,
-                        price: item.price?.toLocaleString() || "0",
+                        status: item.status,
+                        price: typeof item.price === 'string' ? parseInt(item.price).toLocaleString() : item.price?.toLocaleString() || "0",
                         name: item.product_name,
-                        link: item.productLink || item.product_link || "-",
+                        link: item.product_link || "-",
                         quantity: item.quantity,
                         export: exportDate,
-                        money: item.deliveryPrice || item.delivery_price || "0",
-                        reason: item.reason || item.rejectReason || "-",
+                        money: item.deliveryPrice || "0",
+                        reason: item.reason || "-",
+                        rejectReason: item.rejectReason || null,
                     };
                 });
                 
@@ -93,7 +112,93 @@ export default function ItemList() {
     const getCheckboxIcon = (isChecked: boolean) =>
         isChecked ? "/assets/checkbox.svg" : "/assets/nonCheck.svg";
 
-    const clubOptions = ["나의 동아리", "반짝반짝빛나는밤"];
+    const handleFinalSubmit = async () => {
+        if (itemsData.length === 0) {
+            showToast.warning("임시 신청된 물품이 없습니다.");
+            return;
+        }
+
+        // 체크된 항목만 신청할지, 전체를 신청할지 확인
+        const checkedIndices = checked.map((c, i) => c ? i : -1).filter(i => i !== -1);
+        const checkedItemIds = checkedIndices.map(i => itemsData[i]?.id).filter(Boolean);
+
+        const message = checkedItemIds.length > 0 
+            ? `선택한 ${checkedItemIds.length}개 물품을 최종 신청하시겠습니까?`
+            : "모든 임시 신청 물품을 최종 신청하시겠습니까?";
+
+        if (!confirm(message)) {
+            return;
+        }
+
+        try {
+            const result = await submitFinalItems(checkedItemIds.length > 0 ? checkedItemIds : undefined);
+            if (result.status === "PENDING") {
+                showToast.success(result.message || "최종 신청이 완료되었습니다!");
+                // 목록 새로고침
+                const data = await getItemList(true);
+                setItemsData(data);
+                setChecked(data.map(() => false));
+            } else {
+                showToast.error(result.message || "최종 신청에 실패했습니다.");
+            }
+        } catch (error) {
+            console.error("최종 신청 실패:", error);
+            showToast.error("최종 신청 중 오류가 발생했습니다.");
+        }
+    };
+
+    const handleDelete = async () => {
+        const checkedIndices = checked.map((c, i) => c ? i : -1).filter(i => i !== -1);
+        
+        if (checkedIndices.length === 0) {
+            showToast.warning("삭제할 물품을 선택해주세요.");
+            return;
+        }
+
+        const checkedItemIds = checkedIndices.map(i => itemsData[i]?.id).filter(Boolean);
+
+        if (!confirm(`선택한 ${checkedItemIds.length}개 물품을 삭제하시겠습니까?`)) {
+            return;
+        }
+
+        try {
+            if (activeGroup === "임시신청") {
+                // 임시 물품 일괄 삭제
+                const result = await deleteTempItems(checkedItemIds);
+                if (result.status === "INTEMP") {
+                    showToast.success(result.message || "삭제되었습니다.");
+                } else {
+                    showToast.error(result.message || "삭제에 실패했습니다.");
+                }
+            } else {
+                // 제출된 물품 개별 삭제
+                await Promise.all(checkedItemIds.map(id => deleteItem(id)));
+                showToast.success("삭제되었습니다.");
+            }
+            
+            // 목록 새로고침
+            const isTemp = activeGroup === "임시신청";
+            const data = await getItemList(isTemp);
+            setItemsData(data);
+            setChecked(data.map(() => false));
+        } catch (error) {
+            console.error("삭제 실패:", error);
+            showToast.error("삭제 중 오류가 발생했습니다.");
+        }
+    };
+
+    const handleEditItem = (item: any) => {
+        // 원본 데이터에서 해당 아이템 찾기
+        const originalItem = originalData.find((d: any) => d.id === item.id);
+        
+        if (originalItem) {
+            // URL에 데이터를 인코딩해서 전달
+            const dataStr = encodeURIComponent(JSON.stringify(originalItem));
+            router.push(`/itemEdit?itemId=${item.id}&data=${dataStr}`);
+        } else {
+            showToast.error("물품 정보를 찾을 수 없습니다.");
+        }
+    };
 
     return (
         <_.Container>
@@ -108,34 +213,6 @@ export default function ItemList() {
                     </_.ClassText>
                 ))}
             </_.BarGroup>
-            <_.SelectGroup>
-                <_.SelectWrapper>
-                    <_.Select
-                        id="club"
-                        value={club}
-                        onChange={(e) => setClub(e.target.value)}
-                    >
-                        <option value="">전체</option>
-                        {clubOptions.map((option) => (
-                            <option key={option} value={option}>
-                                {option}
-                            </option>
-                        ))}
-                    </_.Select>
-                    <Image
-                        src="/assets/toggle.svg"
-                        alt="토글"
-                        width={20}
-                        height={20}
-                        style={{
-                            position: "absolute",
-                            right: "0.5rem",
-                            top: "50%",
-                            transform: "translateY(-50%) rotate(90deg)",
-                        }}
-                    />
-                </_.SelectWrapper>
-            </_.SelectGroup>
             <_.BtnWrapper>
                 <_.InfoContainer>
                     {isLoading ? (
@@ -173,24 +250,43 @@ export default function ItemList() {
                                         }}
                                         style={{ cursor: item.link && item.link !== "-" ? 'pointer' : 'default' }}
                                     >
-                                        가격 : {item.price}원
+                                        가격: {item.price}원
                                     </_.UnContent>
                                     <_.Content>{item.quantity}개</_.Content>
                                     <_.Content>{item.reason}</_.Content>
                                     <_.Content>{item.export} 도착예정</_.Content>
-                                    <_.Content>배송비 : {item.money}원</_.Content>
-                                    {item.state === "승인 거부" && (
-                                        <_.Reapply onClick={() => router.push(`/reapply?itemId=${item.id}`)}>
-                                            재신청하기
-                                        </_.Reapply>
+                                    <_.Content>배송비: {item.money}원</_.Content>
+                                    {item.status === "REJECTED" && item.rejectReason && (
+                                        <_.Content style={{ color: '#DF3636' }}>거절 사유: {item.rejectReason}</_.Content>
                                     )}
+                                    <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem' }}>
+                                        {activeGroup === "임시신청" && (
+                                            <_.Reapply onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleEditItem(item);
+                                            }}>
+                                                수정하기
+                                            </_.Reapply>
+                                        )}
+                                        {item.state === "승인 거부" && (
+                                            <_.Reapply onClick={(e) => {
+                                                e.stopPropagation();
+                                                router.push(`/reapply?itemId=${item.id}`);
+                                            }}>
+                                                재신청하기
+                                            </_.Reapply>
+                                        )}
+                                    </div>
                                 </_.Group>
                             )}
                         </_.Wrapper>
                     ))}
                 </_.InfoContainer>
                 <_.BtnGroup>
-                    <BtnSecondary>삭제</BtnSecondary>
+                    <BtnSecondary onClick={handleDelete}>삭제</BtnSecondary>
+                    {activeGroup === "임시신청" && (
+                        <BtnPrimary onClick={handleFinalSubmit}>최종 신청</BtnPrimary>
+                    )}
                     <BtnPrimary onClick={() => router.back()}>돌아가기</BtnPrimary>
                 </_.BtnGroup>
             </_.BtnWrapper>
