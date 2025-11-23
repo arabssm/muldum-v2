@@ -4,39 +4,20 @@ export const Container = styled.div`
   display: flex;
   flex-direction: column;
   width: 100%;
-  gap: 1rem;
+  gap: 2rem;
   padding: 1rem;
 `;
 
-export const TabGroup = styled.div`
+export const Section = styled.div`
   display: flex;
-  width: 100%;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  padding-bottom: 0.5rem;
-  margin-bottom: 2rem;
-`;
-
-export const TabButton = styled.div<{ isActive: boolean }>`
-  display: flex;
-  padding: 0.75rem;
-  font-size: 1.125rem;
-  font-weight: ${({ isActive }) => (isActive ? 500 : 400)};
-  cursor: pointer;
-  color: ${({ isActive }) => (isActive ? "#4B4B4B" : "#B2B2B2")};
-  border-bottom: 2.5px solid ${({ isActive }) => (isActive ? "#4B4B4B" : "#B2B2B2")};
-
-  &:hover {
-    background-color: ${({ isActive }) =>
-      isActive ? "transparent" : "#f5f5f5b6"};
-  }
+  flex-direction: column;
+  gap: 1rem;
 `;
 
 export const Header = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1rem;
 `;
 
 export const Title = styled.h2`
@@ -58,6 +39,40 @@ export const MonthSelector = styled.div`
       border-color: #1976d2;
     }
   }
+`;
+
+export const TeamList = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+`;
+
+export const TeamItem = styled.div<{ isSelected: boolean }>`
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1rem;
+  border: 2px solid ${(props) => (props.isSelected ? '#1976d2' : '#e0e0e0')};
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background-color: ${(props) => (props.isSelected ? '#e3f2fd' : '#fff')};
+
+  &:hover {
+    border-color: #1976d2;
+    background-color: #f5f5f5;
+  }
+`;
+
+export const TeamName = styled.div`
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #333;
+`;
+
+export const TeamMembers = styled.div`
+  font-size: 0.9rem;
+  color: #666;
 `;
 
 export const ReportList = styled.div`

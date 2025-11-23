@@ -43,7 +43,7 @@ export default function Items() {
           <_.Message>{lockedMessage}</_.Message>
         </_.MessageWrapper>
       ) : (
-        <ItemForm />
+        <ItemForm hideClubSelect={true} />
       )}
     </_.Container>
   );

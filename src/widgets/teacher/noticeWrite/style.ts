@@ -121,12 +121,13 @@ export const ThumbnailWrapper = styled.div`
     display: flex;
     flex-direction: column;
     width: 8rem;
-    height: auto;
+    height: 8rem;
 `;
 
 export const Thumbnail = styled.img`
     width: 100%;
     height: 100%;
+    object-fit: cover;
     border-radius: 4px;
 `;
 

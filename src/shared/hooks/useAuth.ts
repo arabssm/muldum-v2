@@ -46,7 +46,12 @@ export function useAuth() {
 
   const logout = async () => {
     try {
-      await axiosInstance.post('/ara/auth/logout');
+      const refreshToken = getCookie('refresh_token');
+      if (refreshToken) {
+        await axiosInstance.post('/ara/auth/logout', {
+          refreshToken: refreshToken
+        });
+      }
     } catch (error) {
       console.error('로그아웃 요청 실패:', error);
     } finally {

@@ -6,29 +6,19 @@ import { useState, useEffect } from "react";
 import { items } from "./data";
 import { BtnPrimary, BtnSecondary } from "@/shared/ui/button";
 import { useRouter } from "next/navigation";
-import { useApplyAndModalState } from "@/shared/hooks/apply";
-
 const Groups = ["임시신청", "최종신청"] as const;
 import { getItemList, submitFinalItems, deleteTempItems, deleteItem } from "@/shared/api/items";
 import { showToast } from "@/shared/ui/toast";
 
 export default function ItemList() {
     const [openIndex, setOpenIndex] = useState<number | null>(null);
-    const { activeGroup, setActiveGroup } = useApplyAndModalState();
-    const [itemsData, setItemsData] = useState<any[]>(items);
+    const [activeGroup, setActiveGroup] = useState<"임시신청" | "최종신청">("임시신청");
+    const [itemsData, setItemsData] = useState<any[]>([]);
     const [originalData, setOriginalData] = useState<any[]>([]); // 원본 API 데이터 저장
-    const [checked, setChecked] = useState<boolean[]>(() =>
-        items.map(() => false)
-    );
+    const [checked, setChecked] = useState<boolean[]>([]);
+    const [isAllChecked, setIsAllChecked] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const router = useRouter();
-
-    // 페이지 진입 시 임시신청 탭으로 설정
-    useEffect(() => {
-        if (activeGroup !== "임시신청") {
-            setActiveGroup("임시신청");
-        }
-    }, []);
 
     useEffect(() => {
         const fetchItems = async () => {
@@ -88,6 +78,7 @@ export default function ItemList() {
                 
                 setItemsData(transformedData);
                 setChecked(transformedData.map(() => false));
+                setIsAllChecked(false);
             } catch (error) {
                 console.error('물품 목록 조회 실패:', error);
             } finally {
@@ -104,9 +95,18 @@ export default function ItemList() {
 
     const handleCheckboxClick = (index: number, e: React.MouseEvent) => {
         e.stopPropagation();
-        setChecked((prev) =>
-            prev.map((val, i) => (i === index ? !val : val))
-        );
+        setChecked((prev) => {
+            const newChecked = prev.map((val, i) => (i === index ? !val : val));
+            setIsAllChecked(newChecked.every(c => c));
+            return newChecked;
+        });
+    };
+
+    const handleSelectAll = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        const newValue = !isAllChecked;
+        setIsAllChecked(newValue);
+        setChecked(itemsData.map(() => newValue));
     };
 
     const getCheckboxIcon = (isChecked: boolean) =>
@@ -214,20 +214,34 @@ export default function ItemList() {
                 ))}
             </_.BarGroup>
             <_.BtnWrapper>
+                {activeGroup === "임시신청" && itemsData.length > 0 && !isLoading && (
+                    <div style={{ display: 'flex', alignItems: 'center', marginBottom: '0.25rem', cursor: 'pointer', padding: '0.25rem 0' }} onClick={handleSelectAll}>
+                        <Image
+                            src={getCheckboxIcon(isAllChecked)}
+                            alt="전체선택"
+                            width={20}
+                            height={20}
+                            style={{ marginRight: "0.5rem" }}
+                        />
+                        <span style={{ fontSize: '0.9rem' }}>전체선택</span>
+                    </div>
+                )}
                 <_.InfoContainer>
                     {isLoading ? (
                         <div>로딩 중...</div>
                     ) : itemsData.map((item, index) => (
                         <_.Wrapper key={index}>
                             <_.ToggleWrapper onClick={() => handleToggle(index)}>
-                                <Image
-                                    src={getCheckboxIcon(checked[index])}
-                                    alt="체크박스"
-                                    width={20}
-                                    height={20}
-                                    style={{ marginRight: "0.5rem", cursor: "pointer" }}
-                                    onClick={(e) => handleCheckboxClick(index, e)}
-                                />
+                                {activeGroup === "임시신청" && (
+                                    <Image
+                                        src={getCheckboxIcon(checked[index])}
+                                        alt="체크박스"
+                                        width={20}
+                                        height={20}
+                                        style={{ marginRight: "0.5rem", cursor: "pointer" }}
+                                        onClick={(e) => handleCheckboxClick(index, e)}
+                                    />
+                                )}
                                 <_.State color={item.color}>{item.state}</_.State>
                                 <_.ToggleImage isOpen={openIndex === index}>
                                     <Image
@@ -283,7 +297,9 @@ export default function ItemList() {
                     ))}
                 </_.InfoContainer>
                 <_.BtnGroup>
-                    <BtnSecondary onClick={handleDelete}>삭제</BtnSecondary>
+                    {activeGroup === "임시신청" && (
+                        <BtnSecondary onClick={handleDelete}>삭제</BtnSecondary>
+                    )}
                     {activeGroup === "임시신청" && (
                         <BtnPrimary onClick={handleFinalSubmit}>최종 신청</BtnPrimary>
                     )}

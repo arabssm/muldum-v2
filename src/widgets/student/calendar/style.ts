@@ -197,6 +197,55 @@ export const SaveBtn = styled.button`
   }
 `;
 
+export const DetailContent = styled.div`
+  width: 100%;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  font-size: 1rem;
+  color: #333;
+  line-height: 1.5;
+  min-height: 80px;
+  white-space: pre-wrap;
+`;
+
+export const ButtonRow = styled.div`
+  display: flex;
+  gap: 0.75rem;
+  width: 100%;
+  margin-top: 0.5rem;
+`;
+
+export const EditBtn = styled.button`
+  flex: 1;
+  padding: 0.75rem;
+  background: #4CAF50;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  
+  &:hover {
+    background: #45a049;
+  }
+`;
+
+export const DeleteBtn = styled.button`
+  flex: 1;
+  padding: 0.75rem;
+  background: #f44336;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  
+  &:hover {
+    background: #da190b;
+  }
+`;
+
 export const EventBarAbsolute = styled.div<{
   color: string;
   left: string;

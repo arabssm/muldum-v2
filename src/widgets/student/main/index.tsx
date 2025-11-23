@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import Slider from "@/shared/ui/slider";
 import MainSkeleton from "./skeleton";
-import { Menu } from "./data";
+import { Menu, TeacherMenu } from "./data";
 import useNotices from "@/shared/hooks/useNotices";
 import { getUserInfo } from "@/shared/api/user";
 import type { Notice } from "@/shared/types/notice";
@@ -75,7 +75,7 @@ export default function Main() {
                     <_.Info>
                         <_.Wrapper>
                             <_.Title>메뉴</_.Title>
-                            {Menu.map((menu) => (
+                            {(userRole === "TEACHER" ? TeacherMenu : Menu).map((menu) => (
                                 <Link key={menu.path} href={menu.path}>
                                     <_.Menu>
                                         <_.Title>{menu.title}</_.Title>

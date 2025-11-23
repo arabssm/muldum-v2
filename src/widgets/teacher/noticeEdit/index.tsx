@@ -1,11 +1,17 @@
 'use client';
 
-import * as _ from './style';
+import * as _ from '../noticeWrite/style';
 import { BtnPrimary, BtnSecondary } from '@/shared/ui/button';
 import BlockNoteEditor from '@/shared/ui/tag';
-import { useNoticeWrite } from '@/shared/hooks/useFilePreviews';
+import { useNoticeEdit } from '../../../shared/hooks/useNoticeEdit';
+import { useRouter } from 'next/navigation';
 
-export default function NoticeWrite() {
+interface NoticeEditProps {
+    id: string;
+}
+
+export default function NoticeEdit({ id }: NoticeEditProps) {
+    const router = useRouter();
     const {
         files,
         fileInputRef,
@@ -14,20 +20,24 @@ export default function NoticeWrite() {
         onClickDrop,
         onInputChange,
         removeAt,
-        editorRef,
         title,
         setTitle,
         deadlineDate,
         setDeadlineDate,
         handleSubmit,
-        content,
         setContent,
-    } = useNoticeWrite();
+        isLoading,
+        initialContent,
+    } = useNoticeEdit(id);
+
+    if (isLoading) {
+        return <_.Container>로딩 중...</_.Container>;
+    }
 
     return (
         <_.Container>
             <_.Group>
-                <_.Title>공지사항 작성</_.Title>
+                <_.Title>공지사항 수정</_.Title>
                 <_.Wrapper>
                     <_.SubTitle>제목</_.SubTitle>
                     <_.Input
@@ -49,7 +59,7 @@ export default function NoticeWrite() {
                     <_.SubTitle>내용</_.SubTitle>
                     <_.detail>
                         <BlockNoteEditor
-                            initialContent={''}
+                            initialContent={initialContent}
                             onChange={(val) => setContent(val)}
                         />
                     </_.detail>
@@ -63,20 +73,23 @@ export default function NoticeWrite() {
                                 '클릭하여 파일을 넣거나 드래그 하세요.'
                             ) : (
                                 <_.FileList>
-                                    {files.map((p, idx) => {
-                                        const fullFileName = p.file.name;
-                                        const displayFileName = fullFileName.length > 10 ? fullFileName.slice(0, 10) + '...' : fullFileName;
-                                        const fileNameLower = fullFileName.toLowerCase();
-                                        const isImage = /\.(jpg|jpeg|png|gif|webp|svg)$/.test(fileNameLower);
-                                        const isAudio = /\.(mp3|wav|ogg|m4a)$/.test(fileNameLower);
-                                        const isVideo = /\.(mp4|webm|mov|avi)$/.test(fileNameLower);
-                                        const isPdf = /\.pdf$/.test(fileNameLower);
+                                    {files.map((p: any, idx: number) => {
+                                        const fileUrl = p.url.toLowerCase();
+                                        const rawFileName = p.file?.name || p.url.split('/').pop()?.split('?')[0] || '파일';
+                                        // UUID 패턴 제거 (예: 477410da-2aa0-4168-8198-c0c71ba052d3_)
+                                        const decodedFileName = decodeURIComponent(rawFileName);
+                                        const cleanFileName = decodedFileName.replace(/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}_/i, '');
+                                        const fileName = cleanFileName.length > 10 ? cleanFileName.slice(0, 10) + '...' : cleanFileName;
+                                        const isImage = /\.(jpg|jpeg|png|gif|webp|svg)(\?|$)/.test(fileUrl);
+                                        const isAudio = /\.(mp3|wav|ogg|m4a)(\?|$)/.test(fileUrl);
+                                        const isVideo = /\.(mp4|webm|mov|avi)(\?|$)/.test(fileUrl);
+                                        const isPdf = /\.pdf(\?|$)/.test(fileUrl);
 
                                         return (
                                             <_.FileItem key={p.url}>
                                                 <_.ThumbnailWrapper>
                                                     {isImage ? (
-                                                        <_.Thumbnail src={p.url} alt={fullFileName} />
+                                                        <_.Thumbnail src={p.url} alt={fileName} />
                                                     ) : (
                                                         <div style={{
                                                             width: '100%',
@@ -93,7 +106,7 @@ export default function NoticeWrite() {
                                                         </div>
                                                     )}
                                                     <_.RemoveBtn
-                                                        onClick={(e) => {
+                                                        onClick={(e: React.MouseEvent) => {
                                                             e.stopPropagation();
                                                             removeAt(idx);
                                                         }}
@@ -101,7 +114,7 @@ export default function NoticeWrite() {
                                                         ✕
                                                     </_.RemoveBtn>
                                                 </_.ThumbnailWrapper>
-                                                <_.FileName>{displayFileName}</_.FileName>
+                                                <_.FileName>{fileName}</_.FileName>
                                             </_.FileItem>
                                         );
                                     })}
@@ -111,8 +124,8 @@ export default function NoticeWrite() {
                     </div>
                 </_.Wrapper>
                 <_.BtnGroup>
-                    <BtnSecondary>취소</BtnSecondary>
-                    <BtnPrimary onClick={handleSubmit}>작성하기</BtnPrimary>
+                    <BtnSecondary onClick={() => router.back()}>취소</BtnSecondary>
+                    <BtnPrimary onClick={handleSubmit}>수정하기</BtnPrimary>
                 </_.BtnGroup>
             </_.Group>
         </_.Container>

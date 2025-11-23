@@ -3,10 +3,7 @@
 import * as _ from "./style";
 import { BtnPrimary } from "@/shared/ui/button";
 import BlockNoteEditor from "@/shared/ui/tag";
-import Picker from "@emoji-mart/react";
-import data from "@emoji-mart/data";
 import { useNotion } from "@/shared/hooks/useNotion";
-import { useState } from "react";
 import type { NotionProps } from "@/shared/types/team"
 import Loading from "@/shared/ui/loading";
 
@@ -17,32 +14,62 @@ export default function Notion({ teamId, readOnly = false }: NotionProps) {
         icon, setIcon,
         cover, setCover,
         loading, saveNotion,
+        updateBanner,
+        updateIcon
     } = useNotion(teamId);
 
-    const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-
-    const handleCoverChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleCoverChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
-        const reader = new FileReader();
-        reader.onload = (ev) => setCover(ev.target?.result as string);
-        reader.readAsDataURL(file);
+        
+        try {
+            const { showToast } = await import('@/shared/ui/toast');
+            const { getPresignedUrl, uploadFileToS3 } = await import('@/shared/api/admin/notice');
+            
+            showToast.info("배너 업로드 중...");
+            
+            // 1. Presigned URL 받기
+            const presignedData = await getPresignedUrl(file.name);
+            
+            // 2. S3에 업로드
+            const s3Url = await uploadFileToS3(presignedData, file);
+            
+            // 3. 서버에 배너 URL 업데이트
+            await updateBanner(s3Url);
+            
+            showToast.success("배너가 업데이트되었습니다!");
+        } catch (error) {
+            console.error("배너 업로드 실패:", error);
+            const { showToast } = await import('@/shared/ui/toast');
+            showToast.error("배너 업로드에 실패했습니다");
+        }
     };
 
-    const handleIconImage = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleIconImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
-        const reader = new FileReader();
-        reader.onload = (ev) => {
-            setIcon(ev.target?.result as string);
-            setShowEmojiPicker(false);
-        };
-        reader.readAsDataURL(file);
-    };
-
-    const handleResetIcon = () => {
-        setIcon("🌿");
-        setShowEmojiPicker(false);
+        
+        try {
+            const { showToast } = await import('@/shared/ui/toast');
+            const { getPresignedUrl, uploadFileToS3 } = await import('@/shared/api/admin/notice');
+            
+            showToast.info("로고 업로드 중...");
+            
+            // 1. Presigned URL 받기
+            const presignedData = await getPresignedUrl(file.name);
+            
+            // 2. S3에 업로드
+            const s3Url = await uploadFileToS3(presignedData, file);
+            
+            // 3. 서버에 아이콘 URL 업데이트
+            await updateIcon(s3Url);
+            
+            showToast.success("로고가 업데이트되었습니다!");
+        } catch (error) {
+            console.error("로고 업로드 실패:", error);
+            const { showToast } = await import('@/shared/ui/toast');
+            showToast.error("로고 업로드에 실패했습니다");
+        }
     };
 
     if (loading) return <><Loading /></>;
@@ -85,44 +112,26 @@ export default function Notion({ teamId, readOnly = false }: NotionProps) {
                         )}
                     </_.Cover>
                     <_.IconWrapper>
-                        {icon.startsWith("data:image") ? (
+                        {icon ? (
                             <_.IconImageWrapper>
                                 <_.IconImage
                                     src={icon}
-                                    alt="icon"
+                                    alt="로고"
                                     onClick={readOnly ? undefined : () =>
                                         document.getElementById("icon-upload")?.click()
                                     }
                                     style={{ cursor: readOnly ? "default" : "pointer" }}
+                                    title={readOnly ? "" : "클릭하여 로고 변경"}
                                 />
-                                {!readOnly && (
-                                    <_.ResetButton onClick={handleResetIcon}>✕</_.ResetButton>
-                                )}
                             </_.IconImageWrapper>
                         ) : (
-                            <_.EmojiWrapper>
-                                <_.IconDisplay
-                                    onClick={readOnly ? undefined : () => setShowEmojiPicker(!showEmojiPicker)}
-                                    style={{ cursor: readOnly ? "default" : "pointer" }}
-                                >
-                                    {icon}
-                                </_.IconDisplay>
-                                {!readOnly && showEmojiPicker && (
-                                    <_.EmojiPickerWrapper>
-                                        <Picker
-                                            data={data}
-                                            onEmojiSelect={(emoji: any) => {
-                                                setIcon(emoji.native);
-                                                setShowEmojiPicker(false);
-                                            }}
-                                            theme="light"
-                                        />
-                                        <_.ImageLabel htmlFor="icon-upload">
-                                            이미지로 변경
-                                        </_.ImageLabel>
-                                    </_.EmojiPickerWrapper>
-                                )}
-                            </_.EmojiWrapper>
+                            !readOnly && (
+                                <_.IconImageWrapper>
+                                    <label htmlFor="icon-upload" style={{ cursor: "pointer" }}>
+                                        <_.IconDisplay>📷</_.IconDisplay>
+                                    </label>
+                                </_.IconImageWrapper>
+                            )
                         )}
                         {!readOnly && (
                             <input

@@ -13,7 +13,12 @@ import { getUserInfo } from '@/shared/api/user';
 
 export default function NoticeDetailPage({ id }: NoticeDetailProps) {
     const router = useRouter();
-    const { id: noticeId } = useParams<{ id: string }>();
+    const params = useParams<{ id: string }>();
+    const noticeId = params?.id || id;
+
+    console.log('NoticeDetailPage - props id:', id);
+    console.log('NoticeDetailPage - params:', params);
+    console.log('NoticeDetailPage - noticeId:', noticeId);
 
     const [notice, setNotice] = useState<NoticeDetail | null>(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -24,14 +29,19 @@ export default function NoticeDetailPage({ id }: NoticeDetailProps) {
 
         const fetchData = async () => {
             try {
-                const [noticeRes, userInfo] = await Promise.all([
-                    getNoticeDetail(noticeId),
-                    getUserInfo()
-                ]);
-                
+                const noticeRes = await getNoticeDetail(noticeId);
                 const data = noticeRes?.data ?? noticeRes;
                 setNotice(data);
-                setUserRole(userInfo.user_type);
+                
+                // 사용자 정보는 선택적으로 가져오기 (로그인하지 않아도 공지 조회 가능)
+                try {
+                    const userInfo = await getUserInfo();
+                    setUserRole(userInfo.user_type);
+                } catch (userErr) {
+                    console.log('사용자 정보 없음 (비로그인 상태)');
+                    setUserRole(null);
+                }
+                
                 showToast.success("공지를 불러왔습니다!");
             } catch (err) {
                 console.error('공지 상세 불러오기 실패:', err);
@@ -136,9 +146,17 @@ export default function NoticeDetailPage({ id }: NoticeDetailProps) {
                         onClick={() => router.back()}
                     />
                     {userRole === "TEACHER" && (
-                        <_.DeleteBtn onClick={handleDelete}>
-                            삭제하기
-                        </_.DeleteBtn>
+                        <div style={{ display: 'flex', gap: '0.5rem' }}>
+                            <_.DeleteBtn onClick={() => {
+                                console.log('수정하기 버튼 클릭 - noticeId:', noticeId);
+                                router.push(`/noticeEdit/${noticeId}`);
+                            }}>
+                                수정하기
+                            </_.DeleteBtn>
+                            <_.DeleteBtn onClick={handleDelete}>
+                                삭제하기
+                            </_.DeleteBtn>
+                        </div>
                     )}
                 </_.HeaderGroup>
                 <_.Title>{notice.title}</_.Title>
@@ -148,45 +166,109 @@ export default function NoticeDetailPage({ id }: NoticeDetailProps) {
                     <_.Subtitle>작성자: {notice.teacher || '-'}</_.Subtitle>
                 </_.Group>
                 <div>
-                    {notice.content && notice.content.startsWith('[') ? (
-                        <BlockNoteEditor 
-                            initialContent={notice.content} 
-                            onChange={() => {}}
-                            editable={false}
-                        />
-                    ) : (
-                        parseCustomTags(notice.content || '')
-                    )}
+                    {(() => {
+                        try {
+                            if (notice.content && notice.content.startsWith('[')) {
+                                const parsed = JSON.parse(notice.content);
+                                if (Array.isArray(parsed) && parsed.length > 0) {
+                                    return (
+                                        <BlockNoteEditor 
+                                            initialContent={notice.content} 
+                                            onChange={() => {}}
+                                            editable={false}
+                                        />
+                                    );
+                                }
+                            }
+                        } catch (e) {
+                            console.error('BlockNote 파싱 실패:', e);
+                        }
+                        return parseCustomTags(notice.content || '');
+                    })()}
                 </div>
                 {notice.files?.length ? (
                     <_.ImgGroup>
                         {notice.files
                             .filter(file => file?.url)
-                            .map((file, idx) => (
-                                <_.FileWrapper key={idx}>
-                                    <Image
-                                        src={file.url}
-                                        alt={`공지 이미지 ${idx + 1}`}
-                                        width={100}
-                                        height={100}
-                                        style={{ width: '100%', height: 'auto' }}
-                                    />
-                                    <_.DownloadBtn
-                                        onClick={() => {
-                                            const filename = file.url.split('/').pop()?.split('?')[0] || `파일_${idx + 1}`;
-                                            handleDownload(file.url, filename);
-                                        }}
-                                        title="다운로드"
-                                    >
-                                        <Image
-                                            src="/assets/download.svg"
-                                            alt="다운로드"
-                                            width={20}
-                                            height={20}
-                                        />
-                                    </_.DownloadBtn>
-                                </_.FileWrapper>
-                            ))}
+                            .map((file, idx) => {
+                                const fileUrl = file.url.toLowerCase();
+                                const isImage = /\.(jpg|jpeg|png|gif|webp|svg)(\?|$)/.test(fileUrl);
+                                const isAudio = /\.(mp3|wav|ogg|m4a)(\?|$)/.test(fileUrl);
+                                const isVideo = /\.(mp4|webm|mov|avi)(\?|$)/.test(fileUrl);
+                                const isPdf = /\.pdf(\?|$)/.test(fileUrl);
+
+                                return (
+                                    <_.FileWrapper key={idx} style={{ width: isImage ? '30%' : '100%' }}>
+                                        {isImage ? (
+                                            <>
+                                                <Image
+                                                    src={file.url}
+                                                    alt={`공지 이미지 ${idx + 1}`}
+                                                    width={100}
+                                                    height={100}
+                                                    style={{ width: '100%', height: 'auto' }}
+                                                />
+                                                <_.DownloadBtn
+                                                    onClick={() => {
+                                                        const filename = file.url.split('/').pop()?.split('?')[0] || `파일_${idx + 1}`;
+                                                        handleDownload(file.url, filename);
+                                                    }}
+                                                    title="다운로드"
+                                                >
+                                                    <Image
+                                                        src="/assets/download.svg"
+                                                        alt="다운로드"
+                                                        width={20}
+                                                        height={20}
+                                                    />
+                                                </_.DownloadBtn>
+                                            </>
+                                        ) : (
+                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', maxWidth: '70%' }}>
+                                                {isAudio ? (
+                                                    <audio controls style={{ width: '100%' }}>
+                                                        <source src={file.url} />
+                                                        브라우저가 오디오를 지원하지 않습니다.
+                                                    </audio>
+                                                ) : isVideo ? (
+                                                    <video controls style={{ width: '100%', height: 'auto', maxHeight: '50vh' }}>
+                                                        <source src={file.url} />
+                                                        브라우저가 비디오를 지원하지 않습니다.
+                                                    </video>
+                                                ) : isPdf ? (
+                                                    <iframe
+                                                        src={file.url}
+                                                        style={{ width: '100%', height: '50vh', border: '1px solid #ddd', borderRadius: '4px' }}
+                                                        title={`PDF ${idx + 1}`}
+                                                    />
+                                                ) : (
+                                                    <div style={{ padding: '1rem', border: '1px solid #ddd', borderRadius: '4px' }}>
+                                                        <p>파일: {file.url.split('/').pop()?.split('?')[0] || `파일_${idx + 1}`}</p>
+                                                    </div>
+                                                )}
+                                                <button
+                                                    onClick={() => {
+                                                        const filename = file.url.split('/').pop()?.split('?')[0] || `파일_${idx + 1}`;
+                                                        handleDownload(file.url, filename);
+                                                    }}
+                                                    style={{
+                                                        padding: '0.5rem 1rem',
+                                                        backgroundColor: '#4B4B4B',
+                                                        color: 'white',
+                                                        border: 'none',
+                                                        borderRadius: '4px',
+                                                        cursor: 'pointer',
+                                                        fontSize: '0.9rem',
+                                                        alignSelf: 'flex-start'
+                                                    }}
+                                                >
+                                                    다운로드
+                                                </button>
+                                            </div>
+                                        )}
+                                    </_.FileWrapper>
+                                );
+                            })}
                     </_.ImgGroup>
                 ) : null}
             </_.Container>

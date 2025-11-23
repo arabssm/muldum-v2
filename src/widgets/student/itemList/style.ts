@@ -60,7 +60,7 @@ export const Wrapper = styled.div`
 export const BtnWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 10rem;
+  gap: 1.5rem;
 `;
 
 export const ToggleWrapper = styled.div`

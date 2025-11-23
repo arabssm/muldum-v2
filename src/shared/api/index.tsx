@@ -17,12 +17,31 @@ export const getClubs = async () => {
   return res.data;
 };
 
-// 팀 페이지 노션 부분
+// 팀 페이지 조회 (새 API)
+export const getTeamPage = async (team_id: string) => {
+  const res = await axiosInstance.get(`/ara/teamspace/network/team/${team_id}`);
+  return res.data;
+};
+
+// 레거시 팀 페이지 조회 (호환성 유지)
 export const getNotion = async (team_id: string) => {
   const res = await axiosInstance.get(`/std/teamspace/${team_id}`);
   return res.data;
 };
 
+// 팀 페이지 수정 (이름, 소개)
+export const updateTeamPage = (teamId: number, data: { name?: string | null; content: string }) =>
+  axiosInstance.patch(`/std/teamspace/network/team/${teamId}`, data).then(res => res.data);
+
+// 팀 배너 이미지 수정
+export const updateTeamBanner = (teamId: number, url: string) =>
+  axiosInstance.patch(`/std/teamspace/network/team/${teamId}/banner`, { url }).then(res => res.data);
+
+// 팀 아이콘 수정
+export const updateTeamIcon = (teamId: number, url: string) =>
+  axiosInstance.patch(`/std/teamspace/team/${teamId}/icon`, { url }).then(res => res.data);
+
+// 레거시 API (호환성 유지)
 export const editNotion = (team_id: string, data: { name: string; content: string }) =>
   axiosInstance.patch(`/std/teamspace?type=${team_id}`, data).then(res => res.data);
 
