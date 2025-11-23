@@ -8,6 +8,7 @@ import styled from '@emotion/styled';
 import TopAppBar from '@/shared/ui/topAppBar';
 import Footer from '@/shared/ui/footer';
 import Toast from '@/shared/ui/toast';
+import MobileBlocker from '@/shared/ui/mobileBlocker';
 import type { ProvidersProps } from '@/shared/types';
 import Head from 'next/head';
 import Sentry from "../../sentry";
@@ -34,6 +35,7 @@ export default function Providers({ children }: ProvidersProps) {
       </Head>
 
       <GlobalStyle />
+      <MobileBlocker />
       <TopAppBar />
 
       <QueryClientProvider client={queryClient}>
