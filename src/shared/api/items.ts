@@ -70,7 +70,8 @@ export const updateItem = async (itemId: number, data: Partial<ItemRequest>) => 
 };
 
 export const getCrawlRecommendations = async (query: string, limit: number = 3) => {
-  const url = `http://localhost:8000/recommend/11st?name=${encodeURIComponent(query)}&limit=${limit}`;
+  const baseUrl = process.env.NEXT_PUBLIC_AI_BASE_URL || 'http://localhost:8000';
+  const url = `${baseUrl}/recommend/11st?name=${encodeURIComponent(query)}&limit=${limit}`;
   const res = await axios.get(url);
   return res.data;
 };

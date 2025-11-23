@@ -758,7 +758,8 @@ export function useVideoChat() {
             });
 
             // AI 서버로 업로드
-            const response = await fetch('http://localhost:8000/analyze', {
+            const baseUrl = process.env.NEXT_PUBLIC_AI_BASE_URL || 'http://localhost:8000';
+            const response = await fetch(`${baseUrl}/analyze`, {
                 method: 'POST',
                 body: formData
             });
