@@ -2,11 +2,14 @@ import { useState, useEffect } from "react";
 import { getTeamPage, updateTeamPage, updateTeamBanner, updateTeamIcon } from "@/shared/api/index";
 import { showToast } from "@/shared/ui/toast";
 
+const DEFAULT_BANNER = "https://muldumarabucket.s3.ap-northeast-2.amazonaws.com/%E1%84%80%E1%85%B5%E1%84%87%E1%85%A9%E1%86%AB+%E1%84%80%E1%85%A9%E1%86%BC%E1%84%8C%E1%85%B5+%E1%84%87%E1%85%A2%E1%84%80%E1%85%A7%E1%86%BC.svg";
+const DEFAULT_ICON = "https://muldumarabucket.s3.ap-northeast-2.amazonaws.com/defaulyicon.svg";
+
 export const useNotion = (teamId: string) => {
     const [title, setTitle] = useState("동아리이름");
     const [content, setContent] = useState("");
-    const [icon, setIcon] = useState("🌿");
-    const [cover, setCover] = useState<string | null>(null);
+    const [icon, setIcon] = useState(DEFAULT_ICON);
+    const [cover, setCover] = useState<string | null>(DEFAULT_BANNER);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -18,12 +21,12 @@ export const useNotion = (teamId: string) => {
                 setContent(data.content || "");
                 // config에서 아이콘과 배너 정보 추출
                 if (data.config) {
-                    setIcon(data.config.iconImageUrl || "🌿");
-                    setCover(data.config.backgroundImageUrl || null);
+                    setIcon(data.config.iconImageUrl || DEFAULT_ICON);
+                    setCover(data.config.backgroundImageUrl || DEFAULT_BANNER);
                 }
             } catch (error) {
                 console.log("팀 페이지 데이터를 불러오지 못했지만 페이지 표시 가능");
-                // 기본 값
+                // 기본 값 유지
             } finally {
                 setLoading(false);
             }
