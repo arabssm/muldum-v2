@@ -6,10 +6,10 @@ import Image from 'next/image';
 import * as _ from './style';
 import { useModal } from '@/components/modal/useModal';
 import LoginModal from '@/shared/ui/modal/loginModal';
-import { showToast } from '../toast/index'
 import { useAuth } from '@/shared/hooks/useAuth';
 import { useState, useEffect } from 'react';
 import { getUserInfo } from '@/shared/api/user';
+import WaterAnimation from '@/shared/ui/waterAnimation';
 
 export default function TopAppBar() {
   const pathname = usePathname();
@@ -71,12 +71,12 @@ export default function TopAppBar() {
       </_.Wrapper>
 
       <_.BtnGroup>
+        <WaterAnimation />
         {isLoggedIn ? (
           <_.LoginBtn onClick={logout}>로그아웃</_.LoginBtn>
         ) : (
           <_.LoginBtn onClick={openModal}>로그인</_.LoginBtn>
         )}
-        <_.MyInfo onClick={() => showToast.warning("권한이 부족합니다!")}>내 정보</_.MyInfo>
       </_.BtnGroup>
 
       <Modal>
