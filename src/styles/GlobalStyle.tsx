@@ -9,12 +9,12 @@ const GlobalStyle = () => (
         box-sizing: border-box;
       }
 
-      @font-face {
+    @font-face {
         font-family: 'Pretendard';
-        src: url('https://cdn.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-bold.woff') format('woff');
+        src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-Medium.woff2') format('woff2');
         font-weight: 500;
         font-display: swap;
-     }
+    }
 
       html,
       body,
