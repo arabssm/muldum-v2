@@ -5,7 +5,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ModalPortal } from './modalPortal';
 import type { ModalProps } from '@/shared/types';
 
-export const Modal = ({ isOpen, closeModal, children }: ModalProps) => {
+interface ExtendedModalProps extends ModalProps {
+    maxWidth?: string;
+}
+
+export const Modal = ({ isOpen, closeModal, children, maxWidth = '480px' }: ExtendedModalProps) => {
     return (
         <ModalPortal>
             <AnimatePresence>
@@ -22,6 +26,7 @@ export const Modal = ({ isOpen, closeModal, children }: ModalProps) => {
                             animate={{ scale: 1, opacity: 1 }}
                             exit={{ scale: 0.9, opacity: 0 }}
                             transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+                            style={{ maxWidth }}
                         >
                             {children}
                         </Content>
@@ -50,8 +55,8 @@ const Content = styled(motion.div)`
   background: #fff;
   border-radius: 16px;
   padding: 24px;
-  max-width: 800px;
-  width: 90%;
+  max-width: 480px;
+  width: 100%;
   max-height: 85vh;
   overflow-y: auto;
   box-shadow: 0 2px 16px rgba(0, 0, 0, 0.2);

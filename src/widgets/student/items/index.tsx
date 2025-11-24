@@ -115,7 +115,7 @@ export default function Items() {
         <ItemForm hideClubSelect={true} />
       )}
 
-      <Modal isOpen={isGuideModalOpen} closeModal={() => setIsGuideModalOpen(false)}>
+      <Modal isOpen={isGuideModalOpen} closeModal={() => setIsGuideModalOpen(false)} maxWidth="800px">
         <_.GuideModalInner>
           <_.GuideTitle>물품 신청 안내</_.GuideTitle>
           <_.GuideEditorWrapper>

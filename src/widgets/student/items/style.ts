@@ -82,36 +82,31 @@ export const ErrorMessage = styled.div`
 export const GuideModalInner = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-  padding: 0;
+  gap: 1.5rem;
   background-color: white;
   border-radius: 8px;
   width: 100%;
-  max-height: 70vh;
-  overflow: hidden;
+  max-height: 80vh;
+  overflow-y: auto;
 `;
 
 export const GuideTitle = styled.h2`
-  font-size: 1.25rem;
+  font-size: 1.5rem;
   font-weight: 600;
   color: #333;
   margin: 0;
-  padding: 1.5rem 1.5rem 0 1.5rem;
-  flex-shrink: 0;
 `;
 
 export const GuideEditorWrapper = styled.div`
   width: 100%;
-  height: 300px;
+  min-height: 200px;
+  max-height: 50vh;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 1.5rem 1.5rem;
-  background-color: #fafafa;
+  padding: 1rem;
+  background-color: #fff;
+  border-radius: 4px;
   flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
   
   /* 에디터 내부 요소가 밖으로 튀어나가지 않도록 */
   & > * {
@@ -123,9 +118,6 @@ export const GuideEditorWrapper = styled.div`
   /* BlockNote 에디터 스타일 조정 */
   .bn-container {
     max-width: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
   }
 `;
 
@@ -134,9 +126,6 @@ export const GuideButtonRow = styled.div`
   justify-content: space-between;
   align-items: center;
   gap: 1rem;
-  flex-shrink: 0;
-  padding: 1rem 1.5rem 1.5rem 1.5rem;
-  border-top: 1px solid #e0e0e0;
 `;
 
 export const GuideCheckboxWrapper = styled.div`
