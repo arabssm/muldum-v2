@@ -10,22 +10,27 @@ function GoogleLoginContent() {
   const { handleGoogleCallback } = useGoogleLogin();
 
   useEffect(() => {
-    const code = searchParams.get('code');
-    
-    if (code) {
-      console.log('Google OAuth code detected:', code);
-      handleGoogleCallback(code)
-        .then(() => {
-          console.log('Google login successful');
+    const processLogin = async () => {
+      try {
+        const code = searchParams?.get('code');
+        
+        if (!code) {
+          console.warn('No authorization code found');
           router.replace('/');
-        })
-        .catch((error) => {
-          console.error('Google 로그인 실패:', error);
-          router.replace('/');
-        });
-    } else {
-      router.replace('/');
-    }
+          return;
+        }
+        
+        console.log('Google OAuth code detected:', code);
+        await handleGoogleCallback(code);
+        console.log('Google login successful');
+        router.replace('/');
+      } catch (error) {
+        console.error('Google 로그인 실패:', error);
+        router.replace('/');
+      }
+    };
+
+    processLogin();
   }, [searchParams, handleGoogleCallback, router]);
 
   return (

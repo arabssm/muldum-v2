@@ -9,43 +9,46 @@ import TopAppBar from '@/shared/ui/topAppBar';
 import Footer from '@/shared/ui/footer';
 import Toast from '@/shared/ui/toast';
 import MobileBlocker from '@/shared/ui/mobileBlocker';
+import ErrorBoundary from '@/shared/ui/errorBoundary';
 import type { ProvidersProps } from '@/shared/types';
 import Head from 'next/head';
 import Sentry from "../../sentry";
 
 export default function Providers({ children }: ProvidersProps) {
   return (
-    <EmotionRegistry options={{ key: 'css' }}>
-      <Head>
-        <title>물듬</title>
-        <meta charSet="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <link rel="icon" type="image/svg+xml" href="/muldum.svg" />
-        <script async src="https://www.googletagmanager.com/gtag/js?id=G-647YRBZSPE"></script>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              window.dataLayer = window.dataLayer || [];
-              function gtag(){dataLayer.push(arguments);}
-              gtag('js', new Date());
-              gtag('config', 'G-647YRBZSPE');
-            `,
-          }}
-        />
-      </Head>
+    <ErrorBoundary>
+      <EmotionRegistry options={{ key: 'css' }}>
+        <Head>
+          <title>물듬</title>
+          <meta charSet="UTF-8" />
+          <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+          <link rel="icon" type="image/svg+xml" href="/muldum.svg" />
+          <script async src="https://www.googletagmanager.com/gtag/js?id=G-647YRBZSPE"></script>
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', 'G-647YRBZSPE');
+              `,
+            }}
+          />
+        </Head>
 
-      <GlobalStyle />
-      <MobileBlocker />
-      <TopAppBar />
+        <GlobalStyle />
+        <MobileBlocker />
+        <TopAppBar />
 
-      <QueryClientProvider client={queryClient}>
-        <Container>{children}</Container>
-        <div id="modal-root"></div>
-        <Toast />
-      </QueryClientProvider>
+        <QueryClientProvider client={queryClient}>
+          <Container>{children}</Container>
+          <div id="modal-root"></div>
+          <Toast />
+        </QueryClientProvider>
 
-      <Footer />
-    </EmotionRegistry>
+        <Footer />
+      </EmotionRegistry>
+    </ErrorBoundary>
   );
 }
 

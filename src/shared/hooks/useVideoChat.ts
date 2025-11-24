@@ -277,20 +277,8 @@ export function useVideoChat() {
             console.log('User info for WebSocket:', { userId: userInfo.id, userName: userInfo.name });
 
             // 환경 변수 또는 현재 도메인 기반으로 API URL 결정
-            let apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
-            
-            if (!apiBaseUrl && typeof window !== 'undefined') {
-                // 배포 환경에서 환경 변수가 없으면 현재 도메인 기반으로 추론
-                const hostname = window.location.hostname;
-                if (hostname.includes('muldum.com')) {
-                    apiBaseUrl = 'https://backend.muldum.com';
-                } else {
-                    apiBaseUrl = 'http://localhost:8080';
-                }
-            }
-            
-            apiBaseUrl = apiBaseUrl || 'http://localhost:8080';
-            console.log('API Base URL from env:', process.env.NEXT_PUBLIC_API_BASE_URL);
+            const { getApiBaseUrl } = await import('../lib/envCheck');
+            const apiBaseUrl = getApiBaseUrl();
             console.log('Using API Base URL:', apiBaseUrl);
             
             const wsProtocol = apiBaseUrl.startsWith('https') ? 'wss' : 'ws';
@@ -758,7 +746,8 @@ export function useVideoChat() {
             });
 
             // AI 서버로 업로드
-            const baseUrl = process.env.NEXT_PUBLIC_AI_BASE_URL || 'http://localhost:8000';
+            const { getAiBaseUrl } = await import('../lib/envCheck');
+            const baseUrl = getAiBaseUrl();
             const response = await fetch(`${baseUrl}/analyze`, {
                 method: 'POST',
                 body: formData

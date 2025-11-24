@@ -1,35 +1,41 @@
-"use client";
+'use client';
 
-import styled from "@emotion/styled";
-import { HashLoader } from "react-spinners";
+import styled from '@emotion/styled';
+import { keyframes } from '@emotion/react';
 
 export default function Loading() {
-    return (
-        <Dimmer>
-            <LoadingContainer>
-                <HashLoader size={80} />
-            </LoadingContainer>
-        </Dimmer>
-    );
+  return (
+    <LoadingContainer>
+      <Spinner />
+      <LoadingText>로딩 중...</LoadingText>
+    </LoadingContainer>
+  );
 }
 
-const Dimmer = styled.div`
-  position: fixed;
-  inset: 0;
-  z-index: 99;
+const spin = keyframes`
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 `;
 
 const LoadingContainer = styled.div`
-  width: 150px;
-  height: 150px;
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 99;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
-  background: transparent;
-  border-radius: 4px;
+  justify-content: center;
+  min-height: 200px;
+  gap: 1rem;
+`;
+
+const Spinner = styled.div`
+  width: 50px;
+  height: 50px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #667eea;
+  border-radius: 50%;
+  animation: ${spin} 1s linear infinite;
+`;
+
+const LoadingText = styled.p`
+  font-size: 1rem;
+  color: #666;
 `;

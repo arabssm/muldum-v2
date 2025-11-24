@@ -34,6 +34,10 @@ export default function TeamDetail() {
         setUserTeamId(userInfo.teamId || null);
       } catch (error) {
         console.error('사용자 정보 조회 실패:', error);
+        showToast.error('사용자 정보를 불러올 수 없습니다');
+        // 기본값 설정
+        setUserRole('STUDENT');
+        setUserTeamId(null);
       }
     };
 
@@ -56,9 +60,10 @@ export default function TeamDetail() {
           console.error('응답이 배열이 아닙니다:', data);
           setReports([]);
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error('월말평가 목록 조회 실패:', error);
-        showToast.error('월말평가 목록을 불러오는데 실패했습니다');
+        const errorMessage = error?.response?.data?.message || '월말평가 목록을 불러오는데 실패했습니다';
+        showToast.error(errorMessage);
         setReports([]);
       } finally {
         setIsLoading(false);

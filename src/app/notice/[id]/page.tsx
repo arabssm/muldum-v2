@@ -5,7 +5,14 @@ interface NoticeDetailPageProps {
 }
 
 export default async function NoticeDetailPage({ params }: NoticeDetailPageProps) {
-  const { id } = await params;
-
-  return <NoticeDetail id={id} />;
+  try {
+    const resolvedParams = await params;
+    if (!resolvedParams?.id) {
+      throw new Error('공지 ID가 없습니다');
+    }
+    return <NoticeDetail id={resolvedParams.id} />;
+  } catch (error) {
+    console.error('NoticeDetailPage 에러:', error);
+    return <div>공지를 불러올 수 없습니다.</div>;
+  }
 }

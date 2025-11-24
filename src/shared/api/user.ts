@@ -38,13 +38,36 @@ const parseProfile = (profileStr: string): ParsedProfile => {
 };
 
 export const getUserInfo = async (): Promise<UserInfo> => {
-  const { data } = await axiosInstance.get('/user/me');
-  
-  // profile 문자열에서 team_id 추출
-  const parsedProfile = parseProfile(data.profile || '');
-  
-  return {
-    ...data,
-    teamId: parsedProfile.team_id,
-  };
+  try {
+    const { data } = await axiosInstance.get('/user/me');
+    
+    if (!data) {
+      throw new Error('사용자 정보를 받아올 수 없습니다');
+    }
+    
+    // profile 문자열에서 team_id 추출
+    const parsedProfile = parseProfile(data.profile || '');
+    
+    return {
+      id: data.id || 0,
+      name: data.name || '사용자',
+      email: data.email || '',
+      profile: data.profile || '',
+      user_type: data.user_type || 'STUDENT',
+      teamId: parsedProfile.team_id,
+    };
+  } catch (error: any) {
+    console.error('getUserInfo 에러:', error);
+    
+    // 네트워크 에러나 인증 에러 시 더 명확한 에러 메시지
+    if (!error.response) {
+      throw new Error('서버에 연결할 수 없습니다');
+    }
+    
+    if (error.response?.status === 401) {
+      throw new Error('인증이 필요합니다');
+    }
+    
+    throw error;
+  }
 };

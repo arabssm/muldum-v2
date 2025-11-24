@@ -59,6 +59,8 @@ export default function Main() {
                 setUserRole(userInfo.user_type);
             } catch (error) {
                 console.error('사용자 정보 조회 실패:', error);
+                // 기본값으로 학생 설정
+                setUserRole('STUDENT');
             }
         };
 
