@@ -1,22 +1,15 @@
 "use client";
 
 import styled from "@emotion/styled";
-import { useLoadingStore } from "@/shared/store/loading";
-import { createPortal } from "react-dom";
 import { HashLoader } from "react-spinners";
 
 export default function Loading() {
-    const { isVisible } = useLoadingStore();
-
-    if (!isVisible) return null;
-
-    return createPortal(
+    return (
         <Dimmer>
             <LoadingContainer>
                 <HashLoader size={80} />
             </LoadingContainer>
-        </Dimmer>,
-        document.body
+        </Dimmer>
     );
 }
 
