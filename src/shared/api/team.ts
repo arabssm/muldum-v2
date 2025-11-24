@@ -17,6 +17,7 @@ export interface Team {
   id: number;
   name: string;
   members: string[];
+  memberDetails?: TeamMember[]; // 원본 멤버 정보
   class?: string;
   newCount?: number;
 }
@@ -41,6 +42,7 @@ export const getNetworkTeams = async (): Promise<Team[]> => {
     members: team.members?.map(m => 
       m.studentId ? `${m.studentId} ${m.userName}` : m.userName
     ) || [],
+    memberDetails: team.members, // 원본 멤버 정보 유지
     class: team.class || undefined,
   }));
 };

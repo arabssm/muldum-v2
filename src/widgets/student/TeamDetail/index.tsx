@@ -48,11 +48,9 @@ export default function TeamDetail() {
         setIsLoading(true);
         const data = await getTeacherReportList(teamId);
         console.log('API 응답:', data);
-        // 배열인지 확인하고 처리
         if (Array.isArray(data)) {
           setReports(data);
         } else if (data && typeof data === 'object' && 'reports' in data) {
-          // { reports: [...] } 형태인 경우
           setReports((data as any).reports || []);
         } else {
           console.error('응답이 배열이 아닙니다:', data);

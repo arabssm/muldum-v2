@@ -46,9 +46,44 @@ export default function Team() {
         setActiveGroup(group);
     };
 
+    // 학번에서 반 추출 함수 (예: 2111 → 1반, 2212 → 2반, 2312 → 3반, 2401 → 4반)
+    const getClassFromStudentId = (studentId?: string): string | null => {
+        if (!studentId || studentId.length < 4) {
+            console.log('Invalid studentId:', studentId);
+            return null;
+        }
+        // 학번 형식: YCNN (Y=학년 첫자리, C=반, NN=번호)
+        // 2111 → 2(학년) 1(반) 11(번호) → 1반
+        // 2212 → 2(학년) 2(반) 12(번호) → 2반
+        // 2312 → 2(학년) 3(반) 12(번호) → 3반
+        
+        // 두 번째 자리가 반 번호
+        const classChar = studentId.charAt(1);
+        console.log('StudentId:', studentId, 'charAt(1):', classChar, 'Result:', `${classChar}반`);
+        
+        if (classChar >= '1' && classChar <= '4') {
+            return `${classChar}반`;
+        }
+        
+        return null;
+    };
+
     const clubs: ApiTeam[] =
         activeGroup === "전공동아리" || activeGroup === "네트워크"
-            ? teams
+            ? teams.map(team => {
+                // 첫 번째 멤버의 학번으로 반 결정
+                const firstMember = team.memberDetails?.[0];
+                const detectedClass = firstMember?.studentId 
+                    ? getClassFromStudentId(firstMember.studentId)
+                    : null;
+                
+                console.log('Team:', team.name, 'First Member:', firstMember?.userName, 'StudentId:', firstMember?.studentId, 'Detected Class:', detectedClass);
+                
+                return {
+                    ...team,
+                    class: detectedClass || team.class
+                };
+            })
             : activeGroup === "자율동아리"
                 ? freeClubs
                 : [];
@@ -76,11 +111,16 @@ export default function Team() {
                 </_.Group>
                 {pathname === "/team" && (
                     <_.Group>
-                        {Classes.map((label) => (
+                        {(activeGroup === "전공동아리" 
+                            ? ["전체"] 
+                            : activeGroup === "네트워크" 
+                                ? Classes 
+                                : []
+                        ).map((label) => (
                             <_.ClassText
                                 key={label}
                                 isActive={activeClass === label}
-                                onClick={() => setActiveClass(label)}
+                                onClick={() => setActiveClass(label as ClassType)}
                             >
                                 {label}
                             </_.ClassText>
