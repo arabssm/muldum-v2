@@ -390,14 +390,32 @@ export default function Apply() {
             </_.Wrapper>
             {(activeClass === "네트워크" && networkTeams.length > 0) || (activeClass === "전공동아리" && majorTeams.length > 0) ? (
                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', width: '100%' }}>
-                    <Image src="assets/arrow.svg" alt="화살표" width={24} height={24} style={{ cursor: "pointer", flexShrink: 0 }} />
-                    <div style={{ 
-                        display: 'flex', 
-                        gap: '0.5rem', 
-                        overflowX: 'auto', 
-                        flex: 1,
-                        padding: '0.5rem 0'
-                    }}>
+                    <Image 
+                        src="assets/arrow.svg" 
+                        alt="화살표" 
+                        width={24} 
+                        height={24} 
+                        style={{ cursor: "pointer", flexShrink: 0 }} 
+                        onClick={() => {
+                            const container = document.getElementById('team-scroll-container');
+                            if (container) {
+                                container.scrollBy({ left: -200, behavior: 'smooth' });
+                            }
+                        }}
+                    />
+                    <div 
+                        id="team-scroll-container"
+                        style={{ 
+                            display: 'flex', 
+                            gap: '0.5rem', 
+                            overflowX: 'auto', 
+                            flex: 1,
+                            padding: '0.5rem 0',
+                            scrollbarWidth: 'none',
+                            msOverflowStyle: 'none'
+                        }}
+                        className="hide-scrollbar"
+                    >
                         {(activeClass === "네트워크" ? networkTeams : majorTeams).map((team) => (
                             <div key={team.id} style={{ position: 'relative', flexShrink: 0 }}>
                                 <_.Btn 
@@ -435,7 +453,19 @@ export default function Apply() {
                             </div>
                         ))}
                     </div>
-                    <Image src="assets/arrow.svg" alt="화살표" width={24} height={24} style={{ transform: "rotate(180deg)", cursor: "pointer", flexShrink: 0 }} />
+                    <Image 
+                        src="assets/arrow.svg" 
+                        alt="화살표" 
+                        width={24} 
+                        height={24} 
+                        style={{ transform: "rotate(180deg)", cursor: "pointer", flexShrink: 0 }} 
+                        onClick={() => {
+                            const container = document.getElementById('team-scroll-container');
+                            if (container) {
+                                container.scrollBy({ left: 200, behavior: 'smooth' });
+                            }
+                        }}
+                    />
                 </div>
             ) : null}
             <_.InfoContainer>

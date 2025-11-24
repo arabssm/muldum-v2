@@ -43,6 +43,16 @@ const GlobalStyle = () => (
       .bn-container .bn-editor {
         max-width: 100% !important;
       }
+
+      /* 스크롤바 숨김 */
+      .hide-scrollbar::-webkit-scrollbar {
+        display: none;
+      }
+      
+      .hide-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
     
     `}
   />
