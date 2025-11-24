@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import ItemForm from "@/components/itemForm";
 import { updateItem } from "@/shared/api/items";
 import { showToast } from "@/shared/ui/toast";
+import Loading from "@/shared/ui/loading";
 
 export default function ItemEdit() {
   const router = useRouter();
@@ -73,7 +74,7 @@ export default function ItemEdit() {
   };
 
   if (!initialData) {
-    return <div style={{ padding: '2rem', textAlign: 'center' }}>로딩 중...</div>;
+    return <div style={{ padding: '2rem', textAlign: 'center' }}><Loading /></div>;
   }
 
   return (

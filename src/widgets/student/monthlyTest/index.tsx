@@ -8,6 +8,7 @@ import { useState, useEffect, useRef } from 'react';
 import type { MonthlyTestProps } from "@/shared/types";
 import { saveDraftReport, submitReport, getDraftReport } from '@/shared/api/monthReport';
 import { showToast } from '@/shared/ui/toast';
+import Loading from '@/shared/ui/loading';
 
 export default function MonthlyTest({ sections = [] }: MonthlyTestProps) {
   const router = useRouter();
@@ -169,7 +170,7 @@ export default function MonthlyTest({ sections = [] }: MonthlyTestProps) {
   if (isLoading) {
     return (
       <_.Container>
-        <div>로딩 중...</div>
+        <div>.<Loading /></div>
       </_.Container>
     );
   }

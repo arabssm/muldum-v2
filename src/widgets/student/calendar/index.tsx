@@ -26,19 +26,13 @@ export default function Calendar() {
 
     const colors = ['#FFD8D8', '#FFF1B2', '#D9F7BE', '#D6E4FF', '#EBD8FF'];
 
-    // API 데이터를 FullCalendar 이벤트로 변환
     useEffect(() => {
         const convertedEvents: EventInput[] = calendars.map((cal, index) => {
-            // MMDD 형식을 파싱
             const startMonth = Math.floor(cal.Startdate / 100);
             const startDay = cal.Startdate % 100;
             const endMonth = Math.floor(cal.Enddate / 100);
             const endDay = cal.Enddate % 100;
-            
-            // YYYY-MM-DD 형식으로 직접 생성 (타임존 문제 방지)
             const startStr = `${cal.Startyear}-${String(startMonth).padStart(2, '0')}-${String(startDay).padStart(2, '0')}`;
-            
-            // 종료일은 FullCalendar가 exclusive이므로 +1일
             const endDate = new Date(cal.Endyear, endMonth - 1, endDay + 1);
             const endStr = `${endDate.getFullYear()}-${String(endDate.getMonth() + 1).padStart(2, '0')}-${String(endDate.getDate()).padStart(2, '0')}`;
 
@@ -84,7 +78,6 @@ export default function Calendar() {
 
         try {
             if (editingEvent) {
-                // 수정
                 await editCalendar(editingEvent.calender_id, {
                     Startyear,
                     Startdate,
@@ -94,7 +87,6 @@ export default function Calendar() {
                     content,
                 });
             } else {
-                // 생성
                 await addCalendar({
                     Startyear,
                     Startdate,
@@ -208,8 +200,6 @@ export default function Calendar() {
                     eventDisplay="block"
                 />
             </_.CalendarWrapper>
-
-            {/* 일정 등록/수정 모달 */}
             <Modal isOpen={isOpen} closeModal={() => { 
                 setIsOpen(false); 
                 setSelectedRange(null); 
@@ -241,8 +231,6 @@ export default function Calendar() {
                     </_.Row>
                 </_.ModalInner>
             </Modal>
-
-            {/* 일정 상세 모달 */}
             <Modal isOpen={isDetailOpen} closeModal={() => {
                 setIsDetailOpen(false);
                 setViewingEvent(null);

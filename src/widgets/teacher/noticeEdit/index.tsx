@@ -3,8 +3,9 @@
 import * as _ from '../noticeWrite/style';
 import { BtnPrimary, BtnSecondary } from '@/shared/ui/button';
 import BlockNoteEditor from '@/shared/ui/tag';
-import { useNoticeEdit } from '../../../shared/hooks/useNoticeEdit';
+import { useNoticeEdit } from '@/shared/hooks/useNoticeEdit';
 import { useRouter } from 'next/navigation';
+import Loading from '@/shared/ui/loading';
 
 interface NoticeEditProps {
     id: string;
@@ -31,7 +32,7 @@ export default function NoticeEdit({ id }: NoticeEditProps) {
     } = useNoticeEdit(id);
 
     if (isLoading) {
-        return <_.Container>로딩 중...</_.Container>;
+        return <_.Container><Loading /></_.Container>;
     }
 
     return (

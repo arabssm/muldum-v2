@@ -10,6 +10,7 @@ import type { NoticeDetail, NoticeDetailProps } from '@/shared/types/notice';
 import Toast, { showToast } from "@/shared/ui/toast";
 import BlockNoteEditor from '@/shared/ui/tag';
 import { getUserInfo } from '@/shared/api/user';
+import Loading from '@/shared/ui/loading';
 
 export default function NoticeDetailPage({ id }: NoticeDetailProps) {
     const router = useRouter();
@@ -129,7 +130,7 @@ export default function NoticeDetailPage({ id }: NoticeDetailProps) {
         return <>{result}</>;
     };
 
-    if (isLoading) return <_.Container>로딩 중...</_.Container>;
+    if (isLoading) return <_.Container><Loading /></_.Container>;
     if (!notice) return <_.Container>공지가 존재하지 않습니다.</_.Container>;
 
     return (

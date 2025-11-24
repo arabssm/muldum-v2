@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 const Groups = ["임시신청", "최종신청"] as const;
 import { getItemList, submitFinalItems, deleteTempItems, deleteItem } from "@/shared/api/items";
 import { showToast } from "@/shared/ui/toast";
+import Loading from "@/shared/ui/loading";
 
 export default function ItemList() {
     const [openIndex, setOpenIndex] = useState<number | null>(null);
@@ -228,7 +229,7 @@ export default function ItemList() {
                 )}
                 <_.InfoContainer>
                     {isLoading ? (
-                        <div>로딩 중...</div>
+                        <div><Loading /></div>
                     ) : itemsData.map((item, index) => (
                         <_.Wrapper key={index}>
                             <_.ToggleWrapper onClick={() => handleToggle(index)}>

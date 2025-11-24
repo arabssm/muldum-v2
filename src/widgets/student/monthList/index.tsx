@@ -7,6 +7,7 @@ import FormSection from '../monthlyTest/FormSection';
 import { getReportList, getReportDetail } from '@/shared/api/monthReport';
 import type { MonthReportSimpleResponse, MonthReportDetailResponse } from '@/shared/api/monthReport';
 import { showToast } from '@/shared/ui/toast';
+import Loading from '@/shared/ui/loading';
 
 interface ReportWithDetail extends MonthReportSimpleResponse {
   detail?: MonthReportDetailResponse;
@@ -84,7 +85,7 @@ export default function MonthlyList() {
   if (isInitialLoading) {
     return (
       <_.Container>
-        <div>로딩 중...</div>
+        <div><Loading /></div>
       </_.Container>
     );
   }
@@ -116,7 +117,7 @@ export default function MonthlyList() {
             <_.Month>{month > 0 ? `${month}월` : ''}</_.Month>
           </_.MonthHeader>
           <_.Content isOpen={openIndex === i}>
-            {loading && openIndex === i && <div>로딩 중...</div>}
+            {loading && openIndex === i && <div><Loading /></div>}
             {report.detail && (
               <>
                 <FormSection 

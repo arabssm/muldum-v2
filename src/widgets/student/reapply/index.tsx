@@ -6,6 +6,7 @@ import { data } from "./data";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { getItemList, getCrawlRecommendations } from "@/shared/api/items";
+import Loading from "@/shared/ui/loading";
 
 interface AlternativeItem {
   image: string;
@@ -88,7 +89,7 @@ export default function Main() {
       {initialFormData ? (
         <ItemForm hideClubSelect initialData={initialFormData} />
       ) : (
-        <div>로딩 중...</div>
+        <div><Loading /></div>
       )}
       <_.Title>비슷한 물품 추천</_.Title>
       {isLoading ? (
