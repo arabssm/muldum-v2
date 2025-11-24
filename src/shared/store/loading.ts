@@ -13,3 +13,8 @@ export const useLoadingStore = create<LoadingState>((set) => ({
   show: () => set({ isVisible: true }),
   hide: () => set({ isVisible: false }),
 }));
+
+export const loadingApi = {
+  show: () => useLoadingStore.getState().show(),
+  hide: () => useLoadingStore.getState().hide(),
+};

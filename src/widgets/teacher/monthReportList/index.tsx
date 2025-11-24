@@ -7,6 +7,7 @@ import { useTeams } from '@/shared/hooks/team';
 import { getTeacherReportList } from '@/shared/api/monthReport';
 import type { MonthReportSimpleResponse } from '@/shared/api/monthReport';
 import { showToast } from '@/shared/ui/toast';
+import Loading from '@/shared/ui/loading';
 
 export default function MonthReportList() {
   const router = useRouter();
@@ -67,7 +68,7 @@ export default function MonthReportList() {
   if (teamsLoading) {
     return (
       <_.Container>
-        <div>로딩 중...</div>
+        <div><Loading /></div>
       </_.Container>
     );
   }
@@ -101,7 +102,7 @@ export default function MonthReportList() {
           </_.Header>
 
           {reportsLoading ? (
-            <div>로딩 중...</div>
+            <div><Loading /></div>
           ) : reports.length === 0 ? (
             <_.EmptyMessage>작성된 월말평가가 없습니다</_.EmptyMessage>
           ) : (

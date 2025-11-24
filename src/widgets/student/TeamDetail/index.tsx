@@ -12,6 +12,7 @@ import MonthlyTest from '@/widgets/student/monthlyTest';
 import Calendar from '@/widgets/student/calendar';
 import VideoChat from '@/widgets/student/videoChat';
 import { sections } from '@/widgets/student/monthlyTest/data';
+import Loading from '@/shared/ui/loading';
 
 type TabType = '노션' | '월말평가' | '캘린더' | '화상채팅';
 
@@ -106,7 +107,7 @@ export default function TeamDetail() {
         if (userRole === 'TEACHER') {
           // 선생님: 다른 팀 월말평가 조회
           return isLoading ? (
-            <div>로딩 중...</div>
+            <div><Loading /></div>
           ) : reports.length === 0 ? (
             <_.EmptyMessage>작성된 월말평가가 없습니다</_.EmptyMessage>
           ) : (

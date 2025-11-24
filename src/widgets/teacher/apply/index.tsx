@@ -10,6 +10,7 @@ import { useState, useEffect } from "react";
 import { getApprovedItems, getRejectedItems, getNotApprovedItems, approveItems, rejectItems, downloadExcel, type TeacherItem, getRejectTemplates, addRejectTemplates, deleteRejectTemplate, type RejectTemplate, getTeamApprovedItems, getTeamNotApprovedItems, getTeamRejectedItems, type TeacherItemsResponse } from "@/shared/api/items";
 import { showToast } from "@/shared/ui/toast";
 import { getNetworkTeamsWithItemCount, type Team } from "@/shared/api/team";
+import Loading from "@/shared/ui/loading";
 
 const Groups = ["승인 가능 물품 조회", "승인된 물품 조회", "거절된 물품 조회"] as const;
 const Classes = ["전체", "전공동아리", "네트워크", "1반", "2반", "3반", "4반"] as const;
@@ -330,7 +331,7 @@ export default function Apply() {
             )}
             <_.InfoContainer>
                 {loading ? (
-                    <div style={{ padding: "2rem", textAlign: "center" }}>로딩 중...</div>
+                    <div style={{ padding: "2rem", textAlign: "center" }}><Loading /></div>
                 ) : items.length === 0 ? (
                     <div style={{ padding: "2rem", textAlign: "center" }}>물품이 없습니다</div>
                 ) : (
