@@ -42,16 +42,14 @@ export const HeaderGroup = styled.div`
 
 export const DeleteBtn = styled.button`
     padding: 0.75rem 1.5rem;
-    border-radius: 4px;
-    background-color: #FF6B6B;
-    color: #fff;
     border: none;
-    font-size: 1rem;
+    font-size: 0.9rem;
     font-weight: 500;
+    color: #707070;
     cursor: pointer;
 
     &:hover {
-        background-color: #FF5252;
+        color: #1D1D1D;
     }
 `;
 
