@@ -40,12 +40,7 @@ export function useApplyAndModalState() {
     const [noticeText, setNoticeText] = useState("");
 
     const handleSave = () => {
-        if (!title.trim()) {
-            alert("차수를 입력해주세요");
-            return;
-        }
-        alert(`${title}차 물품 신청 기간이 열렸습니다.`);
-        setTitle("");
+        // This is now handled in the apply widget component
         setIsOpen(false);
     };
 

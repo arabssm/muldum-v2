@@ -1,51 +1,82 @@
 "use client";
 
-import * as _ from './style';
-import BlockNoteEditor from '@/shared/ui/tag';
-import { useNoticeWrite } from '@/shared/hooks/useFilePreviews';
-import { BtnPrimary, BtnSecondary } from '@/shared/ui/button';
-import { useRouter } from 'next/navigation';
-import { createItemGuide } from '@/shared/api/items';
-import { showToast } from '@/shared/ui/toast';
+import * as _ from "./style";
+import { useState, useEffect } from "react";
+import { BtnPrimary } from "@/shared/ui/button";
+import { createItemGuide, getLatestItemGuide } from "@/shared/api/items";
+import { showToast } from "@/shared/ui/toast";
+import { useRouter } from "next/navigation";
+import BlockNoteEditor from "@/shared/ui/tag";
+
+const ProjectTypes = ["전공동아리", "네트워크"] as const;
 
 export default function Caution() {
-    const { content, setContent } = useNoticeWrite();
-    const router = useRouter();
+  const router = useRouter();
+  const [content, setContent] = useState("");
+  const [projectType, setProjectType] = useState<string>("전공동아리");
+  const [loading, setLoading] = useState(true);
 
-    const handleSubmit = async () => {
-        if (!content || content.trim() === '') {
-            showToast.warning('내용을 입력해주세요.');
-            return;
+  useEffect(() => {
+    const fetchGuide = async () => {
+      try {
+        const guide = await getLatestItemGuide(projectType);
+        if (guide && guide.content) {
+          setContent(guide.content);
         }
-
-        try {
-            await createItemGuide(content);
-            showToast.success('주의사항이 작성되었습니다.');
-            router.push('/apply');
-        } catch (error) {
-            console.error('Failed to create guide:', error);
-            showToast.error('주의사항 작성에 실패했습니다.');
-        }
+      } catch (error) {
+        console.error("Failed to fetch guide:", error);
+      } finally {
+        setLoading(false);
+      }
     };
 
-    return (
-        <_.Container>
-            <_.Group>
-                <_.Title>주의사항 작성</_.Title>
-                <_.Wrapper>
-                    <_.SubTitle>내용</_.SubTitle>
-                    <_.detail>
-                        <BlockNoteEditor
-                            initialContent={''}
-                            onChange={(val) => setContent(val)}
-                        />
-                    </_.detail>
-                </_.Wrapper>
-                <_.BtnGroup>
-                    <BtnSecondary onClick={() => router.push('/apply')}>취소</BtnSecondary>
-                    <BtnPrimary onClick={handleSubmit}>작성하기</BtnPrimary>
-                </_.BtnGroup>
-            </_.Group>
-        </_.Container>
-    );
+    fetchGuide();
+  }, [projectType]);
+
+  const handleSubmit = async () => {
+    if (!content.trim()) {
+      showToast.warning("안내 내용을 입력해주세요.");
+      return;
+    }
+
+    try {
+      await createItemGuide({ content, projectType });
+      showToast.success("주의사항이 저장되었습니다.");
+      router.push("/apply");
+    } catch (error) {
+      console.error("Failed to create item guide:", error);
+      showToast.error("주의사항 저장에 실패했습니다.");
+    }
+  };
+
+  if (loading) {
+    return <_.Container>로딩 중...</_.Container>;
+  }
+
+  return (
+    <_.Container>
+      <_.Page>
+        <_.HeaderSection>
+          <_.Title>물품 신청 주의사항 작성</_.Title>
+          <_.SelectWrapper>
+            <_.Select value={projectType} onChange={(e) => setProjectType(e.target.value)}>
+              {ProjectTypes.map((type) => (
+                <option key={type} value={type}>
+                  {type}
+                </option>
+              ))}
+            </_.Select>
+          </_.SelectWrapper>
+        </_.HeaderSection>
+        <_.EditorWrapper>
+          <BlockNoteEditor
+            initialContent={content}
+            onChange={(value) => setContent(value)}
+            editable={true}
+          />
+        </_.EditorWrapper>
+      </_.Page>
+      <BtnPrimary onClick={handleSubmit}>저장</BtnPrimary>
+    </_.Container>
+  );
 }

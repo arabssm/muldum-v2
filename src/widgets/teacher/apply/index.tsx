@@ -7,7 +7,7 @@ import { Modal } from "@/components/modal/modal";
 import { useApplyAndModalState } from "@/shared/hooks/apply";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
-import { getApprovedItems, getRejectedItems, getNotApprovedItems, approveItems, rejectItems, downloadExcel, type TeacherItem, getRejectTemplates, addRejectTemplates, deleteRejectTemplate, type RejectTemplate, getTeamApprovedItems, getTeamNotApprovedItems, getTeamRejectedItems, type TeacherItemsResponse, getApprovedItemsOnDate, getApprovedDates, getRejectedItemsOnDate, getRejectedDates, getMajorNotApprovedItems, getMajorApprovedItems, getMajorRejectedItems, getMajorTeamNotApprovedItems, getMajorTeamApprovedItems, getMajorTeamRejectedItems } from "@/shared/api/items";
+import { getApprovedItems, getRejectedItems, getNotApprovedItems, approveItems, rejectItems, downloadExcel, type TeacherItem, getRejectTemplates, addRejectTemplates, deleteRejectTemplate, type RejectTemplate, getTeamApprovedItems, getTeamNotApprovedItems, getTeamRejectedItems, type TeacherItemsResponse, getApprovedItemsOnDate, getApprovedDates, getRejectedItemsOnDate, getRejectedDates, getMajorNotApprovedItems, getMajorApprovedItems, getMajorRejectedItems, getMajorTeamNotApprovedItems, getMajorTeamApprovedItems, getMajorTeamRejectedItems, createOrUpdateShippingPolicy, getShippingPolicy, type ShippingPolicy } from "@/shared/api/items";
 import { showToast } from "@/shared/ui/toast";
 import { getNetworkTeamsWithItemCount, getMajorTeamsWithItemCount, type Team } from "@/shared/api/team";
 import Loading from "@/shared/ui/loading";
@@ -28,7 +28,7 @@ export default function Apply() {
 
     const router = useRouter();
     const [deliveryCost, setDeliveryCost] = useState("");
-    const [ruleText, setRuleText] = useState("");
+    const [cannotApplyForShipping, setCannotApplyForShipping] = useState(false);
     const [items, setItems] = useState<TeacherItem[]>([]);
     const [loading, setLoading] = useState(false);
     const [rejectReason, setRejectReason] = useState("");
@@ -137,6 +137,22 @@ export default function Apply() {
         };
 
         fetchTemplates();
+    }, []);
+
+    useEffect(() => {
+        const fetchShippingPolicy = async () => {
+            try {
+                const policy = await getShippingPolicy();
+                if (policy) {
+                    setDeliveryCost(policy.atLeastShippingMoney.toString());
+                    setCannotApplyForShipping(policy.youCantApplyForIgenship);
+                }
+            } catch (error) {
+                console.error('Failed to fetch shipping policy:', error);
+            }
+        };
+
+        fetchShippingPolicy();
     }, []);
 
     useEffect(() => {
@@ -292,6 +308,27 @@ export default function Apply() {
     const handleLocalCheckboxClick = (index: number, e: React.MouseEvent) => {
         e.stopPropagation();
         setLocalChecked(prev => prev.map((v, i) => (i === index ? !v : v)));
+    };
+
+    const handleSaveShippingPolicy = async () => {
+        const cost = parseInt(deliveryCost);
+        
+        if (isNaN(cost) || cost < 0) {
+            showToast.warning("유효한 배송비를 입력해주세요 (0 이상의 숫자)");
+            return;
+        }
+
+        try {
+            await createOrUpdateShippingPolicy({
+                atLeastShippingMoney: cost,
+                youCantApplyForIgenship: cannotApplyForShipping
+            });
+            showToast.success("배송 정책이 저장되었습니다.");
+            setIsOpen(false);
+        } catch (error) {
+            console.error('Failed to save shipping policy:', error);
+            showToast.error("배송 정책 저장에 실패했습니다.");
+        }
     };
 
     return (
@@ -552,20 +589,35 @@ export default function Apply() {
             <Modal isOpen={isOpen} closeModal={() => setIsOpen(false)}>
                 <_.ModalInner>
                     <Image src="/assets/n.svg" alt="플러스 아이콘" width={48} height={48} />
-                    <_.ModalTitle> 택배비 및 규칙을 <br /> 추가하세요 </_.ModalTitle>
+                    <_.ModalTitle>배송 정책 설정</_.ModalTitle>
                     <_.Input
+                        type="number"
                         value={deliveryCost}
                         onChange={(e) => setDeliveryCost(e.target.value)}
-                        placeholder="1. 택배비를 입력하세요"
+                        placeholder="무료 배송 최소 금액 (원)"
+                        min="0"
                     />
-                    <_.Input
-                        value={ruleText}
-                        onChange={(e) => setRuleText(e.target.value)}
-                        placeholder="2. 그 외 규칙을 입력하세요"
-                    />
+                    <div style={{ 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        gap: '0.5rem',
+                        padding: '0.75rem',
+                        cursor: 'pointer',
+                        userSelect: 'none'
+                    }}
+                    onClick={() => setCannotApplyForShipping(!cannotApplyForShipping)}
+                    >
+                        <Image
+                            src={cannotApplyForShipping ? "/assets/checkbox.svg" : "/assets/nonCheck.svg"}
+                            alt="체크박스"
+                            width={20}
+                            height={20}
+                        />
+                        <span style={{ fontSize: '0.9rem' }}>배송비 신청 불가</span>
+                    </div>
                     <_.Row>
                         <_.NoBtn onClick={() => setIsOpen(false)}>닫기</_.NoBtn>
-                        <_.SaveBtn onClick={handleSave}>
+                        <_.SaveBtn onClick={handleSaveShippingPolicy}>
                             저장
                         </_.SaveBtn>
                     </_.Row>

@@ -1,56 +1,64 @@
 import styled from "@emotion/styled";
 
 export const Container = styled.div`
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    min-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  width: 100%;
+  height: 100%;
+  padding: 2rem;
 `;
 
-export const BtnGroup = styled.div`
-    width: 100%;
-    justify-content: end;
-    display: flex;
-    gap: 1rem;
-    margin-top: 1rem;
+export const Page = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  background-color: white;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 `;
 
-export const Group = styled.div`
-    display: flex;
-    gap: 4rem;
-    width: 80%;
-    flex-direction: column;
-    align-items: center;
+export const HeaderSection = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 `;
 
-export const Wrapper = styled.div`
-    display: flex;
-    align-items: flex-start;
-    gap: 2rem;
-    width: 100%;
+export const Title = styled.h1`
+  font-size: 2rem;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+  border: none;
+  outline: none;
 `;
 
-export const Title = styled.div`
-    width: 100%;
-    font-size: 1.5rem;
-    font-weight: 500;
+export const SelectWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 `;
 
-export const SubTitle = styled.div`
-    font-size: 1.4rem;
-    font-weight: 500;
-    min-width: 8%;
-    display: flex;
-    align-items: center;
+export const Select = styled.select`
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  border: 1px solid #d1d1d1;
+  border-radius: 4px;
+  background-color: #f5f5f5;
+  cursor: pointer;
+  font-weight: 500;
+
+  &:focus {
+    outline: none;
+    border-color: #ff9b62;
+  }
 `;
 
-export const detail = styled.div`
-    width: 100%;
-    flex: 1;
-    padding: 1rem 0;
-    min-height: 15vh;
-    border: 1px solid #D1D1D1;
-    border-radius: 4px;
-    display: flex;
-    color: #D1D1D1;
+export const EditorWrapper = styled.div`
+  width: 100%;
+  min-height: 500px;
 `;

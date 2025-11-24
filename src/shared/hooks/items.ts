@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import type { ItemFormProps } from "@/shared/types/group";
-import { createItemRequest, getItemPreview } from "@/shared/api/items";
+import { createItemRequest, getItemPreview, getShippingPolicy } from "@/shared/api/items";
 import { getUserInfo } from "@/shared/api/user";
 import { showToast } from "@/shared/ui/toast";
 
@@ -85,6 +85,28 @@ export function useItemForm(handleSubmit?: ItemFormProps["handleSubmit"], initia
 
     setIsSubmitting(true);
     try {
+      // 배송 정책 확인
+      const shippingPolicy = await getShippingPolicy();
+      
+      if (shippingPolicy) {
+        const itemPrice = parseFloat(price.replace(/,/g, '')) || 0;
+        const deliveryPrice = parseFloat(drivePrice.replace(/,/g, '')) || 0;
+        
+        // 배송비 신청 불가 정책 확인
+        if (shippingPolicy.youCantApplyForIgenship && deliveryPrice > 0) {
+          showToast.error("현재 배송비 신청이 불가능합니다.");
+          setIsSubmitting(false);
+          return;
+        }
+        
+        // 최소 금액 미달 시 배송비 필수
+        if (itemPrice < shippingPolicy.atLeastShippingMoney && deliveryPrice === 0) {
+          showToast.error(`${shippingPolicy.atLeastShippingMoney.toLocaleString()}원 미만 물품은 배송비를 입력해야 합니다.`);
+          setIsSubmitting(false);
+          return;
+        }
+      }
+
       const requestData = {
         product_name: item,
         quantity,

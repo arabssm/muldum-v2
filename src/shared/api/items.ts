@@ -265,12 +265,6 @@ export const getMajorTeamRejectedItems = async (teamId: number): Promise<Teacher
   return res.data;
 };
 
-// 주의사항 작성 API
-export const createItemGuide = async (content: string) => {
-  const res = await axiosInstance.post('/tch/items/guide', { content });
-  return res.data;
-};
-
 // 거절 사유 템플릿 API
 export interface RejectTemplate {
   id: number;
@@ -325,4 +319,78 @@ export const getTeamRejectedItems = async (teamId: number): Promise<TeacherItems
     items: Array.isArray(res.data) ? res.data : [],
     newCount: 0
   };
+};
+
+// 배송 정책 API
+export interface ShippingPolicy {
+  id: number;
+  atLeastShippingMoney: number;
+  youCantApplyForIgenship: boolean;
+  updatedAt: string;
+}
+
+export const createOrUpdateShippingPolicy = async (data: {
+  atLeastShippingMoney: number;
+  youCantApplyForIgenship: boolean;
+}): Promise<ShippingPolicy> => {
+  const res = await axiosInstance.post('/tch/items/shipping-policy', data);
+  return res.data;
+};
+
+export const getShippingPolicy = async (): Promise<ShippingPolicy | null> => {
+  try {
+    const res = await axiosInstance.get('/ara/items/shipping-policy');
+    if (res.status === 204) {
+      return null;
+    }
+    return res.data;
+  } catch (error) {
+    return null;
+  }
+};
+
+// 물품 신청 안내 API
+export interface ItemGuide {
+  id: number;
+  content: string;
+  projectType: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface ItemGuideRequest {
+  content: string;
+  projectType: string;
+}
+
+export interface ItemGuideResponse {
+  id: number;
+  message: string;
+}
+
+export const createItemGuide = async (data: ItemGuideRequest): Promise<ItemGuideResponse> => {
+  const res = await axiosInstance.post('/tch/items/guide', data);
+  return res.data;
+};
+
+export const updateItemGuide = async (guideId: number, data: ItemGuideRequest): Promise<ItemGuideResponse> => {
+  const res = await axiosInstance.patch(`/tch/items/guide/${guideId}`, data);
+  return res.data;
+};
+
+export const getItemGuide = async (guideId: number, projectType: string): Promise<ItemGuide> => {
+  const res = await axiosInstance.get(`/ara/items/guide/${guideId}`, {
+    params: { type: projectType }
+  });
+  return res.data;
+};
+
+// 최신 가이드 조회 (guideId를 1로 고정하여 사용)
+export const getLatestItemGuide = async (projectType: string): Promise<ItemGuide | null> => {
+  try {
+    return await getItemGuide(1, projectType);
+  } catch (error) {
+    console.error("Failed to fetch latest guide:", error);
+    return null;
+  }
 };

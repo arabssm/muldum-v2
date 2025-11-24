@@ -34,19 +34,25 @@ export const Modal = ({ isOpen, closeModal, children }: ModalProps) => {
 
 const Overlay = styled(motion.div)`
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
   z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
 `;
 
 const Content = styled(motion.div)`
   background: #fff;
   border-radius: 16px;
   padding: 24px;
-  max-width: 480px;
-  width: 100%;
+  max-width: 800px;
+  width: 90%;
+  max-height: 85vh;
+  overflow-y: auto;
   box-shadow: 0 2px 16px rgba(0, 0, 0, 0.2);
 `;
