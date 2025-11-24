@@ -16,6 +16,14 @@ export const useNotion = (teamId: string) => {
         const fetchNotion = async () => {
             try {
                 const data = await getTeamPage(teamId);
+                
+                // 응답이 HTML인지 확인
+                if (typeof data === 'string' && data.includes('<')) {
+                    console.error("서버가 HTML을 반환했습니다. API 엔드포인트를 확인하세요.");
+                    showToast.error("팀 페이지를 불러올 수 없습니다.");
+                    return;
+                }
+                
                 // 새 API 응답 구조: { teamId, teamName, content, config }
                 setTitle(data.teamName || "동아리이름");
                 setContent(data.content || "");
@@ -24,8 +32,16 @@ export const useNotion = (teamId: string) => {
                     setIcon(data.config.iconImageUrl || DEFAULT_ICON);
                     setCover(data.config.backgroundImageUrl || DEFAULT_BANNER);
                 }
-            } catch (error) {
-                console.log("팀 페이지 데이터를 불러오지 못했지만 페이지 표시 가능");
+            } catch (error: any) {
+                console.error("팀 페이지 로드 에러:", error);
+                
+                // JSON 파싱 에러인 경우
+                if (error.message?.includes('JSON') || error.message?.includes('Unexpected token')) {
+                    console.error("서버가 잘못된 응답을 반환했습니다.");
+                    showToast.error("서버 응답 오류가 발생했습니다.");
+                } else {
+                    console.log("팀 페이지 데이터를 불러오지 못했지만 페이지 표시 가능");
+                }
                 // 기본 값 유지
             } finally {
                 setLoading(false);

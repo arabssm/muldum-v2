@@ -66,7 +66,14 @@ const refreshAccessToken = async (): Promise<string> => {
 };
 
 axiosInstance.interceptors.response.use(
-    (res) => res,
+    (res) => {
+        // HTML 응답 감지
+        if (typeof res.data === 'string' && res.data.trim().startsWith('<')) {
+            console.error('서버가 HTML을 반환했습니다:', res.config.url);
+            throw new Error('서버가 HTML을 반환했습니다. API 엔드포인트를 확인하세요.');
+        }
+        return res;
+    },
     async (error: AxiosError) => {
         const original = error.config as AxiosRequestConfig & { _retry?: boolean };
 
