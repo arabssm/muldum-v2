@@ -7,13 +7,13 @@ import { Modal } from "@/components/modal/modal";
 import { useApplyAndModalState } from "@/shared/hooks/apply";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
-import { getApprovedItems, getRejectedItems, getNotApprovedItems, approveItems, rejectItems, downloadExcel, type TeacherItem, getRejectTemplates, addRejectTemplates, deleteRejectTemplate, type RejectTemplate, getTeamApprovedItems, getTeamNotApprovedItems, getTeamRejectedItems, type TeacherItemsResponse } from "@/shared/api/items";
+import { getApprovedItems, getRejectedItems, getNotApprovedItems, approveItems, rejectItems, downloadExcel, type TeacherItem, getRejectTemplates, addRejectTemplates, deleteRejectTemplate, type RejectTemplate, getTeamApprovedItems, getTeamNotApprovedItems, getTeamRejectedItems, type TeacherItemsResponse, getApprovedItemsOnDate, getApprovedDates, getRejectedItemsOnDate, getRejectedDates, getMajorNotApprovedItems, getMajorApprovedItems, getMajorRejectedItems, getMajorTeamNotApprovedItems, getMajorTeamApprovedItems, getMajorTeamRejectedItems } from "@/shared/api/items";
 import { showToast } from "@/shared/ui/toast";
-import { getNetworkTeamsWithItemCount, type Team } from "@/shared/api/team";
+import { getNetworkTeamsWithItemCount, getMajorTeamsWithItemCount, type Team } from "@/shared/api/team";
 import Loading from "@/shared/ui/loading";
 
 const Groups = ["승인 가능 물품 조회", "승인된 물품 조회", "거절된 물품 조회"] as const;
-const Classes = ["전체", "전공동아리", "네트워크", "1반", "2반", "3반", "4반"] as const;
+const Classes = ["전체", "전공동아리", "네트워크"] as const;
 
 export default function Apply() {
     const {
@@ -29,7 +29,6 @@ export default function Apply() {
     const router = useRouter();
     const [deliveryCost, setDeliveryCost] = useState("");
     const [ruleText, setRuleText] = useState("");
-    const [isNthOpen, setIsNthOpen] = useState(false);
     const [items, setItems] = useState<TeacherItem[]>([]);
     const [loading, setLoading] = useState(false);
     const [rejectReason, setRejectReason] = useState("");
@@ -41,41 +40,82 @@ export default function Apply() {
     const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
     const [isCustomReason, setIsCustomReason] = useState(false);
     const [networkTeams, setNetworkTeams] = useState<Team[]>([]);
+    const [majorTeams, setMajorTeams] = useState<Team[]>([]);
     const [selectedTeam, setSelectedTeam] = useState<number | null>(null);
     const [newCount, setNewCount] = useState(0);
-    
-    const toggleNth = () => setIsNthOpen(prev => !prev);
+    const [selectedDate, setSelectedDate] = useState<string>("");
+    const [availableDates, setAvailableDates] = useState<string[]>([]);
 
     useEffect(() => {
         const fetchItems = async () => {
             setLoading(true);
             try {
-                let response: TeacherItemsResponse = { items: [], newCount: 0 };
+                let items: TeacherItem[] = [];
+                let count = 0;
                 
                 // 네트워크 탭이고 팀이 선택된 경우
                 if (activeClass === "네트워크" && selectedTeam) {
+                    // 네트워크 탭이고 팀이 선택된 경우
+                    let response: TeacherItemsResponse = { items: [], newCount: 0 };
+                    
                     if (activeGroup === "승인 가능 물품 조회") {
                         response = await getTeamNotApprovedItems(selectedTeam);
                     } else if (activeGroup === "승인된 물품 조회") {
-                        response = await getTeamApprovedItems(selectedTeam);
+                        response = await getTeamApprovedItems(selectedTeam, selectedDate || undefined);
                     } else if (activeGroup === "거절된 물품 조회") {
                         response = await getTeamRejectedItems(selectedTeam);
                     }
-                } else if (activeClass !== "네트워크") {
-                    // 네트워크가 아닌 경우 기존 로직
+                    
+                    items = response.items || [];
+                    count = response.newCount || 0;
+                } else if (activeClass === "전공동아리" && selectedTeam) {
+                    // 전공동아리 탭이고 팀이 선택된 경우
+                    let response: TeacherItemsResponse = { items: [], newCount: 0 };
+                    
+                    if (activeGroup === "승인 가능 물품 조회") {
+                        response = await getMajorTeamNotApprovedItems(selectedTeam);
+                    } else if (activeGroup === "승인된 물품 조회") {
+                        response = await getMajorTeamApprovedItems(selectedTeam, selectedDate || undefined);
+                    } else if (activeGroup === "거절된 물품 조회") {
+                        response = await getMajorTeamRejectedItems(selectedTeam);
+                    }
+                    
+                    items = response.items || [];
+                    count = response.newCount || 0;
+                } else if (activeClass === "전공동아리") {
+                    // 전공동아리 전체 조회
+                    let response: TeacherItemsResponse = { items: [], newCount: 0 };
+                    
+                    if (activeGroup === "승인 가능 물품 조회") {
+                        response = await getMajorNotApprovedItems();
+                    } else if (activeGroup === "승인된 물품 조회") {
+                        response = await getMajorApprovedItems(selectedDate || undefined);
+                    } else if (activeGroup === "거절된 물품 조회") {
+                        response = await getMajorRejectedItems(selectedDate || undefined);
+                    }
+                    
+                    items = response.items || [];
+                    count = response.newCount || 0;
+                } else {
+                    // 전체 조회
+                    let response: TeacherItemsResponse = { items: [], newCount: 0 };
+                    
                     if (activeGroup === "승인 가능 물품 조회") {
                         response = await getNotApprovedItems();
                     } else if (activeGroup === "승인된 물품 조회") {
-                        response = await getApprovedItems();
+                        response = await getApprovedItems(selectedDate || undefined);
                     } else if (activeGroup === "거절된 물품 조회") {
-                        response = await getRejectedItems();
+                        response = await getRejectedItems(selectedDate || undefined);
                     }
+                    
+                    items = response.items || [];
+                    count = response.newCount || 0;
                 }
                 
-                setItems(response.items || []);
-                setNewCount(response.newCount || 0);
-                setLocalChecked((response.items || []).map(() => false));
-                console.log('Fetched items:', response.items, 'New count:', response.newCount);
+                setItems(items);
+                setNewCount(count);
+                setLocalChecked(items.map(() => false));
+                console.log('Fetched items:', items, 'New count:', count);
             } catch (error) {
                 console.error('Failed to fetch items:', error);
             } finally {
@@ -84,7 +124,7 @@ export default function Apply() {
         };
 
         fetchItems();
-    }, [activeGroup, activeClass, selectedTeam]);
+    }, [activeGroup, activeClass, selectedTeam, selectedDate]);
 
     useEffect(() => {
         const fetchTemplates = async () => {
@@ -100,7 +140,7 @@ export default function Apply() {
     }, []);
 
     useEffect(() => {
-        const fetchNetworkTeams = async () => {
+        const fetchTeams = async () => {
             if (activeClass === "네트워크") {
                 try {
                     const teams = await getNetworkTeamsWithItemCount();
@@ -108,11 +148,41 @@ export default function Apply() {
                 } catch (error) {
                     console.error('Failed to fetch network teams:', error);
                 }
+            } else if (activeClass === "전공동아리") {
+                try {
+                    const teams = await getMajorTeamsWithItemCount();
+                    setMajorTeams(teams);
+                } catch (error) {
+                    console.error('Failed to fetch major teams:', error);
+                }
             }
         };
 
-        fetchNetworkTeams();
+        fetchTeams();
     }, [activeClass]);
+
+    // 페이지 로드 시 날짜 목록 가져오기 (캐싱용)
+    useEffect(() => {
+        const fetchAvailableDates = async () => {
+            try {
+                let dates: string[] = [];
+                if (activeGroup === "승인된 물품 조회") {
+                    dates = await getApprovedDates();
+                } else if (activeGroup === "거절된 물품 조회") {
+                    dates = await getRejectedDates();
+                }
+                setAvailableDates(dates);
+                console.log('Available dates:', dates);
+            } catch (error) {
+                console.error('Failed to fetch available dates:', error);
+                setAvailableDates([]);
+            }
+        };
+
+        fetchAvailableDates();
+    }, [activeGroup]);
+
+
 
     const handleApprove = async () => {
         const selectedItems = items.filter((_, index) => localChecked[index]);
@@ -274,12 +344,51 @@ export default function Apply() {
                     </_.Group>
                     <_.GrayBtn onClick={() => router.push('/caution')}>주의사항 작성</_.GrayBtn>
                     <_.GrayBtn onClick={() => setIsOpen(true)}>규칙 추가</_.GrayBtn>
-                    <_.GrayBtn onClick={toggleNth}>{isNthOpen ? "n차 물품 닫기" : "n차 물품 열기"} </_.GrayBtn>
                     <_.GrayBtn onClick={toggleAll}>전체선택</_.GrayBtn>
                     <_.GrayBtn onClick={() => setIsTemplateModalOpen(true)}>거절 템플릿 관리</_.GrayBtn>
                 </_.TopWrapper>
+                {(activeGroup === "승인된 물품 조회" || activeGroup === "거절된 물품 조회") && (
+                    <div style={{ 
+                        display: 'flex', 
+                        gap: '0.5rem', 
+                        alignItems: 'center',
+                        padding: '0.5rem 0',
+                        width: '100%'
+                    }}>
+                        <select
+                            value={selectedDate}
+                            onChange={(e) => setSelectedDate(e.target.value)}
+                            style={{
+                                padding: '0.5rem 1rem',
+                                fontSize: '0.875rem',
+                                border: '1px solid #D1D1D1',
+                                borderRadius: '4px',
+                                backgroundColor: 'white',
+                                cursor: 'pointer',
+                                minWidth: '200px',
+                                flex: '0 0 auto'
+                            }}
+                        >
+                            <option value="">전체 날짜</option>
+                            {availableDates.map((date) => (
+                                <option key={date} value={date}>
+                                    {new Date(date).toLocaleDateString('ko-KR', {
+                                        year: 'numeric',
+                                        month: 'long',
+                                        day: 'numeric'
+                                    })}
+                                </option>
+                            ))}
+                        </select>
+                        {activeGroup === "승인된 물품 조회" && activeClass === "전체" && (
+                            <_.GrayBtn onClick={() => downloadExcel(selectedDate || undefined)}>
+                                엑셀 다운로드
+                            </_.GrayBtn>
+                        )}
+                    </div>
+                )}
             </_.Wrapper>
-            {activeClass === "네트워크" && networkTeams.length > 0 && (
+            {(activeClass === "네트워크" && networkTeams.length > 0) || (activeClass === "전공동아리" && majorTeams.length > 0) ? (
                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', width: '100%' }}>
                     <Image src="assets/arrow.svg" alt="화살표" width={24} height={24} style={{ cursor: "pointer", flexShrink: 0 }} />
                     <div style={{ 
@@ -289,7 +398,7 @@ export default function Apply() {
                         flex: 1,
                         padding: '0.5rem 0'
                     }}>
-                        {networkTeams.map((team) => (
+                        {(activeClass === "네트워크" ? networkTeams : majorTeams).map((team) => (
                             <div key={team.id} style={{ position: 'relative', flexShrink: 0 }}>
                                 <_.Btn 
                                     onClick={() => setSelectedTeam(team.id)}
@@ -328,7 +437,7 @@ export default function Apply() {
                     </div>
                     <Image src="assets/arrow.svg" alt="화살표" width={24} height={24} style={{ transform: "rotate(180deg)", cursor: "pointer", flexShrink: 0 }} />
                 </div>
-            )}
+            ) : null}
             <_.InfoContainer>
                 {loading ? (
                     <div style={{ padding: "2rem", textAlign: "center" }}><Loading /></div>
@@ -338,14 +447,16 @@ export default function Apply() {
                     items.map((item, index) => (
                         <_.InfoWrapper key={item.item_id}>
                             <_.ToggleWrapper onClick={() => handleToggle(index)}>
-                                <Image
-                                    src={getCheckboxIcon(localChecked[index])}
-                                    alt="체크박스"
-                                    width={20}
-                                    height={20}
-                                    style={{ marginRight: "0.5rem", cursor: "pointer" }}
-                                    onClick={(e) => handleLocalCheckboxClick(index, e)}
-                                />
+                                {activeGroup !== "승인된 물품 조회" && (
+                                    <Image
+                                        src={getCheckboxIcon(localChecked[index])}
+                                        alt="체크박스"
+                                        width={20}
+                                        height={20}
+                                        style={{ marginRight: "0.5rem", cursor: "pointer" }}
+                                        onClick={(e) => handleLocalCheckboxClick(index, e)}
+                                    />
+                                )}
                                 <_.State color={item.status === 'APPROVED' ? '#4CAF50' : item.status === 'REJECTED' ? '#f44336' : '#FFA500'}>
                                     {item.status === 'APPROVED' ? '승인' : item.status === 'REJECTED' ? '거절' : '대기'}
                                 </_.State>
@@ -373,6 +484,26 @@ export default function Apply() {
                                     <_.Content>신청 사유: {item.reason}</_.Content>
                                     <_.Content>{new Date(item.deliveryTime).toLocaleDateString()} 도착예정</_.Content>
                                     <_.Content>배송비: {item.deliveryPrice}원</_.Content>
+                                    {item.team_name && (
+                                        <_.Content style={{ color: '#666', fontSize: '0.9rem' }}>
+                                            팀: {item.team_name}
+                                        </_.Content>
+                                    )}
+                                    {item.approved_at && (
+                                        <_.Content style={{ color: '#4CAF50', fontSize: '0.9rem' }}>
+                                            승인 날짜: {new Date(item.approved_at).toLocaleString('ko-KR')}
+                                        </_.Content>
+                                    )}
+                                    {item.rejected_at && (
+                                        <_.Content style={{ color: '#f44336', fontSize: '0.9rem' }}>
+                                            거절 날짜: {new Date(item.rejected_at).toLocaleString('ko-KR')}
+                                        </_.Content>
+                                    )}
+                                    {item.updated_at && (
+                                        <_.Content style={{ color: '#666', fontSize: '0.9rem' }}>
+                                            수정 날짜: {new Date(item.updated_at).toLocaleString('ko-KR')}
+                                        </_.Content>
+                                    )}
                                     {item.status === 'REJECTED' && item.rejectReason && <_.Content style={{ color: '#f44336' }}>거절 사유: {item.rejectReason}</_.Content>}
                                 </_.InfoGroup>
                             )}
@@ -381,10 +512,12 @@ export default function Apply() {
                 )}
             </_.InfoContainer>
 
-            <_.BtnWrapper>
-                <BtnSecondary onClick={handleReject}>거절</BtnSecondary>
-                <BtnPrimary onClick={handleApprove}>승인</BtnPrimary>
-            </_.BtnWrapper>
+            {activeGroup !== "승인된 물품 조회" && (
+                <_.BtnWrapper>
+                    <BtnSecondary onClick={handleReject}>거절</BtnSecondary>
+                    <BtnPrimary onClick={handleApprove}>승인</BtnPrimary>
+                </_.BtnWrapper>
+            )}
 
             <Modal isOpen={isOpen} closeModal={() => setIsOpen(false)}>
                 <_.ModalInner>
@@ -403,7 +536,7 @@ export default function Apply() {
                     <_.Row>
                         <_.NoBtn onClick={() => setIsOpen(false)}>닫기</_.NoBtn>
                         <_.SaveBtn onClick={handleSave}>
-                            {isNthOpen ? "닫기" : "열기"}
+                            저장
                         </_.SaveBtn>
                     </_.Row>
                 </_.ModalInner>

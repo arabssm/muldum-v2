@@ -79,6 +79,7 @@ export const getCrawlRecommendations = async (query: string, limit: number = 3) 
 // 선생님용 API
 export interface TeacherItem {
   team_id: number;
+  team_name?: string; // 팀 이름
   type: string;
   item_id: number;
   product_name: string;
@@ -91,6 +92,9 @@ export interface TeacherItem {
   deliveryPrice: string;
   deliveryTime: string;
   rejectReason: string | null;
+  updated_at: string; // ISO 8601 형식 (2025-11-24T15:30:00)
+  approved_at?: string; // ISO 8601 형식 (2025-12-09T15:07:20)
+  rejected_at?: string; // ISO 8601 형식 (2025-12-09T15:07:20)
 }
 
 export interface TeacherItemsResponse {
@@ -98,21 +102,32 @@ export interface TeacherItemsResponse {
   newCount: number;
 }
 
-export const getApprovedItems = async (nth?: number): Promise<TeacherItemsResponse> => {
-  const params = nth ? { nth } : {};
+export const getApprovedItems = async (date?: string): Promise<TeacherItemsResponse> => {
+  const params = date ? { date } : {};
   const res = await axiosInstance.get('/tch/items/approved', { params });
+  // 응답이 배열이면 래핑
+  if (Array.isArray(res.data)) {
+    return { items: res.data, newCount: 0 };
+  }
   return res.data;
 };
 
-export const getRejectedItems = async (nth?: number): Promise<TeacherItemsResponse> => {
-  const params = nth ? { nth } : {};
+export const getRejectedItems = async (date?: string): Promise<TeacherItemsResponse> => {
+  const params = date ? { date } : {};
   const res = await axiosInstance.get('/tch/items/rejected', { params });
+  // 응답이 배열이면 래핑
+  if (Array.isArray(res.data)) {
+    return { items: res.data, newCount: 0 };
+  }
   return res.data;
 };
 
-export const getNotApprovedItems = async (nth?: number): Promise<TeacherItemsResponse> => {
-  const params = nth ? { nth } : {};
-  const res = await axiosInstance.get('/tch/items', { params });
+export const getNotApprovedItems = async (): Promise<TeacherItemsResponse> => {
+  const res = await axiosInstance.get('/tch/items');
+  // 응답이 배열이면 래핑
+  if (Array.isArray(res.data)) {
+    return { items: res.data, newCount: 0 };
+  }
   return res.data;
 };
 
@@ -126,8 +141,8 @@ export const rejectItems = async (items: { item_id: number; reason: string }[]) 
   return res.data;
 };
 
-export const downloadExcel = async (nth?: number) => {
-  const params = nth ? { nth } : {};
+export const downloadExcel = async (date?: string) => {
+  const params = date ? { date } : {};
   const res = await axiosInstance.get('/tch/items/xlsx', { 
     params,
     responseType: 'blob'
@@ -136,11 +151,124 @@ export const downloadExcel = async (nth?: number) => {
   const url = window.URL.createObjectURL(new Blob([res.data]));
   const link = document.createElement('a');
   link.href = url;
-  link.setAttribute('download', `items_${nth || 'current'}.xlsx`);
+  link.setAttribute('download', `items_${date || 'all'}.xlsx`);
   document.body.appendChild(link);
   link.click();
   link.remove();
   window.URL.revokeObjectURL(url);
+};
+
+// 특정 날짜에 승인된 물품 조회
+export const getApprovedItemsOnDate = async (date: string, teamName?: string): Promise<TeacherItem[]> => {
+  const params: { date: string; teamName?: string } = { date };
+  if (teamName) params.teamName = teamName;
+  
+  const res = await axiosInstance.get('/tch/items/approved-on', { params });
+  return res.data;
+};
+
+// 특정 날짜에 거절된 물품 조회
+export const getRejectedItemsOnDate = async (date: string, teamName?: string): Promise<TeacherItem[]> => {
+  const params: { date: string; teamName?: string } = { date };
+  if (teamName) params.teamName = teamName;
+  
+  const res = await axiosInstance.get('/tch/items/rejected-on', { params });
+  return res.data;
+};
+
+// 승인된 날짜 목록 조회
+export const getApprovedDates = async (start?: string, end?: string): Promise<string[]> => {
+  const params: { start?: string; end?: string } = {};
+  if (start) params.start = start;
+  if (end) params.end = end;
+  
+  const res = await axiosInstance.get('/tch/items/approved-dates', { params });
+  return res.data;
+};
+
+// 거절된 날짜 목록 조회
+export const getRejectedDates = async (start?: string, end?: string): Promise<string[]> => {
+  const params: { start?: string; end?: string } = {};
+  if (start) params.start = start;
+  if (end) params.end = end;
+  
+  const res = await axiosInstance.get('/tch/items/rejected-dates', { params });
+  return res.data;
+};
+
+// 전공동아리 물품 조회 API
+export const getMajorItems = async (): Promise<TeacherItemsResponse> => {
+  const res = await axiosInstance.get('/tch/items/major');
+  if (Array.isArray(res.data)) {
+    return { items: res.data, newCount: 0 };
+  }
+  return res.data;
+};
+
+export const getMajorNotApprovedItems = async (): Promise<TeacherItemsResponse> => {
+  const res = await axiosInstance.get('/tch/items/major/not-approved');
+  if (Array.isArray(res.data)) {
+    return { items: res.data, newCount: 0 };
+  }
+  return res.data;
+};
+
+export const getMajorApprovedItems = async (date?: string): Promise<TeacherItemsResponse> => {
+  const params = date ? { date } : {};
+  const res = await axiosInstance.get('/tch/items/major/approved', { params });
+  if (Array.isArray(res.data)) {
+    return { items: res.data, newCount: 0 };
+  }
+  return res.data;
+};
+
+export const getMajorRejectedItems = async (date?: string): Promise<TeacherItemsResponse> => {
+  const params = date ? { date } : {};
+  const res = await axiosInstance.get('/tch/items/major/rejected', { params });
+  if (Array.isArray(res.data)) {
+    return { items: res.data, newCount: 0 };
+  }
+  return res.data;
+};
+
+// 특정 전공동아리 팀 물품 조회
+export const getMajorTeamItems = async (teamId: number): Promise<TeacherItemsResponse> => {
+  const res = await axiosInstance.get(`/tch/items/major/${teamId}`);
+  if (Array.isArray(res.data)) {
+    return { items: res.data, newCount: 0 };
+  }
+  return res.data;
+};
+
+export const getMajorTeamNotApprovedItems = async (teamId: number): Promise<TeacherItemsResponse> => {
+  const res = await axiosInstance.get(`/tch/items/major/${teamId}/not-approved`);
+  if (Array.isArray(res.data)) {
+    return { items: res.data, newCount: 0 };
+  }
+  return res.data;
+};
+
+export const getMajorTeamApprovedItems = async (teamId: number, date?: string): Promise<TeacherItemsResponse> => {
+  const params = date ? { date } : {};
+  const res = await axiosInstance.get(`/tch/items/major/${teamId}/approved`, { params });
+  if (Array.isArray(res.data)) {
+    return { items: res.data, newCount: 0 };
+  }
+  return res.data;
+};
+
+export const getMajorTeamRejectedItems = async (teamId: number): Promise<TeacherItemsResponse> => {
+  const res = await axiosInstance.get(`/tch/items/major/${teamId}/rejected`);
+  if (Array.isArray(res.data)) {
+    return { items: res.data, newCount: 0 };
+  }
+  return res.data;
+};
+
+// 주의사항 작성 API
+export const createItemGuide = async (content: string) => {
+  const res = await axiosInstance.post('/tch/items/guide', { content });
+  return res.data;
 };
 
 // 거절 사유 템플릿 API
@@ -174,8 +302,9 @@ export const getTeamItems = async (teamId: number): Promise<TeacherItemsResponse
   };
 };
 
-export const getTeamApprovedItems = async (teamId: number): Promise<TeacherItemsResponse> => {
-  const res = await axiosInstance.get(`/tch/items/${teamId}/approved`);
+export const getTeamApprovedItems = async (teamId: number, date?: string): Promise<TeacherItemsResponse> => {
+  const params = date ? { date } : {};
+  const res = await axiosInstance.get(`/tch/items/${teamId}/approved`, { params });
   return {
     items: Array.isArray(res.data) ? res.data : [],
     newCount: 0

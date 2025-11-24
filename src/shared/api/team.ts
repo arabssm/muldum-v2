@@ -59,3 +59,18 @@ export const getNetworkTeamsWithItemCount = async (): Promise<Team[]> => {
     newCount: team.newCount || 0,
   }));
 };
+
+// 교사용: 전공동아리 팀별 새 물품 수 포함
+export const getMajorTeamsWithItemCount = async (): Promise<Team[]> => {
+  const { data } = await axiosInstance.get('/tch/teamspace/major/item');
+  
+  // 배열로 직접 반환됨
+  const teams = Array.isArray(data) ? data : [];
+  
+  return teams.map((team: TeamWithItemCount) => ({
+    id: team.teamId,
+    name: team.teamName,
+    members: team.members?.map(m => m.userName) || [],
+    newCount: team.newCount || 0,
+  }));
+};

@@ -4,10 +4,18 @@ import { useEffect, useState } from 'react';
 import styled from '@emotion/styled';
 import Image from 'next/image';
 
+const BYPASS_KEY = 'mobile_blocker_bypass';
+
 export default function MobileBlocker() {
   const [isMobile, setIsMobile] = useState(false);
+  const [clickCount, setClickCount] = useState(0);
+  const [isBypassed, setIsBypassed] = useState(false);
 
   useEffect(() => {
+    // 로컬스토리지에서 우회 상태 확인
+    const bypassed = localStorage.getItem(BYPASS_KEY) === 'true';
+    setIsBypassed(bypassed);
+
     const checkDevice = () => {
       const userAgent = navigator.userAgent.toLowerCase();
       const isMobileDevice = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini|mobile|tablet/i.test(userAgent);
@@ -22,12 +30,30 @@ export default function MobileBlocker() {
     return () => window.removeEventListener('resize', checkDevice);
   }, []);
 
-  if (!isMobile) return null;
+  const handleLogoClick = () => {
+    const newCount = clickCount + 1;
+    setClickCount(newCount);
+
+    if (newCount >= 5) {
+      // 5번 클릭 시 우회 활성화
+      localStorage.setItem(BYPASS_KEY, 'true');
+      setIsBypassed(true);
+      setClickCount(0);
+    }
+
+    // 2초 후 카운트 리셋
+    setTimeout(() => {
+      setClickCount(0);
+    }, 2000);
+  };
+
+  // 우회 상태이거나 모바일이 아니면 표시 안 함
+  if (!isMobile || isBypassed) return null;
 
   return (
     <Overlay>
       <Content>
-        <LogoWrapper>
+        <LogoWrapper onClick={handleLogoClick}>
           <Image src="/assets/araLogo.svg" alt="Logo" width={200} height={200} />
         </LogoWrapper>
         <Title>PC에서 접속해주세요</Title>
@@ -64,6 +90,8 @@ const LogoWrapper = styled.div`
   margin-bottom: 2rem;
   display: flex;
   justify-content: center;
+  position: relative;
+  user-select: none;
 `;
 
 const Title = styled.h1`
