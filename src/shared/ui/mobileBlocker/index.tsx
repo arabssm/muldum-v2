@@ -19,9 +19,9 @@ export default function MobileBlocker() {
     const checkDevice = () => {
       const userAgent = navigator.userAgent.toLowerCase();
       const isMobileDevice = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini|mobile|tablet/i.test(userAgent);
-      const isSmallScreen = window.innerWidth <= 1620;
+      const isPortrait = window.innerHeight > window.innerWidth;
       
-      setIsMobile(isMobileDevice || isSmallScreen);
+      setIsMobile(isMobileDevice || isPortrait);
     };
 
     checkDevice();
