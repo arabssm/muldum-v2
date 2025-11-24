@@ -87,7 +87,7 @@ export default function ItemForm({ handleSubmit, hideClubSelect = false, isTemp 
       </_.Group>
       <_.Group>
         <FormInput label="물품링크" value={link} setValue={setLink} onBlur={handleLinkBlur} placeholder="링크를 입력하세요" width="62rem" error={errors.link} />
-        <FormInput label="예상 도착일" value={expectDrive} setValue={setExpectDrive} type="date" width="15rem" error={errors.expectDrive} />
+        <FormInput label="예상 도착일" value={expectDrive} setValue={setExpectDrive} type="date" width="10rem" error={errors.expectDrive} />
       </_.Group>
       <FormInput label="신청사유" value={reason} setValue={setReason} placeholder="신청 사유를 10자 이상 입력해주세요" width="100%" height="20vh" error={errors.reason} />
       <_.BtnGroup>
