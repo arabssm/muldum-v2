@@ -61,3 +61,13 @@ export const BtnGroup = styled.div`
   ${Basic}
   gap: 1.25rem;
 `;
+
+export const UserId = styled.div`
+  ${Basic}
+  font-size: 1rem;
+  font-weight: 500;
+  color: #4B4B4B;
+  padding: 0.6rem 1rem;
+  border-radius: 10rem;
+  background-color: #f6f6f6;
+`;

@@ -9,13 +9,14 @@ import LoginModal from '@/shared/ui/modal/loginModal';
 import { useAuth } from '@/shared/hooks/useAuth';
 import { useState, useEffect } from 'react';
 import { getUserInfo } from '@/shared/api/user';
-import WaterAnimation from '@/shared/ui/waterAnimation';
+
 
 export default function TopAppBar() {
   const pathname = usePathname();
   const { isLoggedIn, logout } = useAuth();
   const { Modal, openModal } = useModal();
   const [userType, setUserType] = useState<'student' | 'teacher' | null>(null);
+  const [userId, setUserId] = useState<string>('');
 
   useEffect(() => {
     const fetchUserType = async () => {
@@ -24,6 +25,7 @@ export default function TopAppBar() {
           const userInfo = await getUserInfo();
           const type = userInfo.user_type.toLowerCase() as 'student' | 'teacher';
           setUserType(type);
+          setUserId(userInfo.name || userInfo.email || '사용자');
           console.log('User type:', type);
         } catch (error) {
           console.error('Failed to fetch user type:', error);
@@ -71,7 +73,9 @@ export default function TopAppBar() {
       </_.Wrapper>
 
       <_.BtnGroup>
-        <WaterAnimation />
+        {isLoggedIn && userId && (
+          <_.UserId>{userId}</_.UserId>
+        )}
         {isLoggedIn ? (
           <_.LoginBtn onClick={logout}>로그아웃</_.LoginBtn>
         ) : (
