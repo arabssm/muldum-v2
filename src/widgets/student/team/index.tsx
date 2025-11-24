@@ -8,6 +8,8 @@ import TeamSkeleton from './skeleton';
 import { Team as ApiTeam } from '@/shared/api/team';
 import { useTeams } from '@/shared/hooks/team';
 import { showToast } from '@/shared/ui/toast';
+import { getUserInfo } from '@/shared/api/user';
+import axiosInstance from '@/shared/lib/axiosInstance';
 
 type GroupType = "전공동아리" | "네트워크" | "자율동아리" | "졸업작품";
 type ClassType = "전체" | "1반" | "2반" | "3반" | "4반";
@@ -23,6 +25,10 @@ export default function Team() {
     const [activeClass, setActiveClass] = useState<ClassType>("전체");
     const [isMounted, setIsMounted] = useState(false);
     const [initialLoading, setInitialLoading] = useState(true);
+    const [userType, setUserType] = useState<string | null>(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [modalType, setModalType] = useState<'student' | 'team'>('student');
+    const [googleSheetUrl, setGoogleSheetUrl] = useState("");
 
     const { teams, isLoading: apiLoading } = useTeams(
         activeGroup === "전공동아리" || activeGroup === "네트워크"
@@ -36,6 +42,18 @@ export default function Team() {
         return () => clearTimeout(timer);
     }, []);
 
+    useEffect(() => {
+        const fetchUserType = async () => {
+            try {
+                const userInfo = await getUserInfo();
+                setUserType(userInfo.user_type);
+            } catch (error) {
+                console.error('Failed to fetch user type:', error);
+            }
+        };
+        fetchUserType();
+    }, []);
+
     const isLoading = apiLoading || initialLoading;
 
     const handleGroupClick = (group: GroupType) => {
@@ -44,6 +62,36 @@ export default function Team() {
             return;
         }
         setActiveGroup(group);
+    };
+
+    const openModal = (type: 'student' | 'team') => {
+        setModalType(type);
+        setIsModalOpen(true);
+    };
+
+    const handleAddUrl = async () => {
+        if (!googleSheetUrl.trim()) {
+            showToast.error('URL을 입력해주세요');
+            return;
+        }
+
+        try {
+            if (modalType === 'student') {
+                await axiosInstance.post('/tch/student/invite', {
+                    googleSheetUrl: googleSheetUrl,
+                });
+            } else {
+                await axiosInstance.post('/tch/teamspace/invite', {
+                    googleSheetUrl: googleSheetUrl,
+                });
+            }
+            setGoogleSheetUrl("");
+            setIsModalOpen(false);
+            showToast.success("추가되었습니다!");
+        } catch (err) {
+            console.error('추가 실패:', err);
+            showToast.error("추가에 실패했습니다.");
+        }
     };
 
     // 학번에서 반 추출 함수 (예: 2111 → 1반, 2212 → 2반, 2312 → 3반, 2401 → 4반)
@@ -97,37 +145,49 @@ export default function Team() {
 
     return (
         <_.Container>
-            <_.Wrapper>
-                <_.Group>
-                    {Groups.map((label) => (
-                        <_.ClassText
-                            key={label}
-                            isActive={activeGroup === label}
-                            onClick={() => handleGroupClick(label)}
-                        >
-                            {label}
-                        </_.ClassText>
-                    ))}
-                </_.Group>
-                {pathname === "/team" && (
+            <_.Header>
+                <_.Wrapper>
                     <_.Group>
-                        {(activeGroup === "전공동아리" 
-                            ? ["전체"] 
-                            : activeGroup === "네트워크" 
-                                ? Classes 
-                                : []
-                        ).map((label) => (
+                        {Groups.map((label) => (
                             <_.ClassText
                                 key={label}
-                                isActive={activeClass === label}
-                                onClick={() => setActiveClass(label as ClassType)}
+                                isActive={activeGroup === label}
+                                onClick={() => handleGroupClick(label)}
                             >
                                 {label}
                             </_.ClassText>
                         ))}
                     </_.Group>
+                    {pathname === "/team" && (
+                        <_.Group>
+                            {(activeGroup === "전공동아리" 
+                                ? ["전체"] 
+                                : activeGroup === "네트워크" 
+                                    ? Classes 
+                                    : []
+                            ).map((label) => (
+                                <_.ClassText
+                                    key={label}
+                                    isActive={activeClass === label}
+                                    onClick={() => setActiveClass(label as ClassType)}
+                                >
+                                    {label}
+                                </_.ClassText>
+                            ))}
+                        </_.Group>
+                    )}
+                </_.Wrapper>
+                {userType === "TEACHER" && (
+                    <_.BtnGroup>
+                        <_.AddButton onClick={() => openModal('student')}>
+                            학생추가
+                        </_.AddButton>
+                        <_.AddButton onClick={() => openModal('team')}>
+                            학생팀추가
+                        </_.AddButton>
+                    </_.BtnGroup>
                 )}
-            </_.Wrapper>
+            </_.Header>
             {isLoading ? (
                 <TeamSkeleton />
             ) : (
@@ -149,6 +209,23 @@ export default function Team() {
                         </_.Box>
                     ))}
                 </_.BoxGroup>
+            )}
+
+            {isModalOpen && (
+                <_.ModalOverlay onClick={() => setIsModalOpen(false)}>
+                    <_.ModalContent onClick={(e: React.MouseEvent) => e.stopPropagation()}>
+                        <_.ModalTitle>
+                            {modalType === 'student' ? '학생 초대 URL 추가' : '학생 팀원 추가 URL 추가'}
+                        </_.ModalTitle>
+                        <_.ModalInput
+                            type="url"
+                            placeholder="Google 시트 URL을 입력하세요"
+                            value={googleSheetUrl}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setGoogleSheetUrl(e.target.value)}
+                        />
+                        <_.ModalButton onClick={handleAddUrl}>추가</_.ModalButton>
+                    </_.ModalContent>
+                </_.ModalOverlay>
             )}
         </_.Container>
     );

@@ -9,10 +9,40 @@ export const Container = styled.div`
     margin: 0 auto;
 `;
 
+export const Header = styled.div`
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    width: 100%;
+`;
+
 export const Wrapper = styled.div`
     display: flex;
     flex-direction: column;
     gap: 2rem;
+    flex: 1;
+`;
+
+export const BtnGroup = styled.div`
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+`;
+
+export const AddButton = styled.button`
+    padding: 0.75rem 1.5rem;
+    background-color: #4B4B4B;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+
+    &:hover {
+        background-color: #333;
+    }
 `;
 
 export const Text = styled.div`
@@ -72,4 +102,67 @@ export const ClassText = styled.div<Bar>`
     background-color: ${({ isActive }) =>
       isActive ? "transparent" : "#f5f5f5b6"};
   }
+`;
+
+export const ModalOverlay = styled.div`
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+`;
+
+export const ModalContent = styled.div`
+    background-color: white;
+    padding: 2rem;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 500px;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+`;
+
+export const ModalTitle = styled.h2`
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #4B4B4B;
+    margin: 0;
+`;
+
+export const ModalInput = styled.input`
+    padding: 1rem;
+    border: 1px solid #E0E0E0;
+    border-radius: 4px;
+    font-size: 1rem;
+    outline: none;
+
+    &:focus {
+        border-color: #4B4B4B;
+    }
+
+    &::placeholder {
+        color: #B2B2B2;
+    }
+`;
+
+export const ModalButton = styled.button`
+    padding: 1rem;
+    background-color: #4B4B4B;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+
+    &:hover {
+        background-color: #333;
+    }
 `;
