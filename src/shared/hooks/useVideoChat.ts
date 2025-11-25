@@ -41,12 +41,35 @@ export function useVideoChat() {
 
     // 효과음 초기화
     useEffect(() => {
-        joinSoundRef.current = new Audio('/sounds/join.mp3');
-        leaveSoundRef.current = new Audio('/sounds/leave.mp3');
-        
-        // 볼륨 설정
-        if (joinSoundRef.current) joinSoundRef.current.volume = 0.5;
-        if (leaveSoundRef.current) leaveSoundRef.current.volume = 0.5;
+        try {
+            console.log('Initializing sound effects...');
+            joinSoundRef.current = new Audio(encodeURI('/assets/sound/sound.mp3'));
+            leaveSoundRef.current = new Audio(encodeURI('/assets/sound/sound1.mp3'));
+            
+            // 볼륨 설정
+            if (joinSoundRef.current) {
+                joinSoundRef.current.volume = 0.5;
+                console.log('Join sound initialized');
+            }
+            if (leaveSoundRef.current) {
+                leaveSoundRef.current.volume = 0.5;
+                console.log('Leave sound initialized');
+            }
+            
+            // 오디오 로드 에러 핸들링
+            if (joinSoundRef.current) {
+                joinSoundRef.current.onerror = (e) => {
+                    console.error('Failed to load join sound:', e);
+                };
+            }
+            if (leaveSoundRef.current) {
+                leaveSoundRef.current.onerror = (e) => {
+                    console.error('Failed to load leave sound:', e);
+                };
+            }
+        } catch (error) {
+            console.error('Error initializing sound effects:', error);
+        }
         
         return () => {
             // 정리
@@ -75,19 +98,29 @@ export function useVideoChat() {
 
     const playJoinSound = () => {
         if (joinSoundRef.current) {
+            console.log('Attempting to play join sound');
             joinSoundRef.current.currentTime = 0;
-            joinSoundRef.current.play().catch(error => {
-                console.log('Failed to play join sound:', error);
-            });
+            joinSoundRef.current.play()
+                .then(() => console.log('Join sound played successfully'))
+                .catch(error => {
+                    console.error('Failed to play join sound:', error);
+                });
+        } else {
+            console.warn('Join sound ref is null');
         }
     };
 
     const playLeaveSound = () => {
         if (leaveSoundRef.current) {
+            console.log('Attempting to play leave sound');
             leaveSoundRef.current.currentTime = 0;
-            leaveSoundRef.current.play().catch(error => {
-                console.log('Failed to play leave sound:', error);
-            });
+            leaveSoundRef.current.play()
+                .then(() => console.log('Leave sound played successfully'))
+                .catch(error => {
+                    console.error('Failed to play leave sound:', error);
+                });
+        } else {
+            console.warn('Leave sound ref is null');
         }
     };
 
