@@ -103,7 +103,7 @@ export default function SliderComponent() {
               <Image
                 src="/assets/basicBG.svg"
                 alt={item.notice}
-                width={1700}
+                width={2500}
                 height={320}
                 style={{ objectFit: "cover", borderRadius: "1rem" }}
               />
