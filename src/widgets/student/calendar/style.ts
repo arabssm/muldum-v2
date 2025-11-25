@@ -216,36 +216,6 @@ export const ButtonRow = styled.div`
   margin-top: 0.5rem;
 `;
 
-export const EditBtn = styled.button`
-  flex: 1;
-  padding: 0.75rem;
-  background: #4CAF50;
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 1rem;
-  
-  &:hover {
-    background: #45a049;
-  }
-`;
-
-export const DeleteBtn = styled.button`
-  flex: 1;
-  padding: 0.75rem;
-  background: #f44336;
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 1rem;
-  
-  &:hover {
-    background: #da190b;
-  }
-`;
-
 export const EventBarAbsolute = styled.div<{
   color: string;
   left: string;
