@@ -54,8 +54,8 @@ export default function Clubs() {
     return <ClubsSkeleton />;
   }
 
-  const generations = currentGeneration && currentGeneration > 1
-    ? Array.from({ length: currentGeneration - 1 }, (_, i) => i + 1)
+  const generations = currentGeneration && currentGeneration > 0
+    ? Array.from({ length: currentGeneration }, (_, i) => i + 1)
     : [];
 
   return (
