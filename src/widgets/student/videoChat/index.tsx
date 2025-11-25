@@ -255,7 +255,6 @@ export default function VideoChat() {
                             key={`remote-${selectedParticipant}`}
                             ref={remoteVideoRef}
                             autoPlay
-                            muted
                             playsInline
                             onLoadedMetadata={() => {
                                 console.log('Remote video loaded for:', selectedParticipant);
