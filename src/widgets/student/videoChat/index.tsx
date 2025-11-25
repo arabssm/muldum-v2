@@ -75,8 +75,24 @@ export default function VideoChat() {
         });
         
         if (selectedParticipant && remoteStreams[selectedParticipant] && remoteVideoRef.current) {
-            console.log('Showing remote video for:', selectedParticipant);
-            remoteVideoRef.current.srcObject = remoteStreams[selectedParticipant];
+            const stream = remoteStreams[selectedParticipant];
+            const videoTracks = stream.getVideoTracks();
+            const audioTracks = stream.getAudioTracks();
+            
+            console.log('Showing remote video for:', selectedParticipant, {
+                videoTracks: videoTracks.length,
+                audioTracks: audioTracks.length,
+                videoEnabled: videoTracks[0]?.enabled,
+                videoReadyState: videoTracks[0]?.readyState,
+                videoMuted: videoTracks[0]?.muted
+            });
+            
+            remoteVideoRef.current.srcObject = stream;
+            
+            // 비디오 재생 강제 시도
+            remoteVideoRef.current.play().catch(err => {
+                console.error('Failed to play remote video:', err);
+            });
         } else if (remoteVideoRef.current) {
             console.log('Clearing remote video ref');
             remoteVideoRef.current.srcObject = null;
@@ -241,6 +257,12 @@ export default function VideoChat() {
                             autoPlay
                             muted
                             playsInline
+                            onLoadedMetadata={() => {
+                                console.log('Remote video loaded for:', selectedParticipant);
+                            }}
+                            onError={(e) => {
+                                console.error('Remote video error:', e);
+                            }}
                             onClick={() => {
                                 console.log('Clicked remote video, switching to local');
                                 setSelectedParticipant(null);
