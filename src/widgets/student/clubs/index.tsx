@@ -15,9 +15,6 @@ export default function Clubs() {
   const [selectedGeneration, setSelectedGeneration] = useState<number | null>(null);
   const [clubs, setClubs] = useState<HistoryClub[]>([]);
 
-  const handleClick = (idx: number) => {
-    router.push(`/clubs/${idx}`);
-  }
 
   useEffect(() => {
     setIsMounted(true);
@@ -26,10 +23,6 @@ export default function Clubs() {
       try {
         const generation = await getCurrentGeneration();
         setCurrentGeneration(generation);
-        
-        if (generation && generation > 1) {
-          setSelectedGeneration(generation - 1);
-        }
       } catch (error) {
         console.error('Failed to fetch current generation:', error);
       }

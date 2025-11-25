@@ -73,7 +73,7 @@ export default function MonthlyTest({ sections = [] }: MonthlyTestProps) {
         goal: goalArray
       });
       setDraftId(response.reportId);
-      showToast.success(response.message);
+      showToast.success(response.message || '임시 저장되었습니다');
     } catch (error) {
       console.error('임시 저장 실패:', error);
       showToast.error('임시 저장에 실패했습니다');
