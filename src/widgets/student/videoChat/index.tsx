@@ -67,12 +67,30 @@ export default function VideoChat() {
     };
 
     useEffect(() => {
+        console.log('Video display update:', { 
+            selectedParticipant, 
+            hasRemoteStream: selectedParticipant ? !!remoteStreams[selectedParticipant] : false,
+            hasLocalStream: !!localStream,
+            videoRefHasStream: !!videoRef.current?.srcObject
+        });
+        
         if (selectedParticipant && remoteStreams[selectedParticipant] && remoteVideoRef.current) {
+            console.log('Showing remote video for:', selectedParticipant);
             remoteVideoRef.current.srcObject = remoteStreams[selectedParticipant];
         } else if (remoteVideoRef.current) {
+            console.log('Clearing remote video ref');
             remoteVideoRef.current.srcObject = null;
         }
-    }, [selectedParticipant, remoteStreams]);
+        
+        // 로컬 화면으로 전환할 때 videoRef에 스트림이 있는지 확인
+        if (!selectedParticipant && videoRef.current) {
+            console.log('Showing local video, current stream:', videoRef.current.srcObject);
+            if (!videoRef.current.srcObject && localStream) {
+                console.log('Reconnecting local stream to videoRef');
+                videoRef.current.srcObject = localStream;
+            }
+        }
+    }, [selectedParticipant, remoteStreams, localStream]);
 
     useEffect(() => {
         if (selectedParticipant && localStream && localPipVideoRef.current) {
@@ -218,23 +236,33 @@ export default function VideoChat() {
                 <div style={{ position: "relative", width: "100%", height: "70vh" }}>
                     {selectedParticipant && remoteStreams[selectedParticipant] ? (
                         <video
+                            key={`remote-${selectedParticipant}`}
                             ref={remoteVideoRef}
                             autoPlay
                             muted
                             playsInline
+                            onClick={() => {
+                                console.log('Clicked remote video, switching to local');
+                                setSelectedParticipant(null);
+                            }}
                             style={{
                                 width: "100%",
                                 height: "100%",
                                 objectFit: "cover",
                                 backgroundColor: "#000",
+                                cursor: "pointer",
                             }}
                         />
                     ) : (
                         <video
+                            key="local"
                             ref={videoRef}
                             autoPlay
                             muted
                             playsInline
+                            onLoadedMetadata={() => {
+                                console.log('Local video loaded, stream:', videoRef.current?.srcObject);
+                            }}
                             style={{
                                 width: "100%",
                                 height: "100%",
@@ -292,17 +320,30 @@ export default function VideoChat() {
                             </div>
                         </div>
                     )}
-                    <div style={{
-                        position: "absolute",
-                        bottom: "10px",
-                        left: "10px",
-                        background: "rgba(0,0,0,0.7)",
-                        color: "white",
-                        padding: "5px 10px",
-                        borderRadius: "4px",
-                        fontSize: "14px",
-                        zIndex: 10,
-                    }}>
+                    <div 
+                        onClick={() => selectedParticipant && setSelectedParticipant(null)}
+                        style={{
+                            position: "absolute",
+                            bottom: "10px",
+                            left: "10px",
+                            background: "rgba(0,0,0,0.7)",
+                            color: "white",
+                            padding: "5px 10px",
+                            borderRadius: "4px",
+                            fontSize: "14px",
+                            zIndex: 10,
+                            cursor: selectedParticipant ? "pointer" : "default",
+                            transition: "background 0.2s ease",
+                        }}
+                        onMouseEnter={(e) => {
+                            if (selectedParticipant) {
+                                e.currentTarget.style.background = "rgba(0,0,0,0.9)";
+                            }
+                        }}
+                        onMouseLeave={(e) => {
+                            e.currentTarget.style.background = "rgba(0,0,0,0.7)";
+                        }}
+                    >
                         {selectedParticipant
                             ? `${participants.find(p => p.id === selectedParticipant)?.name || 'Unknown'}`
                             : "나 (로컬)"
@@ -324,11 +365,15 @@ export default function VideoChat() {
                     />
                 )}
                 {showParticipants && (
-                    <_.ParticipantPanel style={{ zIndex: 1 }}>
-                        <_.CloseButton onClick={() => setShowParticipants(false)}>×</_.CloseButton>
-                        <_.ParticipantList>
+                    <_.ParticipantPanel style={{ zIndex: 1 }} onClick={(e) => e.stopPropagation()}>
+                        <_.CloseButton onClick={(e) => { e.stopPropagation(); setShowParticipants(false); }}>×</_.CloseButton>
+                        <_.ParticipantList onClick={(e) => e.stopPropagation()}>
                             <_.Name
-                                onClick={() => setSelectedParticipant(null)}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    console.log('Clicked "나 (로컬)", setting selectedParticipant to null');
+                                    setSelectedParticipant(null);
+                                }}
                                 style={{
                                     cursor: "pointer",
                                     backgroundColor: selectedParticipant === null ? "#e3f2fd" : "transparent",
@@ -342,7 +387,11 @@ export default function VideoChat() {
                             {participants.map((participant) => (
                                 <_.Name
                                     key={participant.id}
-                                    onClick={() => setSelectedParticipant(participant.id)}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        console.log('Clicked participant:', participant.name, participant.id);
+                                        setSelectedParticipant(participant.id);
+                                    }}
                                     style={{
                                         cursor: "pointer",
                                         backgroundColor: selectedParticipant === participant.id ? "#e3f2fd" : "transparent",

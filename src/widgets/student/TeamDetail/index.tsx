@@ -14,7 +14,7 @@ import VideoChat from '@/widgets/student/videoChat';
 import { sections } from '@/widgets/student/monthlyTest/data';
 import Loading from '@/shared/ui/loading';
 
-type TabType = '노션' | '월말평가' | '캘린더' | '화상채팅';
+type TabType = '노션' | '월말평가' | '캘린더' | '화상통화';
 
 export default function TeamDetail() {
   const params = useParams();
@@ -93,7 +93,7 @@ export default function TeamDetail() {
   
   // 본인 팀이면 4개 탭, 아니면 노션만
   const tabs: TabType[] = isMyTeam 
-    ? ['노션', '월말평가', '캘린더', '화상채팅']
+    ? ['노션', '월말평가', '캘린더', '화상통화']
     : ['노션'];
   
   // 선생님이면 노션, 월말평가 2개 탭
@@ -135,7 +135,7 @@ export default function TeamDetail() {
       case '캘린더':
         return <Calendar />;
       
-      case '화상채팅':
+      case '화상통화':
         return <VideoChat />;
       
       default:
