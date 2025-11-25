@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useState, useEffect } from "react";
 import Group from "@/components/group/items";
 import ItemForm from "@/components/itemForm";
-import ItemsSkeleton from "./skeleton";
+import Loading from "@/shared/ui/loading";
 import { Modal } from "@/components/modal/modal";
 import { getLatestItemGuide } from "@/shared/api/items";
 import BlockNoteEditor from "@/shared/ui/tag";
@@ -105,7 +105,7 @@ export default function Items() {
       <Group active={active} setActive={setActive} setMessage={setLockedMessage} />
 
       {isLoading ? (
-        <ItemsSkeleton />
+        <Loading />
       ) : LockedGroups.includes(active as typeof LockedGroups[number]) ? (
         <_.MessageWrapper>
           <Image src="/assets/nob.svg" alt="No" width={120} height={120} />

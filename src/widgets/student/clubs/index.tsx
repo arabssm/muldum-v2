@@ -4,7 +4,7 @@ import * as _ from './style'
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
-import ClubsSkeleton from './skeleton';
+import Loading from '@/shared/ui/loading';
 import { getCurrentGeneration, getHistoryClubs, HistoryClub } from '@/shared/api/history';
 
 export default function Clubs() {
@@ -51,7 +51,7 @@ export default function Clubs() {
   }, [selectedGeneration]);
 
   if (!isMounted || (isLoading && selectedGeneration !== null)) {
-    return <ClubsSkeleton />;
+    return <Loading />;
   }
 
   const generations = currentGeneration && currentGeneration > 0
