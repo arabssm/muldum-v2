@@ -5,7 +5,7 @@ export const Container = styled.div`
     display: flex;
     flex-direction: column;
     width: 100%;
-    row-gap: 5rem;
+    row-gap: 2.5rem;
     margin: 0 auto;
 `;
 
@@ -19,7 +19,7 @@ export const Header = styled.div`
 export const Wrapper = styled.div`
     display: flex;
     flex-direction: column;
-    gap: 2rem;
+    gap: 1rem;
     flex: 1;
 `;
 
