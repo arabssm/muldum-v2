@@ -37,31 +37,31 @@ export function useVideoChat() {
     const [isScreenSharing, setIsScreenSharing] = useState(false);
     const [isRecording, setIsRecording] = useState(false);
 
-    const pc_config = { 
-        "iceServers": [
-            { "urls": "stun:stun.l.google.com:19302" },
-            { "urls": "stun:stun1.l.google.com:19302" },
-            { "urls": "stun:stun2.l.google.com:19302" },
+    const pc_config: RTCConfiguration = { 
+        iceServers: [
+            { urls: "stun:stun.l.google.com:19302" },
+            { urls: "stun:stun1.l.google.com:19302" },
+            { urls: "stun:stun2.l.google.com:19302" },
             { 
-                "urls": [
+                urls: [
                     "turn:openrelay.metered.ca:80",
                     "turn:openrelay.metered.ca:443",
                     "turn:openrelay.metered.ca:443?transport=tcp"
                 ],
-                "username": "openrelayproject",
-                "credential": "openrelayproject"
+                username: "openrelayproject",
+                credential: "openrelayproject"
             },
             {
-                "urls": [
+                urls: [
                     "turn:relay1.expressturn.com:3478",
                     "turns:relay1.expressturn.com:5349"
                 ],
-                "username": "efSW8RR1XTQSTE6K33",
-                "credential": "Uc4ZYmfJMmfYHVzx"
+                username: "efSW8RR1XTQSTE6K33",
+                credential: "Uc4ZYmfJMmfYHVzx"
             }
         ],
-        "iceCandidatePoolSize": 10,
-        "iceTransportPolicy": "all"
+        iceCandidatePoolSize: 10,
+        iceTransportPolicy: "all"
     };
 
     // 효과음 초기화

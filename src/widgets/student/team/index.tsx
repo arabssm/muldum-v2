@@ -94,6 +94,10 @@ export default function Team() {
         }
     };
 
+    const handleMonthlyTestClick = () => {
+        router.push('/monthlyTest');
+    };
+
     // 학번에서 반 추출 함수 (예: 2111 → 1반, 2212 → 2반, 2312 → 3반, 2401 → 4반)
     const getClassFromStudentId = (studentId?: string): string | null => {
         if (!studentId || studentId.length < 4) {
@@ -177,16 +181,21 @@ export default function Team() {
                         </_.Group>
                     )}
                 </_.Wrapper>
-                {userType === "TEACHER" && (
-                    <_.BtnGroup>
-                        <_.AddButton onClick={() => openModal('student')}>
-                            학생추가
-                        </_.AddButton>
-                        <_.AddButton onClick={() => openModal('team')}>
-                            학생팀추가
-                        </_.AddButton>
-                    </_.BtnGroup>
-                )}
+                <_.BtnGroup>
+                    <_.MonthlyTestButton onClick={handleMonthlyTestClick}>
+                        월말평가 보러가기
+                    </_.MonthlyTestButton>
+                    {userType === "TEACHER" && (
+                        <>
+                            <_.AddButton onClick={() => openModal('student')}>
+                                학생추가
+                            </_.AddButton>
+                            <_.AddButton onClick={() => openModal('team')}>
+                                학생팀추가
+                            </_.AddButton>
+                        </>
+                    )}
+                </_.BtnGroup>
             </_.Header>
             {isLoading ? (
                 <TeamSkeleton />

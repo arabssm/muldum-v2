@@ -9,6 +9,8 @@ import type { MonthlyTestProps } from "@/shared/types";
 import { saveDraftReport, submitReport, getDraftReport } from '@/shared/api/monthReport';
 import { showToast } from '@/shared/ui/toast';
 import Loading from '@/shared/ui/loading';
+import { useTeams } from '@/shared/hooks/team';
+import axiosInstance from '@/shared/lib/axiosInstance';
 
 export default function MonthlyTest({ sections = [] }: MonthlyTestProps) {
   const router = useRouter();
@@ -18,6 +20,10 @@ export default function MonthlyTest({ sections = [] }: MonthlyTestProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [draftId, setDraftId] = useState<number | null>(null);
   const hasLoadedRef = useRef(false);
+  const [monthlyReports, setMonthlyReports] = useState<any[]>([]);
+  
+  const { teams: majorTeams } = useTeams("전공동아리");
+  const { teams: networkTeams } = useTeams("네트워크");
   
   // 폼 데이터 상태 (sections 순서: 주제, 목표, 사용언어·기술스택, 발생문제, 담당교사피드백, 멘토교사피드백)
   const [formData, setFormData] = useState({
@@ -29,13 +35,14 @@ export default function MonthlyTest({ sections = [] }: MonthlyTestProps) {
     mentorFeedback: ''
   });
 
-  // 페이지 진입 시 임시 저장된 데이터 불러오기
+  // 페이지 진입 시 임시 저장된 데이터 및 월말평가 데이터 불러오기
   useEffect(() => {
     if (hasLoadedRef.current) return;
     hasLoadedRef.current = true;
 
-    const loadDraftData = async () => {
+    const loadData = async () => {
       try {
+        // 임시 저장 데이터 불러오기
         const draftData = await getDraftReport();
         if (draftData) {
           setDraftId(draftData.reportId);
@@ -49,15 +56,37 @@ export default function MonthlyTest({ sections = [] }: MonthlyTestProps) {
           });
           showToast.success('임시 저장된 데이터를 불러왔습니다');
         }
+
+        // 월말평가 데이터 불러오기
+        const currentMonth = new Date().getMonth() + 1;
+        const allTeams = [...majorTeams, ...networkTeams];
+        
+        if (allTeams.length > 0) {
+          const reportRequests = allTeams.map(team =>
+            axiosInstance.get(`/tch/major/report`, {
+              params: {
+                team: team.id,
+                month: currentMonth
+              }
+            }).catch(err => {
+              console.error(`Failed to fetch report for team ${team.id}:`, err);
+              return null;
+            })
+          );
+
+          const reports = await Promise.all(reportRequests);
+          const validReports = reports.filter(r => r !== null).map(r => r?.data);
+          setMonthlyReports(validReports);
+        }
       } catch (error) {
-        console.error('임시 저장 데이터 로드 실패:', error);
+        console.error('데이터 로드 실패:', error);
       } finally {
         setIsLoading(false);
       }
     };
 
-    loadDraftData();
-  }, []);
+    loadData();
+  }, [majorTeams, networkTeams]);
 
   const handleInputChange = (field: keyof typeof formData, value: string | string[]) => {
     setFormData(prev => ({ ...prev, [field]: value }));

@@ -45,6 +45,22 @@ export const AddButton = styled.button`
     }
 `;
 
+export const MonthlyTestButton = styled.button`
+    padding: 0.75rem 1.5rem;
+    background-color: #5B8DEF;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+
+    &:hover {
+        background-color: #4A7BD8;
+    }
+`;
+
 export const Text = styled.div`
     display: flex;
     font-size: 1.5rem;
