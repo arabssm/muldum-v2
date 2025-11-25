@@ -187,12 +187,12 @@ export default function Team() {
                     </_.MonthlyTestButton>
                     {userType === "TEACHER" && (
                         <>
-                            <_.AddButton onClick={() => openModal('student')}>
+                            <_.MonthlyTestButton onClick={() => openModal('student')}>
                                 학생추가
-                            </_.AddButton>
-                            <_.AddButton onClick={() => openModal('team')}>
+                            </_.MonthlyTestButton>
+                            <_.MonthlyTestButton onClick={() => openModal('team')}>
                                 학생팀추가
-                            </_.AddButton>
+                            </_.MonthlyTestButton>
                         </>
                     )}
                 </_.BtnGroup>
