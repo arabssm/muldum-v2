@@ -84,13 +84,32 @@ export default function VideoChat() {
                 audioTracks: audioTracks.length,
                 videoEnabled: videoTracks[0]?.enabled,
                 videoReadyState: videoTracks[0]?.readyState,
-                videoMuted: videoTracks[0]?.muted
+                videoMuted: videoTracks[0]?.muted,
+                streamActive: stream.active,
+                streamId: stream.id
+            });
+            
+            // 비디오 엘리먼트 속성 확인
+            console.log('Remote video element before:', {
+                srcObject: remoteVideoRef.current.srcObject,
+                paused: remoteVideoRef.current.paused,
+                readyState: remoteVideoRef.current.readyState,
+                videoWidth: remoteVideoRef.current.videoWidth,
+                videoHeight: remoteVideoRef.current.videoHeight
             });
             
             remoteVideoRef.current.srcObject = stream;
             
             // 비디오 재생 강제 시도
-            remoteVideoRef.current.play().catch(err => {
+            remoteVideoRef.current.play().then(() => {
+                console.log('Remote video playing successfully');
+                console.log('Remote video element after play:', {
+                    paused: remoteVideoRef.current?.paused,
+                    readyState: remoteVideoRef.current?.readyState,
+                    videoWidth: remoteVideoRef.current?.videoWidth,
+                    videoHeight: remoteVideoRef.current?.videoHeight
+                });
+            }).catch(err => {
                 console.error('Failed to play remote video:', err);
             });
         } else if (remoteVideoRef.current) {
