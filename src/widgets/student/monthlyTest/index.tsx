@@ -156,12 +156,12 @@ export default function MonthlyTest({ sections = [] }: MonthlyTestProps) {
       return (
         <_.BtnGroup>
           <BtnSecondary onClick={() => router.push('/MonthlyList')}>이때동안 작성한 월말평가 보러가기</BtnSecondary>
-          <BtnSecondary onClick={handleSaveDraft}>
+          <BtnPrimary onClick={handleSaveDraft}>
             {isSavingDraft ? '저장 중...' : '임시저장'}
-          </BtnSecondary>
-          <BtnPrimary onClick={handleSubmit}>
-            {isSubmitting ? '제출 중...' : '제출하기'}
           </BtnPrimary>
+          <BtnSecondary onClick={handleSubmit}>
+            {isSubmitting ? '제출 중...' : '제출하기'}
+          </BtnSecondary>
         </_.BtnGroup>
       );
     }

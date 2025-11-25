@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Pagination from "@/components/pagination";
 import { useState, useEffect } from "react";
-import NoticeSkeleton from "./skeleton";
+import Loading from "@/shared/ui/loading";
 import useNotices from "@/shared/hooks/useNotices";
 import { getUserInfo } from "@/shared/api/user";
 
@@ -92,7 +92,7 @@ export default function Notice() {
                 )}
             </_.TitleGroup>
             {isLoading ? (
-                <NoticeSkeleton />
+                <Loading />
             ) : (
                 <>
                     <_.NoticeContainer>

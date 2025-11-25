@@ -5,7 +5,7 @@ export const Container = styled.div`
     display: flex;
     flex-direction: column;
     width: 100%;
-    row-gap: 5rem;
+    row-gap: 2.5rem;
     margin: 0 auto;
 `;
 
@@ -19,7 +19,7 @@ export const Header = styled.div`
 export const Wrapper = styled.div`
     display: flex;
     flex-direction: column;
-    gap: 2rem;
+    gap: 1rem;
     flex: 1;
 `;
 
@@ -29,35 +29,18 @@ export const BtnGroup = styled.div`
     align-items: center;
 `;
 
-export const AddButton = styled.button`
-    padding: 0.75rem 1.5rem;
-    background-color: #4B4B4B;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    font-size: 1rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background-color 0.2s;
-
-    &:hover {
-        background-color: #333;
-    }
-`;
-
 export const MonthlyTestButton = styled.button`
-    padding: 0.75rem 1.5rem;
-    background-color: #5B8DEF;
-    color: white;
+    display: flex;
+    padding: 1rem 0rem;
+    background-color: transparent;
     border: none;
+    color: #909090;
     border-radius: 4px;
-    font-size: 1rem;
-    font-weight: 500;
+    font-size: 0.9rem;
     cursor: pointer;
-    transition: background-color 0.2s;
 
     &:hover {
-        background-color: #4A7BD8;
+        color: #333;
     }
 `;
 
@@ -77,6 +60,7 @@ export const Group = styled.div`
 
 export const BoxGroup = styled.div`
     display: grid;
+    align-items: center;
     grid-template-columns: repeat(4, 1fr);
     gap: 1.25rem;
     width: 100%;

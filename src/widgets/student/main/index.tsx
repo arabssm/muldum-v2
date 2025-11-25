@@ -5,11 +5,11 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import Slider from "@/shared/ui/slider";
-import MainSkeleton from "./skeleton";
 import { Menu, TeacherMenu } from "./data";
 import useNotices from "@/shared/hooks/useNotices";
 import { getUserInfo } from "@/shared/api/user";
 import type { Notice } from "@/shared/types/notice";
+import Loading from "@/shared/ui/loading";
 
 export default function Main() {
     const router = useRouter();
@@ -70,7 +70,7 @@ export default function Main() {
     return (
         <_.Container>
             {isLoading ? (
-                <MainSkeleton />
+                <Loading />
             ) : (
                 <>
                     <Slider />
@@ -127,16 +127,7 @@ export default function Main() {
                                         );
                                     })
                                 ) : (
-                                    <div
-                                        style={{
-                                            display: "flex",
-                                            height: "50vh",
-                                            justifyContent: "center",
-                                            alignItems: "center",
-                                            fontSize: "1rem",
-                                            color: "#B2B2B2",
-                                        }}
-                                    >
+                                    <div>
                                         공지가 없습니다.
                                     </div>
                                 )}

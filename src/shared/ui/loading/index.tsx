@@ -17,8 +17,7 @@ const Dimmer = styled.div`
   position: fixed;
   inset: 0;
   z-index: 99;
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(4px);
+  background: rgba(0, 0, 0, 0.2);
 `;
 
 const LoadingContainer = styled.div`

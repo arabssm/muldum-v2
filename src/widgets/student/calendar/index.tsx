@@ -10,6 +10,7 @@ import { Modal } from '@/components/modal/modal';
 import Image from 'next/image';
 import { useCalendar } from '@/shared/hooks/useCalendar';
 import { CalendarEntry } from '@/shared/api/calendar';
+import { BtnSecondary, BtnPrimary } from '@/shared/ui/button';
 
 export default function Calendar() {
     const [isOpen, setIsOpen] = useState(false);
@@ -213,12 +214,12 @@ export default function Calendar() {
                         {editingEvent ? '일정 수정' : '일정 등록'}을 위한 <br /> 정보를 입력해주세요
                     </_.ModalTitle>
                     <_.ModalInput 
-                        placeholder="타이틀을 입력하세요" 
+                        placeholder="타이틀은 필수 입력입니다ㅅ" 
                         value={title} 
                         onChange={(e) => setTitle(e.target.value)}
                     />
                     <_.ModalInput 
-                        placeholder="내용을 입력하세요" 
+                        placeholder="내용은 필수 입력입니다" 
                         value={content} 
                         onChange={(e) => setContent(e.target.value)}
                         onKeyDown={(e) => e.key === 'Enter' && handleSave()}
@@ -241,8 +242,8 @@ export default function Calendar() {
                     <_.DetailContent>{viewingEvent?.content}</_.DetailContent>
                     <_.SmallText>기간: {formatEventDateRange()}</_.SmallText>
                     <_.ButtonRow>
-                        <_.EditBtn onClick={handleEdit}>수정</_.EditBtn>
-                        <_.DeleteBtn onClick={handleDelete}>삭제</_.DeleteBtn>
+                        <BtnPrimary onClick={handleEdit}>수정</BtnPrimary>
+                        <BtnSecondary onClick={handleDelete}>삭제</BtnSecondary>
                     </_.ButtonRow>
                 </_.ModalInner>
             </Modal>

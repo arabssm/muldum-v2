@@ -4,7 +4,7 @@ import * as _ from './style';
 import { freeClubs } from './data';
 import { useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import TeamSkeleton from './skeleton';
+import Loading from '@/shared/ui/loading';
 import { Team as ApiTeam } from '@/shared/api/team';
 import { useTeams } from '@/shared/hooks/team';
 import { showToast } from '@/shared/ui/toast';
@@ -187,18 +187,18 @@ export default function Team() {
                     </_.MonthlyTestButton>
                     {userType === "TEACHER" && (
                         <>
-                            <_.AddButton onClick={() => openModal('student')}>
+                            <_.MonthlyTestButton onClick={() => openModal('student')}>
                                 학생추가
-                            </_.AddButton>
-                            <_.AddButton onClick={() => openModal('team')}>
+                            </_.MonthlyTestButton>
+                            <_.MonthlyTestButton onClick={() => openModal('team')}>
                                 학생팀추가
-                            </_.AddButton>
+                            </_.MonthlyTestButton>
                         </>
                     )}
                 </_.BtnGroup>
             </_.Header>
             {isLoading ? (
-                <TeamSkeleton />
+                <Loading />
             ) : (
                 <_.BoxGroup>
                     {filteredClubs.map((club, index) => (

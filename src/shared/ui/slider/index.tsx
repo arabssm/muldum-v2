@@ -87,7 +87,7 @@ export default function SliderComponent() {
   if (notices.length === 0) {
     return (
       <_.Container>
-        <div style={{ padding: "2rem 0", textAlign: "center", color: "#B2B2B2" }}>
+        <div>
           현재 공지사항이 없습니다.
         </div>
       </_.Container>
@@ -103,7 +103,7 @@ export default function SliderComponent() {
               <Image
                 src="/assets/basicBG.svg"
                 alt={item.notice}
-                width={1700}
+                width={2500}
                 height={320}
                 style={{ objectFit: "cover", borderRadius: "1rem" }}
               />
