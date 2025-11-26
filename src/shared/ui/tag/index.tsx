@@ -12,7 +12,7 @@ const BlockNoteEditor = dynamic(
     const { defaultBlockSpecs } = await import('@blocknote/core');
 
     return function Editor({ initialContent, onChange, editable = true }: BlockNoteEditorProps) {
-      const { image, audio, video, file, ...allowedBlocks } = defaultBlockSpecs;
+      const { audio, video, file, ...allowedBlocks } = defaultBlockSpecs;
 
       const parseContent = (content: string) => {
         if (!content) return undefined;

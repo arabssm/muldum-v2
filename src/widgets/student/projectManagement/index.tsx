@@ -10,6 +10,7 @@ import {
   updateTask, 
   updateTaskStatus, 
   deleteTask,
+  urgeTask,
   Task, 
   TeamMember, 
   TaskStatus, 
@@ -183,6 +184,19 @@ export default function ProjectManagement() {
     }
   };
 
+  const handleUrge = async (taskId: number) => {
+    if (!confirm('담당자에게 독촉 이메일을 전송하시겠습니까?')) return;
+
+    try {
+      await urgeTask(taskId);
+      showToast.success('독촉 이메일이 전송되었습니다.');
+    } catch (error: any) {
+      console.error('Failed to urge task:', error);
+      const errorMessage = error.response?.data?.message || '독촉 이메일 전송에 실패했습니다.';
+      showToast.error(errorMessage);
+    }
+  };
+
   const getTasksByStatus = (status: TaskStatus) => {
     return tasks.filter(task => task.status === status);
   };
@@ -265,6 +279,9 @@ export default function ProjectManagement() {
                       </_.ActionButton>
                       <_.ActionButton onClick={() => handleDelete(task.id)}>
                         삭제
+                      </_.ActionButton>
+                      <_.ActionButton onClick={() => handleUrge(task.id)}>
+                        독촉
                       </_.ActionButton>
                     </_.TaskActions>
                   </_.TaskHeader>

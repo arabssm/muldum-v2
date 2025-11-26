@@ -7,7 +7,7 @@ import Group from "@/components/group/items";
 import ItemForm from "@/components/itemForm";
 import Loading from "@/shared/ui/loading";
 import { Modal } from "@/components/modal/modal";
-import { getLatestItemGuide } from "@/shared/api/items";
+import { getLatestItemGuide, getUsedBudget } from "@/shared/api/items";
 import BlockNoteEditor from "@/shared/ui/tag";
 
 const LockedGroups = ["자율동아리", "졸업작품"] as const;
@@ -25,6 +25,7 @@ export default function Items() {
   const [guideId, setGuideId] = useState<number | null>(null);
   const [guideUpdatedAt, setGuideUpdatedAt] = useState<string>("");
   const [doNotShowAgain, setDoNotShowAgain] = useState(false);
+  const [usedBudget, setUsedBudget] = useState<number | null>(null);
 
   useEffect(() => {
     setIsMounted(true);
@@ -36,6 +37,21 @@ export default function Items() {
 
     return () => clearTimeout(timer);
   }, []);
+
+  useEffect(() => {
+    const fetchUsedBudget = async () => {
+      try {
+        const data = await getUsedBudget();
+        setUsedBudget(data.usedBudget);
+      } catch (error) {
+        console.error("Failed to fetch used budget:", error);
+      }
+    };
+
+    if (isMounted) {
+      fetchUsedBudget();
+    }
+  }, [isMounted]);
 
   useEffect(() => {
     const fetchGuide = async () => {
@@ -119,6 +135,12 @@ export default function Items() {
 
   return (
     <_.Container>
+      {usedBudget !== null && (
+        <_.BudgetInfo>
+          <span>{usedBudget.toLocaleString()}원</span>
+        </_.BudgetInfo>
+      )}
+
       <Group active={active} setActive={setActive} setMessage={setLockedMessage} />
 
       {isLoading ? (

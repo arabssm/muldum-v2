@@ -394,3 +394,13 @@ export const getLatestItemGuide = async (projectType: string): Promise<ItemGuide
     return null;
   }
 };
+
+// 사용한 예산 조회 API
+export interface UsedBudgetResponse {
+  usedBudget: number;
+}
+
+export const getUsedBudget = async (): Promise<UsedBudgetResponse> => {
+  const res = await axiosInstance.get('/std/items/money');
+  return res.data;
+};

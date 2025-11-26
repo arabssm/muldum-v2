@@ -12,15 +12,18 @@ export default function Notion({ teamId, readOnly = false }: NotionProps) {
     const {
         title, setTitle,
         content, setContent,
-        icon, setIcon,
-        cover, setCover,
+        icon,
+        cover,
         loading, saveNotion,
         updateBanner,
         updateIcon,
-        importFromNotion
+        importFromNotion,
+        connectNotion
     } = useNotion(teamId);
 
     const [showImportModal, setShowImportModal] = React.useState(false);
+    const [notionUrl, setNotionUrl] = React.useState("");
+    const [editorKey, setEditorKey] = React.useState(Date.now());
 
     const handleCoverChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -80,6 +83,7 @@ export default function Notion({ teamId, readOnly = false }: NotionProps) {
         }
         
         await importFromNotion(notionUrl);
+        setEditorKey(Date.now()); // 에디터 강제 리렌더링
         setShowImportModal(false);
         setNotionUrl("");
     };
@@ -167,78 +171,72 @@ export default function Notion({ teamId, readOnly = false }: NotionProps) {
                     />
                 </_.HeaderSection>
                 <_.EditorWrapper>
-                    <BlockNoteEditor
-                        initialContent={content}
-                        onChange={readOnly ? undefined : (value) => setContent(value)}
-                        editable={!readOnly}
-                    />
+                    {!loading && (
+                        <BlockNoteEditor
+                            key={editorKey}
+                            initialContent={content}
+                            onChange={readOnly ? undefined : (value) => setContent(value)}
+                            editable={!readOnly}
+                        />
+                    )}
                 </_.EditorWrapper>
             </_.Page>
             {!readOnly && (
-                <_.ButtonGroup>
+                <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
                     <BtnPrimary onClick={() => setShowImportModal(true)}>
                         Notion에서 가져오기
                     </BtnPrimary>
                     <BtnPrimary onClick={saveNotion}>저장</BtnPrimary>
-                </_.ButtonGroup>
+                </div>
             )}
 
             {showImportModal && (
                 <_.ModalOverlay onClick={() => setShowImportModal(false)}>
                     <_.ModalContent onClick={(e) => e.stopPropagation()}>
-                        <_.ModalTitle>Notion 내용 가져오기</_.ModalTitle>
+                        <_.ModalTitle>Notion 페이지 가져오기</_.ModalTitle>
                         
-                        <_.TabContainer>
-                            <_.Tab 
-                                active={importMethod === 'paste'} 
-                                onClick={() => setImportMethod('paste')}
+                        <div style={{
+                            fontSize: '0.9rem',
+                            color: '#666',
+                            lineHeight: '1.6',
+                            marginBottom: '1rem',
+                            padding: '1rem',
+                            background: '#f8f9fa',
+                            borderRadius: '8px'
+                        }}>
+                            처음 사용하시나요?{' '}
+                            <button
+                                onClick={() => {
+                                    setShowImportModal(false);
+                                    connectNotion();
+                                }}
+                                style={{
+                                    background: 'none',
+                                    border: 'none',
+                                    color: '#4a90e2',
+                                    textDecoration: 'underline',
+                                    cursor: 'pointer',
+                                    padding: 0,
+                                    fontSize: 'inherit'
+                                }}
                             >
-                                복사-붙여넣기 (권장)
-                            </_.Tab>
-                            <_.Tab 
-                                active={importMethod === 'url'} 
-                                onClick={() => setImportMethod('url')}
-                            >
-                                URL로 가져오기
-                            </_.Tab>
-                        </_.TabContainer>
-
-                        {importMethod === 'paste' ? (
-                            <>
-                                <_.InfoText>
-                                    1. Notion 페이지에서 내용을 전체 선택 (Cmd/Ctrl + A)<br/>
-                                    2. 복사 (Cmd/Ctrl + C)<br/>
-                                    3. 아래 에디터에 붙여넣기 (Cmd/Ctrl + V)
-                                </_.InfoText>
-                                <_.PasteArea
-                                    placeholder="여기에 Notion 내용을 붙여넣으세요..."
-                                    onPaste={(e) => {
-                                        const pastedContent = e.clipboardData.getData('text');
-                                        setContent(pastedContent);
-                                        setShowImportModal(false);
-                                    }}
-                                />
-                            </>
-                        ) : (
-                            <>
-                                <_.InfoText>
-                                    ⚠️ URL 방식은 권한이 있는 페이지만 가능합니다.<br/>
-                                    Notion Integration에 페이지를 공유해야 합니다.
-                                </_.InfoText>
-                                <_.ModalInput
-                                    type="text"
-                                    placeholder="Notion 페이지 URL을 입력하세요"
-                                    value={notionUrl}
-                                    onChange={(e) => setNotionUrl(e.target.value)}
-                                />
-                                <_.ModalButtons>
-                                    <BtnPrimary onClick={handleImportNotion}>가져오기</BtnPrimary>
-                                    <_.CancelButton onClick={() => setShowImportModal(false)}>
-                                        취소
-                                    </_.CancelButton>
-                                </_.ModalButtons>
-                            </>
-                        )}
+                                Notion 계정 연결하기
+                            </button>
+                        </div>
+                        
+                        <_.ModalInput
+                            type="text"
+                            placeholder="https://www.notion.so/..."
+                            value={notionUrl}
+                            onChange={(e) => setNotionUrl(e.target.value)}
+                        />
+                        
+                        <_.ModalButtons>
+                            <BtnPrimary onClick={handleImportNotion}>가져오기</BtnPrimary>
+                            <_.CancelButton onClick={() => setShowImportModal(false)}>
+                                취소
+                            </_.CancelButton>
+                        </_.ModalButtons>
                     </_.ModalContent>
                 </_.ModalOverlay>
             )}

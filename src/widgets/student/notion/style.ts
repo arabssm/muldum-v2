@@ -170,12 +170,6 @@ export const EditorWrapper = styled.div`
     border-radius: 4px;
   }
 `;
-exp
-ort const ButtonGroup = styled.div`
-  display: flex;
-  gap: 1rem;
-  margin-top: 1rem;
-`;
 
 export const ModalOverlay = styled.div`
   position: fixed;

@@ -127,3 +127,8 @@ export const getDashboard = async (): Promise<DashboardStats> => {
   const response = await axiosInstance.get('/tasks/dashboard');
   return response.data;
 };
+
+// 과제 독촉 이메일 전송
+export const urgeTask = async (taskId: number): Promise<void> => {
+  await axiosInstance.post('/api/v1/urge', { taskId });
+};

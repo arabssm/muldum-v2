@@ -6,6 +6,28 @@ export const Container = styled.div`
     row-gap: 3.5rem;
     width: 100%;
     margin: 0 auto;
+    position: relative;
+`;
+
+export const BudgetInfo = styled.div`
+    position: fixed;
+    top: 6rem;
+    right: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.25rem;
+    background-color: transparent;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #495057;
+    z-index: 100;
+    
+    span {
+        color: #ff9b62;
+        font-weight: 600;
+        font-size: 1.1rem;
+    }
 `;
 
 export const Wrapper = styled.div`
