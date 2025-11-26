@@ -231,7 +231,7 @@ export default function Calendar() {
                         {editingEvent ? '일정 수정' : '일정 등록'}을 위한 <br /> 정보를 입력해주세요
                     </_.ModalTitle>
                     <_.ModalInput 
-                        placeholder="타이틀은 필수 입력입니다ㅅ" 
+                        placeholder="타이틀은 필수 입력입니다" 
                         value={title} 
                         onChange={(e) => setTitle(e.target.value)}
                     />
