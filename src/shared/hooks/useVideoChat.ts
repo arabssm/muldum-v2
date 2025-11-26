@@ -983,8 +983,8 @@ export function useVideoChat() {
             }
             
             // 1. 백엔드 STT에서 회의록 가져오기
-            const { getAiBaseUrl } = await import('../lib/envCheck');
-            const baseUrl = getAiBaseUrl();
+            const { getRealAiBaseUrl } = await import('../lib/envCheck');
+            const baseUrl = getRealAiBaseUrl();
             
             const transcriptResponse = await fetch(`${baseUrl}/stt/transcript/${roomId}`);
             
@@ -1221,8 +1221,8 @@ export function useVideoChat() {
                 
                 console.log(`✅ Audio validation passed: ${completeBlob.size} bytes (~${estimatedDuration.toFixed(2)}s)`);
                 
-                const { getAiBaseUrl } = await import('../lib/envCheck');
-                const baseUrl = getAiBaseUrl();
+                const { getRealAiBaseUrl } = await import('../lib/envCheck');
+                const baseUrl = getRealAiBaseUrl();
                 
                 const formData = new FormData();
                 formData.append('audio', completeBlob, 'audio.webm');
