@@ -12,8 +12,14 @@ const axiosInstance = axios.create({
 });
 
 axiosInstance.interceptors.request.use(async (config) => {
-    // /ara로 시작하는 조회 API는 인증 토큰 없이 요청
-    const isPublicAraApi = config.url?.startsWith('/ara');
+    // 공개 API 목록 (인증 토큰 없이 요청 가능)
+    const publicAraApis = [
+        '/ara/auth',
+        '/ara/teamspace',
+        '/ara/notice'
+    ];
+    
+    const isPublicAraApi = publicAraApis.some(api => config.url?.startsWith(api));
     
     if (isPublicAraApi) {
         return config;
@@ -98,8 +104,13 @@ axiosInstance.interceptors.response.use(
             return Promise.reject(error);
         }
 
-        // /ara로 시작하는 공개 API는 401 에러 처리 스킵
-        const isPublicAraApi = original?.url?.startsWith('/ara');
+        // 공개 API는 401 에러 처리 스킵
+        const publicAraApis = [
+            '/ara/auth',
+            '/ara/teamspace',
+            '/ara/notice'
+        ];
+        const isPublicAraApi = publicAraApis.some(api => original?.url?.startsWith(api));
         if (isPublicAraApi && error.response?.status === 401) {
             return Promise.reject(error);
         }
