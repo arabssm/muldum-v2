@@ -21,6 +21,11 @@ export const Container = styled.div`
 export const Info = styled.div`
     ${flex}
     justify-content: space-between;
+    
+    @media (max-width: 1024px) {
+        flex-direction: column;
+        row-gap: 2rem;
+    }
 `;
 
 export const Wrapper = styled.div`
@@ -28,6 +33,10 @@ export const Wrapper = styled.div`
     flex-direction: column;
     row-gap: 1.5rem;
     width: 48%;
+    
+    @media (max-width: 1024px) {
+        width: 100%;
+    }
 `;
 
 export const NoticeContainer = styled.div`

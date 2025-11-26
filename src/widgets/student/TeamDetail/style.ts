@@ -10,11 +10,10 @@ export const Container = styled.div`
 
 export const TabGroup = styled.div`
   display: flex;
-  width: 100%;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   padding-bottom: 0.5rem;
-  margin-bottom: 2rem;
+  flex: 1;
 `;
 
 export const TabButton = styled.div<{ isActive: boolean }>`
@@ -35,8 +34,10 @@ export const TabButton = styled.div<{ isActive: boolean }>`
 export const Header = styled.div`
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
+  align-items: flex-end;
+  margin-bottom: 2rem;
+  width: 100%;
+  gap: 1rem;
 `;
 
 export const Title = styled.h2`
@@ -112,4 +113,91 @@ export const EmptyMessage = styled.div`
   padding: 3rem;
   color: #999;
   font-size: 1rem;
+`;
+
+export const DeleteText = styled.div`
+  font-size: 0.95rem;
+  color: #909090;
+  cursor: pointer;
+  transition: color 0.2s;
+
+  &:hover {
+    color: #4B4B4B;
+  }
+`;
+
+export const ModalOverlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+`;
+
+export const ModalContent = styled.div`
+  background-color: white;
+  padding: 2rem;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 500px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+`;
+
+export const ModalTitle = styled.h2`
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #4B4B4B;
+  margin: 0;
+`;
+
+export const DeleteMessage = styled.p`
+  font-size: 1rem;
+  color: #4B4B4B;
+  margin: 0;
+  line-height: 1.5;
+`;
+
+export const DeleteButtonGroup = styled.div`
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+`;
+
+export const CancelButton = styled.button`
+  padding: 0.75rem 1.5rem;
+  background-color: #E0E0E0;
+  color: #4B4B4B;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: #D0D0D0;
+  }
+`;
+
+export const ConfirmDeleteButton = styled.button`
+  padding: 0.75rem 1.5rem;
+  background-color: #FF4444;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: #CC0000;
+  }
 `;

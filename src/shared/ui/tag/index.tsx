@@ -14,8 +14,24 @@ const BlockNoteEditor = dynamic(
     return function Editor({ initialContent, onChange, editable = true }: BlockNoteEditorProps) {
       const { image, audio, video, file, ...allowedBlocks } = defaultBlockSpecs;
 
+      const parseContent = (content: string) => {
+        if (!content) return undefined;
+        try {
+          // JSON 형식인지 확인 (배열이나 객체로 시작하는지)
+          const trimmed = content.trim();
+          if (trimmed.startsWith('[') || trimmed.startsWith('{')) {
+            return JSON.parse(content);
+          }
+          // HTML이나 일반 텍스트인 경우 undefined 반환 (기본 블록 사용)
+          return undefined;
+        } catch (error) {
+          console.warn('Failed to parse content:', error);
+          return undefined;
+        }
+      };
+
       const editor = useCreateBlockNote({
-        initialContent: initialContent ? JSON.parse(initialContent) : undefined,
+        initialContent: parseContent(initialContent),
         blockSpecs: allowedBlocks,
         placeholders: {
           default: "내용을 입력하세요...",

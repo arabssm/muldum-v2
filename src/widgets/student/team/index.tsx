@@ -182,11 +182,11 @@ export default function Team() {
                     )}
                 </_.Wrapper>
                 <_.BtnGroup>
-                    <_.MonthlyTestButton onClick={handleMonthlyTestClick}>
-                        월말평가 보러가기
-                    </_.MonthlyTestButton>
                     {userType === "TEACHER" && (
                         <>
+                            <_.MonthlyTestButton onClick={handleMonthlyTestClick}>
+                                월말평가 보러가기
+                            </_.MonthlyTestButton>
                             <_.MonthlyTestButton onClick={() => openModal('student')}>
                                 학생추가
                             </_.MonthlyTestButton>

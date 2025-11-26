@@ -22,7 +22,7 @@ const getDDay = (dateString: string) => {
   const diff = target.getTime() - today.getTime();
   const day = Math.floor(diff / (1000 * 60 * 60 * 24));
 
-  if (day === 0) return "D-0";
+  if (day === 0) return "D-Day";
   if (day > 0) return `D-${day}`;
   return `D+${Math.abs(day)}`;
 };
@@ -65,15 +65,14 @@ export default function SliderComponent() {
   const { data } = useNoticesQuery();
 
   const notices: Notice[] = (data?.content ?? []).map((item: any) => {
-    const rawDate = item.updatedAt?.slice(0, 10);
-    const deadline = item.deadline?.slice(0, 10);
+    const deadlineDate = item.deadlineDate?.slice(0, 10);
 
     return {
       id: item.id,
       notice: item.title,
-      date: rawDate ? rawDate.replace(/-/g, ". ") + "." : "",
+      date: deadlineDate ? deadlineDate.replace(/-/g, ". ") + "." : "",
       teacher: item.teacher,
-      dday: getDDay(deadline || rawDate),
+      dday: getDDay(deadlineDate),
       path: `/notice/${item.id}`,
     };
   });

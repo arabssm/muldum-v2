@@ -5,6 +5,30 @@ export const Container = styled.div`
   flex-direction: column;
   width: 100%;
   height: 70vh;
+  gap: 1rem;
+`;
+
+export const ShareCalendarButton = styled.button`
+  align-self: flex-end;
+  padding: 0.75rem 1.5rem;
+  background: #ff9b62;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    background: #ff8640;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(255, 155, 98, 0.3);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
 `;
 
 export const CalendarWrapper = styled.div`

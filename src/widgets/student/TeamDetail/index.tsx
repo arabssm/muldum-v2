@@ -7,6 +7,7 @@ import { getTeacherReportList } from '@/shared/api/monthReport';
 import type { MonthReportSimpleResponse } from '@/shared/api/monthReport';
 import { showToast } from '@/shared/ui/toast';
 import { getUserInfo } from '@/shared/api/user';
+import { deleteTeam } from '@/shared/api/team';
 import Notion from '@/widgets/student/notion';
 import MonthlyTest from '@/widgets/student/monthlyTest';
 import Calendar from '@/widgets/student/calendar';
@@ -25,6 +26,7 @@ export default function TeamDetail() {
   const [isLoading, setIsLoading] = useState(false);
   const [userRole, setUserRole] = useState<string | null>(null);
   const [userTeamId, setUserTeamId] = useState<number | null>(null);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchUserInfo = async () => {
@@ -75,6 +77,21 @@ export default function TeamDetail() {
 
   const handleReportClick = (reportId: number) => {
     router.push(`/monthWatch?report_id=${reportId}`);
+  };
+
+  const handleDeleteClick = () => {
+    setDeleteModalOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    try {
+      await deleteTeam(teamId);
+      showToast.success('팀이 삭제되었습니다');
+      router.push('/team');
+    } catch (error) {
+      console.error('팀 삭제 실패:', error);
+      showToast.error('팀 삭제에 실패했습니다');
+    }
   };
 
   const getStatusText = (status: string) => {
@@ -145,21 +162,47 @@ export default function TeamDetail() {
 
   return (
     <_.Container>
-      {finalTabs.length > 1 && (
-        <_.TabGroup>
-          {finalTabs.map((tab) => (
-            <_.TabButton
-              key={tab}
-              isActive={activeTab === tab}
-              onClick={() => setActiveTab(tab)}
-            >
-              {tab}
-            </_.TabButton>
-          ))}
-        </_.TabGroup>
-      )}
+      <_.Header>
+        {finalTabs.length > 1 && (
+          <_.TabGroup>
+            {finalTabs.map((tab) => (
+              <_.TabButton
+                key={tab}
+                isActive={activeTab === tab}
+                onClick={() => setActiveTab(tab)}
+              >
+                {tab}
+              </_.TabButton>
+            ))}
+          </_.TabGroup>
+        )}
+        {userRole === 'TEACHER' && (
+          <_.DeleteText onClick={handleDeleteClick}>
+            팀 삭제하기
+          </_.DeleteText>
+        )}
+      </_.Header>
 
       {renderTabContent()}
+
+      {deleteModalOpen && (
+        <_.ModalOverlay onClick={() => setDeleteModalOpen(false)}>
+          <_.ModalContent onClick={(e: React.MouseEvent) => e.stopPropagation()}>
+            <_.ModalTitle>팀 삭제</_.ModalTitle>
+            <_.DeleteMessage>
+              정말 이 팀을 삭제하시겠습니까?
+            </_.DeleteMessage>
+            <_.DeleteButtonGroup>
+              <_.CancelButton onClick={() => setDeleteModalOpen(false)}>
+                취소
+              </_.CancelButton>
+              <_.ConfirmDeleteButton onClick={handleDeleteConfirm}>
+                삭제
+              </_.ConfirmDeleteButton>
+            </_.DeleteButtonGroup>
+          </_.ModalContent>
+        </_.ModalOverlay>
+      )}
     </_.Container>
   );
 }

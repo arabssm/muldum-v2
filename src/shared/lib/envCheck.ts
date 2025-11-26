@@ -33,6 +33,17 @@ export const getAiBaseUrl = (): string => {
   return url;
 };
 
+export const getRealAiBaseUrl = (): string => {
+  const url = process.env.NEXT_PUBLIC_REAL_AI_BASE_URL;
+  
+  if (!url) {
+    console.warn('NEXT_PUBLIC_REAL_AI_BASE_URL이 설정되지 않았습니다. 기본값을 사용합니다.');
+    return 'http://localhost:8001';
+  }
+  
+  return url;
+};
+
 export const getGoogleClientId = (): string => {
   const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
   

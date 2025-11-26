@@ -33,9 +33,17 @@ export function useVideoChat() {
     const mixedStreamRef = useRef<MediaStream | null>(null);
     const joinSoundRef = useRef<HTMLAudioElement | null>(null);
     const leaveSoundRef = useRef<HTMLAudioElement | null>(null);
+    const audioRecordersRef = useRef<{ [userId: string]: { recorder: MediaRecorder; intervalId: NodeJS.Timeout } }>({});
+    
+    // 오디오 WebSocket 관련 refs
+    const audioWsRef = useRef<WebSocket | null>(null);
+    const audioSeqRef = useRef<number>(0);
+    const audioMediaRecorderRef = useRef<MediaRecorder | null>(null);
+    const audioHeaderRef = useRef<Uint8Array | null>(null); // WebM/Ogg 헤더 캐시
 
     const [isScreenSharing, setIsScreenSharing] = useState(false);
     const [isRecording, setIsRecording] = useState(false);
+    const [separatedAudioData, setSeparatedAudioData] = useState<{[key: string]: {src: string, data: string}[]}>({});
 
     const pc_config: RTCConfiguration = { 
         iceServers: [
@@ -299,6 +307,11 @@ export function useVideoChat() {
                 console.error('Failed to add new audio to recording:', error);
             }
         }
+        
+        // 백엔드 STT: 원격 오디오 캡처 시작
+        if (audioTracks.length > 0 && userName && roomId) {
+            startAudioCapture(userId, userName, stream, roomId);
+        }
     };
 
     const closePeerConnection = (userId: string) => {
@@ -334,10 +347,10 @@ export function useVideoChat() {
             const userInfo = await getUserInfo();
             console.log('User info for WebSocket:', { userId: userInfo.id, userName: userInfo.name });
 
-            // 환경 변수 또는 현재 도메인 기반으로 API URL 결정
+            // 화상통화용 Spring API URL 사용
             const { getApiBaseUrl } = await import('../lib/envCheck');
             const apiBaseUrl = getApiBaseUrl();
-            console.log('Using API Base URL:', apiBaseUrl);
+            console.log('Using Spring API Base URL for video chat:', apiBaseUrl);
             
             const wsProtocol = apiBaseUrl.startsWith('https') ? 'wss' : 'ws';
             const wsHost = apiBaseUrl.replace(/^https?:\/\//, '');
@@ -358,15 +371,12 @@ export function useVideoChat() {
                 // 입장 효과음 재생
                 playJoinSound();
                 
-                // 녹음 자동 시작 (약간의 지연 후 - 스트림이 준비될 시간 확보)
-                setTimeout(async () => {
-                    try {
-                        await startRecording();
-                        console.log('Auto-recording started');
-                    } catch (error) {
-                        console.error('Failed to auto-start recording:', error);
+                // 백엔드 STT: 로컬 오디오 캡처 시작
+                setTimeout(() => {
+                    if (localStreamRef.current) {
+                        startAudioCapture(userInfo.id.toString(), userInfo.name, localStreamRef.current, roomId);
                     }
-                }, 2000);
+                }, 1500);
                 
                 // Heartbeat: 30초마다 ping 메시지 전송
                 heartbeatIntervalRef.current = setInterval(() => {
@@ -506,6 +516,15 @@ export function useVideoChat() {
                             }]);
                         }
                         break;
+                    case 'stt':
+                        // STT 결과 수신 (다른 참가자의 음성 인식 결과)
+                        const sttMessage = message as any;
+                        if (sttMessage.userName && sttMessage.transcript) {
+                            console.log('📥 Received STT:', sttMessage.userName, '-', sttMessage.transcript);
+                            console.log(`🗣️ ${sttMessage.userName}: ${sttMessage.transcript}`);
+                            // 필요시 UI에 표시하거나 회의록에 추가
+                        }
+                        break;
                     case 'error':
                         console.error(`Error from server: ${message.message}`);
                         alert(`화상통화 오류: ${message.message}`);
@@ -549,6 +568,9 @@ export function useVideoChat() {
             stopRecording();
             console.log('Auto-stopped recording on leave');
         }
+        
+        // 오디오 WebSocket 정리
+        stopAudioWebSocket();
 
         try {
             if (roomId) {
@@ -627,6 +649,26 @@ export function useVideoChat() {
         const audioTrack = localStreamRef.current.getAudioTracks()[0];
         if (audioTrack) {
             audioTrack.enabled = !audioTrack.enabled;
+            console.log('🎤 Microphone:', audioTrack.enabled ? 'ON' : 'OFF');
+            
+            // 마이크 꺼지면 녹음도 중지
+            if (!audioTrack.enabled) {
+                Object.entries(audioRecordersRef.current).forEach(([userId, { recorder, intervalId }]) => {
+                    if (recorder.state === 'recording') {
+                        recorder.stop();
+                        clearInterval(intervalId);
+                        console.log('⏸️ Paused recording for', userId);
+                    }
+                });
+            } else {
+                // 마이크 켜지면 녹음 재개
+                Object.entries(audioRecordersRef.current).forEach(([userId, { recorder, intervalId }]) => {
+                    if (recorder.state === 'inactive') {
+                        recorder.start();
+                        console.log('▶️ Resumed recording for', userId);
+                    }
+                });
+            }
         }
     };
 
@@ -689,6 +731,309 @@ export function useVideoChat() {
         setIsScreenSharing(false);
     };
 
+    const startAudioWebSocket = async (roomId: string, userId: number, userName: string) => {
+        try {
+            const { getApiBaseUrl } = await import('../lib/envCheck');
+            const apiBaseUrl = getApiBaseUrl();
+            const wsProtocol = apiBaseUrl.startsWith('https') ? 'wss' : 'ws';
+            const wsHost = apiBaseUrl.replace(/^https?:\/\//, '');
+            
+            const audioWsUrl = `${wsProtocol}://${wsHost}/api/ws/audio?roomId=${roomId}&userId=${userId}&userName=${encodeURIComponent(userName)}`;
+            console.log('Connecting to audio WebSocket (Spring):', audioWsUrl);
+            console.log('roomId for audio recording:', roomId, ', userName:', userName);
+            
+            const audioWs = new WebSocket(audioWsUrl);
+            audioWsRef.current = audioWs;
+            audioSeqRef.current = 0;
+            
+            audioWs.onopen = () => {
+                console.log('Audio WebSocket connected');
+                // MediaRecorder 시작 (1초 청크) - roomId, userId, userName 전달
+                startAudioRecording(roomId, userId, userName);
+            };
+            
+            audioWs.onmessage = (event) => {
+                try {
+                    const message = JSON.parse(event.data);
+                    console.log('Audio WebSocket message:', message.type);
+                    
+                    if (message.type === 'separated_audio') {
+                        handleSeparatedAudio(message);
+                    } else if (message.type === 'error') {
+                        console.error('Audio WebSocket error:', message.message);
+                        alert(`오디오 처리 오류: ${message.message}`);
+                        stopAudioWebSocket();
+                    }
+                } catch (error) {
+                    console.error('Failed to parse audio WebSocket message:', error);
+                }
+            };
+            
+            audioWs.onclose = () => {
+                console.log('Audio WebSocket disconnected');
+                stopAudioRecording();
+            };
+            
+            audioWs.onerror = (error) => {
+                console.error('Audio WebSocket error:', error);
+                stopAudioRecording();
+            };
+        } catch (error) {
+            console.error('Failed to start audio WebSocket:', error);
+        }
+    };
+    
+    const stopAudioWebSocket = () => {
+        if (audioWsRef.current) {
+            audioWsRef.current.close();
+            audioWsRef.current = null;
+        }
+        stopAudioRecording();
+        audioSeqRef.current = 0;
+    };
+    
+    const startAudioRecording = (roomId: string, userId: number, userName: string) => {
+        try {
+            if (!localStreamRef.current) {
+                console.warn('No local stream available for audio recording');
+                return;
+            }
+            
+            const audioTrack = localStreamRef.current.getAudioTracks()[0];
+            if (!audioTrack) {
+                console.warn('No audio track available');
+                return;
+            }
+            
+            // roomId 검증 (녹음 시작 전)
+            if (!roomId) {
+                console.error('roomId is empty! Cannot start audio recording.');
+                return;
+            }
+            
+            console.log('Starting audio recording with roomId:', roomId, ', userId:', userId, ', userName:', userName);
+            
+            // 오디오 트랙 상태 확인
+            console.log('Audio track info:', {
+                label: audioTrack.label,
+                enabled: audioTrack.enabled,
+                muted: audioTrack.muted,
+                readyState: audioTrack.readyState
+            });
+            
+            const audioStream = new MediaStream([audioTrack]);
+            
+            // 브라우저가 지원하는 mimeType 확인
+            const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
+                ? 'audio/webm;codecs=opus'
+                : MediaRecorder.isTypeSupported('audio/ogg;codecs=opus')
+                ? 'audio/ogg;codecs=opus'
+                : '';
+            
+            console.log('Selected mimeType:', mimeType || 'browser default');
+            
+            const mediaRecorder = mimeType 
+                ? new MediaRecorder(audioStream, { mimeType })
+                : new MediaRecorder(audioStream);
+            
+            // 실제 사용되는 mimeType 확인
+            console.log('MediaRecorder actual mimeType:', mediaRecorder.mimeType);
+            
+            audioMediaRecorderRef.current = mediaRecorder;
+            
+            mediaRecorder.ondataavailable = async (event) => {
+                // Blob 타입 로깅
+                console.log('Received audio chunk - Blob type:', event.data.type, ', size:', event.data.size);
+                
+                // 빈 청크 스킵
+                if (event.data.size === 0) {
+                    console.log('Skipping empty audio chunk');
+                    return;
+                }
+                
+                if (audioWsRef.current && audioWsRef.current.readyState === WebSocket.OPEN) {
+                    try {
+                        // Blob을 arrayBuffer로 읽기
+                        const buf = await event.data.arrayBuffer();
+                        let bytes = new Uint8Array(buf);
+                        
+                        // 헤더 감지 (WebM: 1A 45 DF A3, Ogg: 4F 67 67 53)
+                        const isWebm = bytes.length >= 4 && 
+                            bytes[0] === 0x1a && bytes[1] === 0x45 && 
+                            bytes[2] === 0xdf && bytes[3] === 0xa3;
+                        const isOgg = bytes.length >= 4 && 
+                            bytes[0] === 0x4f && bytes[1] === 0x67 && 
+                            bytes[2] === 0x67 && bytes[3] === 0x53;
+                        
+                        // 디버그: 앞 4바이트 확인
+                        const headerBytes = [...bytes.slice(0, 4)].map(x => x.toString(16).toUpperCase().padStart(2, '0'));
+                        console.log('Audio chunk header (first 4 bytes):', headerBytes, isWebm ? '(WebM)' : isOgg ? '(Ogg)' : '(No header)');
+                        
+                        // 첫 청크(헤더 포함)를 캐시
+                        if (!audioHeaderRef.current && isWebm) {
+                            audioHeaderRef.current = bytes;
+                            console.log('✓ Cached WebM header for subsequent chunks');
+                        }
+                        
+                        // 헤더 없는 후속 청크에 캐시된 헤더 붙이기
+                        if (!isWebm && !isOgg && audioHeaderRef.current) {
+                            const combined = new Uint8Array(audioHeaderRef.current.length + bytes.length);
+                            combined.set(audioHeaderRef.current, 0);
+                            combined.set(bytes, audioHeaderRef.current.length);
+                            bytes = combined;
+                            console.log('✓ Prepended cached header to chunk (new size:', bytes.byteLength, 'bytes)');
+                        }
+                        
+                        // 1. JSON 메타 전송 (text frame)
+                        const metadata = {
+                            type: 'audio_chunk',
+                            roomId: roomId,
+                            userId: userId,
+                            userName: userName,
+                            seq: audioSeqRef.current++,
+                            sampleRate: 48000,
+                            channels: 1,
+                            codec: 'opus',
+                            startedAt: Date.now()
+                        };
+                        
+                        audioWsRef.current.send(JSON.stringify(metadata));
+                        console.log('✓ Sent audio metadata (seq:', metadata.seq, ', roomId:', metadata.roomId, ', userId:', metadata.userId, ', userName:', metadata.userName, ')');
+                        
+                        // 2. 바이너리 데이터 전송 (binary frame) - Uint8Array 그대로
+                        audioWsRef.current.send(bytes);
+                        console.log('✓ Sent audio binary chunk:', bytes.byteLength, 'bytes');
+                    } catch (error) {
+                        console.error('Failed to send audio chunk:', error);
+                    }
+                }
+            };
+            
+            mediaRecorder.start(1000); // 1초 청크 (timeslice)
+            console.log('✓ Audio recording started for AI processing');
+            console.log('  - roomId:', roomId);
+            console.log('  - userId:', userId);
+            console.log('  - userName:', userName);
+            console.log('  - Stream:', audioStream.id);
+            console.log('  - Audio tracks:', audioStream.getAudioTracks().length);
+        } catch (error) {
+            console.error('Failed to start audio recording:', error);
+        }
+    };
+    
+    const stopAudioRecording = () => {
+        if (audioMediaRecorderRef.current && audioMediaRecorderRef.current.state !== 'inactive') {
+            audioMediaRecorderRef.current.stop();
+            audioMediaRecorderRef.current = null;
+            console.log('Audio recording stopped');
+        }
+        // 헤더 캐시 초기화
+        audioHeaderRef.current = null;
+    };
+    
+    const handleSeparatedAudio = (message: any) => {
+        console.log('Received separated audio:', message);
+        
+        // Base64 데이터를 Blob으로 변환하여 재생/시각화
+        const { fromUserId, seq, data, transcriptChunk } = message;
+        
+        if (data) {
+            Object.entries(data).forEach(([src, base64Data]: [string, any]) => {
+                try {
+                    // Base64를 Blob으로 변환
+                    const binaryString = atob(base64Data);
+                    const bytes = new Uint8Array(binaryString.length);
+                    for (let i = 0; i < binaryString.length; i++) {
+                        bytes[i] = binaryString.charCodeAt(i);
+                    }
+                    const blob = new Blob([bytes], { type: 'audio/wav' });
+                    const url = URL.createObjectURL(blob);
+                    
+                    console.log(`Separated audio ${src} from user ${fromUserId}, seq ${seq}:`, url);
+                    
+                    // 상태에 저장 (나중에 재생/시각화 가능)
+                    setSeparatedAudioData(prev => ({
+                        ...prev,
+                        [fromUserId]: [...(prev[fromUserId] || []), { src, data: url }]
+                    }));
+                    
+                    // 자동 재생 (선택사항)
+                    // const audio = new Audio(url);
+                    // audio.play();
+                } catch (error) {
+                    console.error(`Failed to process separated audio ${src}:`, error);
+                }
+            });
+        }
+        
+        if (transcriptChunk) {
+            console.log('Transcript chunk:', transcriptChunk);
+            // STT 결과를 채팅 메시지로 표시
+            setMessages(prev => [...prev, { 
+                name: 'STT', 
+                text: transcriptChunk 
+            }]);
+        }
+    };
+    
+    const getSummary = async (language: string = 'ko', maxSentences: number = 5) => {
+        try {
+            if (!roomId) {
+                throw new Error('Room ID is required');
+            }
+            
+            // 1. 백엔드 STT에서 회의록 가져오기
+            const { getAiBaseUrl } = await import('../lib/envCheck');
+            const baseUrl = getAiBaseUrl();
+            
+            const transcriptResponse = await fetch(`${baseUrl}/stt/transcript/${roomId}`);
+            
+            if (!transcriptResponse.ok) {
+                throw new Error(`Failed to get transcript: ${transcriptResponse.statusText}`);
+            }
+            
+            const transcriptData = await transcriptResponse.json();
+            const fullTranscript = transcriptData.fullTranscript;
+            
+            if (!fullTranscript || fullTranscript.trim().length === 0) {
+                throw new Error('회의록이 비어있습니다');
+            }
+            
+            console.log('📝 회의록 가져옴:', fullTranscript.substring(0, 200) + '...');
+            
+            // 2. 요약 요청
+            const summaryResponse = await fetch(`${baseUrl}/summaries`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ 
+                    transcript: fullTranscript,
+                    max_keywords: 10,
+                    hf_min_length: 30,
+                    hf_max_length: 60
+                })
+            });
+            
+            if (!summaryResponse.ok) {
+                throw new Error(`Failed to get summary: ${summaryResponse.statusText}`);
+            }
+            
+            const result = await summaryResponse.json();
+            console.log('✅ 요약 완료:', result);
+            
+            return {
+                keywords: result.keywords || [],
+                huggingfaceSummary: result.huggingface_summary || null,
+                chatgptSummary: result.chatgpt_summary || null,
+                geminiSummary: result.gemini_summary || null
+            };
+        } catch (error) {
+            console.error('요약 생성 실패:', error);
+            throw error;
+        }
+    };
+
     const startRecording = async () => {
         try {
             // AudioContext 생성
@@ -738,9 +1083,10 @@ export function useVideoChat() {
                 }
             };
 
-            mediaRecorder.onstop = async () => {
+            mediaRecorder.onstop = () => {
                 console.log('Recording stopped, chunks:', recordedChunksRef.current.length);
-                await uploadRecording();
+                // 녹음 데이터는 오디오 WebSocket을 통해 실시간으로 전송됨
+                recordedChunksRef.current = [];
             };
 
             mediaRecorder.start(1000); // 1초마다 데이터 수집
@@ -768,129 +1114,6 @@ export function useVideoChat() {
         }
 
         mixedStreamRef.current = null;
-    };
-
-    const uploadRecording = async () => {
-        if (recordedChunksRef.current.length === 0) {
-            console.warn('No recorded data to upload');
-            return;
-        }
-
-        try {
-            const webmBlob = new Blob(recordedChunksRef.current, { type: 'audio/webm' });
-            
-            console.log('Converting webm to wav...');
-            
-            // WebM을 WAV로 변환
-            const audioContext = new AudioContext();
-            const arrayBuffer = await webmBlob.arrayBuffer();
-            const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
-            
-            // WAV 파일 생성
-            const wavBlob = await audioBufferToWav(audioBuffer);
-            
-            const formData = new FormData();
-            
-            // 파일명에 roomId와 타임스탬프 포함
-            const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-            const filename = `recording_${roomId}_${timestamp}.wav`;
-            
-            formData.append('file', wavBlob, filename);
-
-            console.log('Uploading recording to AI server:', {
-                size: wavBlob.size,
-                filename,
-                roomId
-            });
-
-            // AI 서버로 업로드
-            const { getAiBaseUrl } = await import('../lib/envCheck');
-            const baseUrl = getAiBaseUrl();
-            const response = await fetch(`${baseUrl}/analyze`, {
-                method: 'POST',
-                body: formData
-            });
-
-            if (!response.ok) {
-                throw new Error(`Upload failed: ${response.statusText}`);
-            }
-
-            const result = await response.json();
-            console.log('Recording analyzed successfully:', result);
-
-            // 업로드 후 청크 초기화
-            recordedChunksRef.current = [];
-        } catch (error) {
-            console.error('Failed to upload recording:', error);
-        }
-    };
-
-    // AudioBuffer를 WAV Blob으로 변환하는 헬퍼 함수
-    const audioBufferToWav = async (audioBuffer: AudioBuffer): Promise<Blob> => {
-        const numberOfChannels = audioBuffer.numberOfChannels;
-        const sampleRate = audioBuffer.sampleRate;
-        const format = 1; // PCM
-        const bitDepth = 16;
-
-        const bytesPerSample = bitDepth / 8;
-        const blockAlign = numberOfChannels * bytesPerSample;
-
-        const data = [];
-        for (let i = 0; i < audioBuffer.numberOfChannels; i++) {
-            data.push(audioBuffer.getChannelData(i));
-        }
-
-        const interleaved = interleave(data);
-        const dataLength = interleaved.length * bytesPerSample;
-        const buffer = new ArrayBuffer(44 + dataLength);
-        const view = new DataView(buffer);
-
-        // WAV 헤더 작성
-        writeString(view, 0, 'RIFF');
-        view.setUint32(4, 36 + dataLength, true);
-        writeString(view, 8, 'WAVE');
-        writeString(view, 12, 'fmt ');
-        view.setUint32(16, 16, true);
-        view.setUint16(20, format, true);
-        view.setUint16(22, numberOfChannels, true);
-        view.setUint32(24, sampleRate, true);
-        view.setUint32(28, sampleRate * blockAlign, true);
-        view.setUint16(32, blockAlign, true);
-        view.setUint16(34, bitDepth, true);
-        writeString(view, 36, 'data');
-        view.setUint32(40, dataLength, true);
-
-        // PCM 데이터 작성
-        floatTo16BitPCM(view, 44, interleaved);
-
-        return new Blob([buffer], { type: 'audio/wav' });
-    };
-
-    const interleave = (channelData: Float32Array[]): Float32Array => {
-        const length = channelData[0].length;
-        const numberOfChannels = channelData.length;
-        const result = new Float32Array(length * numberOfChannels);
-
-        let inputIndex = 0;
-        for (let i = 0; i < length; i++) {
-            for (let channel = 0; channel < numberOfChannels; channel++) {
-                result[inputIndex++] = channelData[channel][i];
-            }
-        }
-        return result;
-    };
-
-    const writeString = (view: DataView, offset: number, string: string) => {
-        for (let i = 0; i < string.length; i++) {
-            view.setUint8(offset + i, string.charCodeAt(i));
-        }
-    };
-
-    const floatTo16BitPCM = (view: DataView, offset: number, input: Float32Array) => {
-        for (let i = 0; i < input.length; i++, offset += 2) {
-            const s = Math.max(-1, Math.min(1, input[i]));
-            view.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7FFF, true);
-        }
     };
 
     const handleResize = (e: React.MouseEvent) => {
@@ -932,6 +1155,132 @@ export function useVideoChat() {
             handleSendMessage();
         }
     };
+    
+    // 백엔드 STT: 오디오 캡처 및 전송
+    const startAudioCapture = async (userId: string, userName: string, stream: MediaStream, currentRoomId: string) => {
+        try {
+            const audioTrack = stream.getAudioTracks()[0];
+            if (!audioTrack) {
+                console.error('❌ No audio track found');
+                return;
+            }
+            
+            console.log('🎤 Audio track:', {
+                label: audioTrack.label,
+                enabled: audioTrack.enabled,
+                muted: audioTrack.muted,
+                readyState: audioTrack.readyState,
+                roomId: currentRoomId
+            });
+            
+            const audioStream = new MediaStream([audioTrack]);
+            const mediaRecorder = new MediaRecorder(audioStream, {
+                mimeType: 'audio/webm;codecs=opus'
+            });
+            
+            let chunks: Blob[] = [];
+            
+            mediaRecorder.onstart = () => {
+                console.log('✅ MediaRecorder started for', userName, 'in room', currentRoomId);
+                chunks = [];
+            };
+            
+            mediaRecorder.ondataavailable = (event) => {
+                if (event.data.size > 0) {
+                    chunks.push(event.data);
+                    console.log('📦 Chunk collected:', event.data.size, 'bytes');
+                }
+            };
+            
+            mediaRecorder.onstop = async () => {
+                if (chunks.length === 0 || !currentRoomId) {
+                    console.log('⚠️ No chunks or roomId, skipping');
+                    return;
+                }
+                
+                // 완전한 Blob 생성
+                const completeBlob = new Blob(chunks, { type: 'audio/webm' });
+                console.log('🎬 Complete audio:', completeBlob.size, 'bytes');
+                
+                // 크기 검증: 최소 10KB (약 1초 이상의 오디오)
+                const MIN_AUDIO_SIZE = 10000; // 10KB
+                if (completeBlob.size < MIN_AUDIO_SIZE) {
+                    console.log(`⚠️ Audio too small (${completeBlob.size} bytes < ${MIN_AUDIO_SIZE} bytes), skipping`);
+                    chunks = [];
+                    return;
+                }
+                
+                // 예상 오디오 길이 계산 (대략적)
+                // WebM Opus: ~16KB/sec (비트레이트에 따라 다름)
+                const estimatedDuration = completeBlob.size / 16000; // 초 단위
+                if (estimatedDuration < 1.0) {
+                    console.log(`⚠️ Audio too short (${estimatedDuration.toFixed(2)}s < 1.0s), skipping`);
+                    chunks = [];
+                    return;
+                }
+                
+                console.log(`✅ Audio validation passed: ${completeBlob.size} bytes (~${estimatedDuration.toFixed(2)}s)`);
+                
+                const { getAiBaseUrl } = await import('../lib/envCheck');
+                const baseUrl = getAiBaseUrl();
+                
+                const formData = new FormData();
+                formData.append('audio', completeBlob, 'audio.webm');
+                formData.append('userId', userId);
+                formData.append('userName', userName);
+                formData.append('roomId', currentRoomId);
+                
+                console.log(`📤 STT 전송 중:`, {
+                    url: `${baseUrl}/stt/stream`,
+                    userId,
+                    userName,
+                    roomId: currentRoomId,
+                    audioSize: completeBlob.size,
+                    estimatedDuration: `${estimatedDuration.toFixed(2)}s`
+                });
+                
+                try {
+                    const res = await fetch(`${baseUrl}/stt/stream`, {
+                        method: 'POST',
+                        body: formData
+                    });
+                    const data = await res.json();
+                    console.log('✅ STT 응답:', data);
+                    if (data.transcript) {
+                        console.log(`🗣️ ${userName}: ${data.transcript}`);
+                    }
+                } catch (err) {
+                    console.error('❌ STT 전송 실패:', err);
+                }
+                
+                chunks = [];
+            };
+            
+            // 30초마다 stop → start 반복
+            const recordingInterval = setInterval(() => {
+                if (mediaRecorder.state === 'recording') {
+                    mediaRecorder.stop();
+                    setTimeout(() => {
+                        if (mediaRecorder.state === 'inactive') {
+                            chunks = [];
+                            mediaRecorder.start();
+                        }
+                    }, 100);
+                }
+            }, 30000); // 30초
+            
+            // ref에 저장하여 나중에 제어 가능하도록
+            audioRecordersRef.current[userId] = {
+                recorder: mediaRecorder,
+                intervalId: recordingInterval
+            };
+            
+            mediaRecorder.start();
+            console.log(`🎙️ ${userName} 오디오 캡처 시작`);
+        } catch (error) {
+            console.error('오디오 캡처 실패:', error);
+        }
+    };
 
     useEffect(() => {
         return () => {
@@ -958,6 +1307,7 @@ export function useVideoChat() {
         connectionStatus,
         isScreenSharing,
         isRecording,
+        separatedAudioData,
         handleResize,
         handleSendMessage,
         handleKeyDown,
@@ -972,5 +1322,6 @@ export function useVideoChat() {
         stopScreenShare,
         startRecording,
         stopRecording,
+        getSummary,
     };
 }

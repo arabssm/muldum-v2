@@ -76,3 +76,8 @@ export const getMajorTeamsWithItemCount = async (): Promise<Team[]> => {
     newCount: team.newCount || 0,
   }));
 };
+
+// 교사용: 팀 삭제
+export const deleteTeam = async (teamId: number): Promise<void> => {
+  await axiosInstance.delete(`/tch/teamspace/team/${teamId}`);
+};

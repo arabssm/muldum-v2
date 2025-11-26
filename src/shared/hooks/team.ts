@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { getNetworkTeams, Team as ApiTeam } from '@/shared/api/team';
+import { getNetworkTeams, getNetworkTeamsWithItemCount, getMajorTeamsWithItemCount, Team as ApiTeam } from '@/shared/api/team';
 import { getClubs } from '@/shared/api';
+import { getUserInfo } from '@/shared/api/user';
 
 type GroupType = "전공동아리" | "네트워크";
 
@@ -14,21 +15,35 @@ export const useTeams = (activeGroup: GroupType) => {
       try {
         let response: ApiTeam[] = [];
 
+        // 사용자 role 확인
+        const userInfo = await getUserInfo();
+        const isTeacher = userInfo.user_type === 'TEACHER';
+
         if (activeGroup === "전공동아리") {
-          const res = await getClubs();
-          // API 응답: { teams: [...] }
-          const teams = res.teams || [];
-          response = teams.map((team: any) => ({
-            id: team.teamId,
-            name: team.teamName,
-            members: team.members?.map((m: any) => 
-              m.studentId ? `${m.studentId} ${m.userName}` : m.userName
-            ) || [],
-            class: team.class || undefined,
-          }));
+          if (isTeacher) {
+            // 교사용 API: 새 물품 수 포함
+            response = await getMajorTeamsWithItemCount();
+          } else {
+            // 학생용 API
+            const res = await getClubs();
+            const teams = res.teams || [];
+            response = teams.map((team: any) => ({
+              id: team.teamId,
+              name: team.teamName,
+              members: team.members?.map((m: any) => 
+                m.studentId ? `${m.studentId} ${m.userName}` : m.userName
+              ) || [],
+              class: team.class || undefined,
+            }));
+          }
         } else if (activeGroup === "네트워크") {
-          const res = await getNetworkTeams();
-          response = Array.isArray(res) ? res : [];
+          if (isTeacher) {
+            // 교사용 API: 새 물품 수 포함
+            response = await getNetworkTeamsWithItemCount();
+          } else {
+            // 학생용 API
+            response = await getNetworkTeams();
+          }
         }
 
         setTeams(response);

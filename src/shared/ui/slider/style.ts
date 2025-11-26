@@ -46,9 +46,15 @@ export const SlideWrapper = styled.div`
     position: relative;
     border-radius: 4px;
     height: 24vh;
+    min-height: 200px;
     overflow: hidden;
     color: #fff;
     cursor: pointer;
+    
+    @media (max-width: 1024px) {
+        height: 20vh;
+        min-height: 180px;
+    }
 `;
 
 export const Overlay = styled.div`
@@ -75,8 +81,18 @@ export const Title = styled.div`
     font-weight: 500;
     top: 20%;
     left: 5%;
-    width: 100%;
-    color: #fff
+    width: 70%;
+    color: #fff;
+    
+    @media (max-width: 1024px) {
+        font-size: 1.8rem;
+        width: 60%;
+    }
+    
+    @media (max-width: 768px) {
+        font-size: 1.5rem;
+        width: 55%;
+    }
 `;
 
 export const SubTitle = styled.div`
@@ -87,6 +103,15 @@ export const SubTitle = styled.div`
     left: 5%;
     top: 67%;
     color: #e9e9e9ff;
+    
+    @media (max-width: 1024px) {
+        font-size: 1.2rem;
+        top: 70%;
+    }
+    
+    @media (max-width: 768px) {
+        font-size: 1rem;
+    }
 `;
 
 export const Date = styled.div`
@@ -97,6 +122,15 @@ export const Date = styled.div`
     left: 5%;
     top: 52%;
     color: #e9e9e9ff;
+    
+    @media (max-width: 1024px) {
+        font-size: 1.2rem;
+        top: 55%;
+    }
+    
+    @media (max-width: 768px) {
+        font-size: 1rem;
+    }
 `;
 
 export const Ddate = styled.div`
@@ -154,4 +188,16 @@ export const DDay = styled.div`
     top: 31%;
     color: #fff;
     font-weight: 600;
+    
+    @media (max-width: 1024px) {
+        font-size: 3.5rem;
+        left: 75%;
+        top: 35%;
+    }
+    
+    @media (max-width: 768px) {
+        font-size: 2.5rem;
+        left: 70%;
+        top: 30%;
+    }
 `;

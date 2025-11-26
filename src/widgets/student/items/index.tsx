@@ -24,6 +24,7 @@ export default function Items() {
   const [guideContent, setGuideContent] = useState("");
   const [guideId, setGuideId] = useState<number | null>(null);
   const [guideUpdatedAt, setGuideUpdatedAt] = useState<string>("");
+  const [doNotShowAgain, setDoNotShowAgain] = useState(false);
 
   useEffect(() => {
     setIsMounted(true);
@@ -44,28 +45,41 @@ export default function Items() {
 
       try {
         const guide = await getLatestItemGuide(active);
+        console.log("Fetched guide:", guide);
+        
         if (guide && guide.content) {
           // localStorage에서 마지막으로 본 가이드 정보 가져오기
-          const lastSeenData = localStorage.getItem(GUIDE_STORAGE_KEY);
+          const storageKey = `${GUIDE_STORAGE_KEY}_${active}`;
+          const lastSeenData = localStorage.getItem(storageKey);
+          console.log("Last seen data:", lastSeenData);
+          
           let shouldShow = true;
 
           if (lastSeenData) {
             try {
               const lastSeen = JSON.parse(lastSeenData);
-              // 같은 가이드 ID이고, updatedAt이 같으면 보여주지 않음
+              console.log("Parsed last seen:", lastSeen);
+              console.log("Comparison:", {
+                guideId: { saved: lastSeen.guideId, current: guide.id, match: lastSeen.guideId === guide.id },
+                projectType: { saved: lastSeen.projectType, current: active, match: lastSeen.projectType === active },
+                updatedAt: { saved: lastSeen.updatedAt, current: guide.updatedAt, match: lastSeen.updatedAt === guide.updatedAt }
+              });
+              
+              // 같은 가이드 ID이고, projectType이 같으면 보여주지 않음
               if (
                 lastSeen.guideId === guide.id &&
-                lastSeen.projectType === active &&
-                lastSeen.updatedAt === guide.updatedAt
+                lastSeen.projectType === active
               ) {
                 shouldShow = false;
               }
             } catch (e) {
-              // 파싱 실패 시 보여줌
+              console.error("Failed to parse last seen data:", e);
               shouldShow = true;
             }
           }
 
+          console.log("Should show modal:", shouldShow);
+          
           if (shouldShow) {
             setGuideContent(guide.content);
             setGuideId(guide.id);
@@ -83,17 +97,20 @@ export default function Items() {
     }
   }, [active, isMounted]);
 
-  const handleDoNotShowAgain = () => {
-    if (guideId && active) {
+  const handleCloseGuideModal = () => {
+    if (doNotShowAgain && guideId && active) {
+      const storageKey = `${GUIDE_STORAGE_KEY}_${active}`;
       const lastSeenData = {
         guideId,
         projectType: active,
         updatedAt: guideUpdatedAt,
         timestamp: new Date().toISOString(),
       };
-      localStorage.setItem(GUIDE_STORAGE_KEY, JSON.stringify(lastSeenData));
+      console.log("Saving to localStorage:", storageKey, lastSeenData);
+      localStorage.setItem(storageKey, JSON.stringify(lastSeenData));
     }
     setIsGuideModalOpen(false);
+    setDoNotShowAgain(false);
   };
 
   if (!isMounted) {
@@ -115,7 +132,7 @@ export default function Items() {
         <ItemForm hideClubSelect={true} />
       )}
 
-      <Modal isOpen={isGuideModalOpen} closeModal={() => setIsGuideModalOpen(false)} maxWidth="800px">
+      <Modal isOpen={isGuideModalOpen} closeModal={handleCloseGuideModal} maxWidth="800px">
         <_.GuideModalInner>
           <_.GuideTitle>물품 신청 안내</_.GuideTitle>
           <_.GuideEditorWrapper>
@@ -125,11 +142,16 @@ export default function Items() {
             />
           </_.GuideEditorWrapper>
           <_.GuideButtonRow>
-            <_.GuideCheckboxWrapper onClick={handleDoNotShowAgain}>
-              <input type="checkbox" id="doNotShow" />
+            <_.GuideCheckboxWrapper>
+              <input 
+                type="checkbox" 
+                id="doNotShow" 
+                checked={doNotShowAgain}
+                onChange={(e) => setDoNotShowAgain(e.target.checked)}
+              />
               <label htmlFor="doNotShow">다시 보지 않기</label>
             </_.GuideCheckboxWrapper>
-            <_.GuideCloseButton onClick={() => setIsGuideModalOpen(false)}>
+            <_.GuideCloseButton onClick={handleCloseGuideModal}>
               확인
             </_.GuideCloseButton>
           </_.GuideButtonRow>

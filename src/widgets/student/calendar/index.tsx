@@ -9,12 +9,14 @@ import * as _ from './style';
 import { Modal } from '@/components/modal/modal';
 import Image from 'next/image';
 import { useCalendar } from '@/shared/hooks/useCalendar';
-import { CalendarEntry } from '@/shared/api/calendar';
+import { CalendarEntry, updateTeamGoogleCalendar } from '@/shared/api/calendar';
 import { BtnSecondary, BtnPrimary } from '@/shared/ui/button';
+import GoogleCalendarModal from '@/shared/ui/modal/googleCalendarModal';
 
 export default function Calendar() {
     const [isOpen, setIsOpen] = useState(false);
     const [isDetailOpen, setIsDetailOpen] = useState(false);
+    const [isGoogleCalendarModalOpen, setIsGoogleCalendarModalOpen] = useState(false);
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
     const [events, setEvents] = useState<EventInput[]>([]);
@@ -23,7 +25,7 @@ export default function Calendar() {
     const [viewingEvent, setViewingEvent] = useState<CalendarEntry | null>(null);
     const calendarRef = useRef<FullCalendar>(null);
 
-    const { calendars, isLoading, addCalendar, editCalendar, removeCalendar } = useCalendar();
+    const { calendars, addCalendar, editCalendar, removeCalendar } = useCalendar();
 
     const colors = ['#FFD8D8', '#FFF1B2', '#D9F7BE', '#D6E4FF', '#EBD8FF'];
 
@@ -176,8 +178,23 @@ export default function Calendar() {
         return `${start.getMonth() + 1}월 ${start.getDate()}일 ~ ${end.getMonth() + 1}월 ${end.getDate()}일`;
     };
 
+    const handleGoogleCalendarSubmit = async (calendarId: string) => {
+        try {
+            const response = await updateTeamGoogleCalendar(calendarId);
+            alert(response.message || '구글 캘린더가 연동되었습니다!');
+            setIsGoogleCalendarModalOpen(false);
+        } catch (error: any) {
+            console.error('구글 캘린더 연동 실패:', error);
+            const errorMessage = error.response?.data?.message || '캘린더 연동에 실패했습니다.';
+            alert(errorMessage);
+        }
+    };
+
     return (
         <_.Container>
+            <_.ShareCalendarButton onClick={() => setIsGoogleCalendarModalOpen(true)}>
+                구글 캘린더 연동
+            </_.ShareCalendarButton>
             <_.CalendarWrapper>
                 <FullCalendar
                     ref={calendarRef}
@@ -247,6 +264,11 @@ export default function Calendar() {
                     </_.ButtonRow>
                 </_.ModalInner>
             </Modal>
+            <GoogleCalendarModal
+                isOpen={isGoogleCalendarModalOpen}
+                onClose={() => setIsGoogleCalendarModalOpen(false)}
+                onSubmit={handleGoogleCalendarSubmit}
+            />
         </_.Container>
     );
 }

@@ -74,6 +74,7 @@ export const Box = styled.div`
     background-color: #FAFAFA;
     border-radius: 4px;
     cursor: pointer;
+    position: relative;
 `;
 
 export const Name = styled.div`
@@ -164,5 +165,75 @@ export const ModalButton = styled.button`
 
     &:hover {
         background-color: #333;
+    }
+`;
+
+export const DeleteButton = styled.button`
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    padding: 0.5rem 1rem;
+    background-color: #FF4444;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    z-index: 10;
+
+    &:hover {
+        background-color: #CC0000;
+    }
+`;
+
+export const DeleteMessage = styled.p`
+    font-size: 1rem;
+    color: #4B4B4B;
+    margin: 0;
+    line-height: 1.5;
+
+    strong {
+        font-weight: 600;
+        color: #FF4444;
+    }
+`;
+
+export const DeleteButtonGroup = styled.div`
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+`;
+
+export const CancelButton = styled.button`
+    padding: 0.75rem 1.5rem;
+    background-color: #E0E0E0;
+    color: #4B4B4B;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+
+    &:hover {
+        background-color: #D0D0D0;
+    }
+`;
+
+export const ConfirmDeleteButton = styled.button`
+    padding: 0.75rem 1.5rem;
+    background-color: #FF4444;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+
+    &:hover {
+        background-color: #CC0000;
     }
 `;

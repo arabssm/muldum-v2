@@ -5,6 +5,8 @@ import { useParams } from "next/navigation";
 import Image from "next/image";
 import * as _ from "./style";
 import { useVideoChat } from "@/shared/hooks/useVideoChat";
+import Loading from "@/shared/ui/loading";
+import { showToast } from "@/shared/ui/toast";
 
 export default function VideoChat() {
     const params = useParams();
@@ -14,9 +16,9 @@ export default function VideoChat() {
         showParticipants, setShowParticipants, chatWidth, chatScrollRef,
         videoRef, message, setMessage, messages, participants, remoteStreams,
         selectedParticipant, setSelectedParticipant, localStream, roomId,
-        isConnected, connectionStatus, isScreenSharing, isRecording, handleResize,
-        handleKeyDown, createRoom, joinRoom, leaveRoom, findOrCreateTeamRoom, toggleCamera,
-        toggleMicrophone, startScreenShare, stopScreenShare, startRecording, stopRecording
+        isConnected, connectionStatus, isScreenSharing, isListening,
+        handleResize, handleKeyDown, createRoom, joinRoom, leaveRoom, findOrCreateTeamRoom, 
+        toggleCamera, toggleMicrophone, startScreenShare, stopScreenShare, getSummary
     } = useVideoChat();
 
     const [camOn, setCamOn] = useState(true);
@@ -25,6 +27,15 @@ export default function VideoChat() {
     const [roomTitle, setRoomTitle] = useState("My Video Room");
     const [inputRoomId, setInputRoomId] = useState("");
     const [isCallActive, setIsCallActive] = useState(false);
+    const [showSummary, setShowSummary] = useState(false);
+    const [summaryData, setSummaryData] = useState<{
+        keywords: string[];
+        huggingfaceSummary: string | null;
+        chatgptSummary: string | null;
+        geminiSummary: string | null;
+    } | null>(null);
+    const [loadingSummary, setLoadingSummary] = useState(false);
+    const [loadingCall, setLoadingCall] = useState(false);
 
     const remoteVideoRef = useRef<HTMLVideoElement>(null);
     const localPipVideoRef = useRef<HTMLVideoElement>(null);
@@ -42,6 +53,7 @@ export default function VideoChat() {
                 return;
             }
 
+            setLoadingCall(true);
             try {
                 console.log('Starting video chat for team:', teamId);
                 
@@ -62,6 +74,8 @@ export default function VideoChat() {
             } catch (error) {
                 console.error("Failed to start video chat:", error);
                 alert(`화상통화를 시작할 수 없습니다: ${error instanceof Error ? error.message : '알 수 없는 오류'}`);
+            } finally {
+                setLoadingCall(false);
             }
         }
     };
@@ -217,6 +231,35 @@ export default function VideoChat() {
         }
     };
 
+    const handleGetSummary = async () => {
+        if (!isCallActive) {
+            showToast.warning('화상통화에 참여 중이 아닙니다.');
+            return;
+        }
+        
+        const confirmed = window.confirm('회의가 자동으로 종료되고 요약이 생성됩니다. 계속하시겠습니까?');
+        if (!confirmed) return;
+        
+        setLoadingSummary(true);
+        
+        try {
+            const result = await getSummary();
+            if (result) {
+                setSummaryData(result);
+                setShowSummary(true);
+                
+                // 요약 후 회의 종료
+                await leaveRoom();
+                setIsCallActive(false);
+            }
+        } catch (error) {
+            console.error('Failed to get summary:', error);
+            showToast.error('현재 AI 서버가 꺼져있어 사용이 불가능합니다.');
+        } finally {
+            setLoadingSummary(false);
+        }
+    };
+
 
 
     const icons = [
@@ -228,15 +271,37 @@ export default function VideoChat() {
 
     return (
         <_.TopContainer>
-            <_.IconGroup onClick={handleToggleCall} style={{ cursor: "pointer" }}>
-                <Image
-                    src={isCallActive ? "/assets/nonopen.svg" : "/assets/open.svg"}
-                    alt="화상통화 아이콘"
-                    width={24}
-                    height={24}
-                />
-                <_.Sub>{isCallActive ? "화상통화 종료" : "화상통화 시작"}</_.Sub>
-            </_.IconGroup>
+            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                <_.IconGroup onClick={handleToggleCall} style={{ cursor: "pointer" }}>
+                    <Image
+                        src={isCallActive ? "/assets/nonopen.svg" : "/assets/open.svg"}
+                        alt="화상통화 아이콘"
+                        width={24}
+                        height={24}
+                    />
+                    <_.Sub>{isCallActive ? "화상통화 종료" : "화상통화 시작"}</_.Sub>
+                </_.IconGroup>
+                {isCallActive && (
+                    <button
+                        onClick={handleGetSummary}
+                        disabled={loadingSummary}
+                        style={{
+                            padding: "6px 12px",
+                            backgroundColor: "#4CAF50",
+                            color: "white",
+                            border: "none",
+                            borderRadius: "6px",
+                            cursor: loadingSummary ? "not-allowed" : "pointer",
+                            fontSize: "12px",
+                            fontWeight: "500",
+                            opacity: loadingSummary ? 0.6 : 1,
+                            whiteSpace: "nowrap",
+                        }}
+                    >
+                        {loadingSummary ? "요약 중..." : "요약"}
+                    </button>
+                )}
+            </div>
             <_.Container>
                 <_.ChatWrapper
                     style={{
@@ -308,6 +373,7 @@ export default function VideoChat() {
                                 height: "100%",
                                 objectFit: "cover",
                                 backgroundColor: "#000",
+                                transform: "scaleX(-1)",
                             }}
                         />
                     )}
@@ -337,6 +403,7 @@ export default function VideoChat() {
                                     backgroundColor: "#000",
                                     cursor: "pointer",
                                     transition: "transform 0.2s ease",
+                                    transform: "scaleX(-1)",
                                 }}
                                 onMouseEnter={(e) => {
                                     e.currentTarget.style.transform = "scale(1.05)";
@@ -389,6 +456,7 @@ export default function VideoChat() {
                             : "나 (로컬)"
                         }
                     </div>
+
                 </div>
                 {!showParticipants && (
                     <Image
@@ -470,6 +538,142 @@ export default function VideoChat() {
                     ))}
                 </_.IconWrapper>
             </_.IconWrapper>
+            
+            {/* 로딩 화면 */}
+            {(loadingSummary || loadingCall) && <Loading />}
+            
+            {/* 요약 모달 */}
+            {showSummary && (
+                <div
+                    style={{
+                        position: "fixed",
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        backgroundColor: "rgba(0, 0, 0, 0.5)",
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        zIndex: 1000,
+                    }}
+                    onClick={() => setShowSummary(false)}
+                >
+                    <div
+                        style={{
+                            backgroundColor: "white",
+                            padding: "30px",
+                            borderRadius: "12px",
+                            maxWidth: "600px",
+                            width: "90%",
+                            maxHeight: "80vh",
+                            overflow: "auto",
+                        }}
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
+                            <h2 style={{ margin: 0, fontSize: "24px", fontWeight: "bold" }}>회의 요약</h2>
+                            <button
+                                onClick={() => setShowSummary(false)}
+                                style={{
+                                    background: "none",
+                                    border: "none",
+                                    fontSize: "28px",
+                                    cursor: "pointer",
+                                    color: "#666",
+                                }}
+                            >
+                                ×
+                            </button>
+                        </div>
+                        
+                        {summaryData ? (
+                            <div>
+                                {/* 키워드 */}
+                                {summaryData.keywords.length > 0 && (
+                                    <div style={{ marginBottom: "20px" }}>
+                                        <h3 style={{ fontSize: "18px", fontWeight: "bold", marginBottom: "10px" }}>주요 키워드</h3>
+                                        <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
+                                            {summaryData.keywords.map((keyword, idx) => (
+                                                <span
+                                                    key={idx}
+                                                    style={{
+                                                        padding: "6px 12px",
+                                                        backgroundColor: "#e3f2fd",
+                                                        borderRadius: "16px",
+                                                        fontSize: "14px",
+                                                        color: "#1976d2",
+                                                    }}
+                                                >
+                                                    {keyword}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                                
+                                {/* Gemini 요약 */}
+                                <div style={{ marginBottom: "20px" }}>
+                                    <h3 style={{ fontSize: "18px", fontWeight: "bold", marginBottom: "10px" }}>요약</h3>
+                                    <div
+                                        style={{
+                                            padding: "16px",
+                                            backgroundColor: "#f5f5f5",
+                                            borderRadius: "8px",
+                                            fontSize: "15px",
+                                            lineHeight: "1.6",
+                                            whiteSpace: "pre-wrap",
+                                        }}
+                                    >
+                                        {summaryData.geminiSummary || "요약할 만큼 충분한 회의 내용이 없습니다. 조금 더 긴 발화를 입력해주세요."}
+                                    </div>
+                                </div>
+                                
+                                {/* ChatGPT 요약 */}
+                                {summaryData.chatgptSummary && (
+                                    <div style={{ marginBottom: "20px" }}>
+                                        <h3 style={{ fontSize: "18px", fontWeight: "bold", marginBottom: "10px" }}>ChatGPT 요약</h3>
+                                        <div
+                                            style={{
+                                                padding: "16px",
+                                                backgroundColor: "#f5f5f5",
+                                                borderRadius: "8px",
+                                                fontSize: "15px",
+                                                lineHeight: "1.6",
+                                                whiteSpace: "pre-wrap",
+                                            }}
+                                        >
+                                            {summaryData.chatgptSummary}
+                                        </div>
+                                    </div>
+                                )}
+                                
+                                {/* Hugging Face 요약 */}
+                                {summaryData.huggingfaceSummary && (
+                                    <div style={{ marginBottom: "20px" }}>
+                                        <h3 style={{ fontSize: "18px", fontWeight: "bold", marginBottom: "10px" }}>HuggingFace 요약</h3>
+                                        <div
+                                            style={{
+                                                padding: "16px",
+                                                backgroundColor: "#f5f5f5",
+                                                borderRadius: "8px",
+                                                fontSize: "15px",
+                                                lineHeight: "1.6",
+                                            }}
+                                        >
+                                            {summaryData.huggingfaceSummary}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        ) : (
+                            <p style={{ textAlign: "center", color: "#666", fontSize: "16px" }}>
+                                요약 내용이 없습니다.
+                            </p>
+                        )}
+                    </div>
+                </div>
+            )}
         </_.TopContainer>
     );
 }

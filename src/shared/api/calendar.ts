@@ -44,3 +44,55 @@ export const updateCalendar = async (
 export const deleteCalendar = async (calender_id: number): Promise<void> => {
   await axiosInstance.delete(`/std/calender/${calender_id}`);
 };
+
+// 구글 캘린더 연동
+export interface UpdateGoogleCalendarRequest {
+  googleCalendarId: string;
+}
+
+export interface GoogleCalendarEventResponse {
+  eventId: string;
+  title: string;
+  description?: string;
+  startDateTime: string;
+  endDateTime: string;
+  allDay: boolean;
+  status: string;
+  htmlLink: string;
+  organizer?: string;
+  location?: string;
+}
+
+export interface GoogleCalendarEventsResponse {
+  calendarId: string;
+  events: GoogleCalendarEventResponse[];
+  nextPageToken?: string;
+  nextSyncToken?: string;
+}
+
+export interface GoogleCalendarSyncRequest {
+  calendarId?: string;
+  timeMin?: string;
+  timeMax?: string;
+  maxResults?: number;
+  pageToken?: string;
+  timeZone?: string;
+}
+
+// 팀의 구글 캘린더 ID 저장
+export const updateTeamGoogleCalendar = async (
+  googleCalendarId: string
+): Promise<{ message: string }> => {
+  const res = await axiosInstance.patch('/std/teamspace/network/team/google-calendar', {
+    googleCalendarId,
+  });
+  return res.data;
+};
+
+// 구글 캘린더 이벤트 가져오기
+export const getGoogleCalendarEvents = async (
+  params?: GoogleCalendarSyncRequest
+): Promise<GoogleCalendarEventsResponse> => {
+  const res = await axiosInstance.get('/std/calender/google', { params });
+  return res.data;
+};
