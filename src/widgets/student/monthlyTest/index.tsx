@@ -6,11 +6,12 @@ import FormSection from './FormSection';
 import { useRouter, usePathname } from 'next/navigation';
 import { useState, useEffect, useRef } from 'react';
 import type { MonthlyTestProps } from "@/shared/types";
-import { saveDraftReport, submitReport, getDraftReport } from '@/shared/api/monthReport';
+import { saveDraftReport, submitReport, getDraftReport, getTeacherReportList } from '@/shared/api/monthReport';
+import type { MonthReportSimpleResponse } from '@/shared/api/monthReport';
 import { showToast } from '@/shared/ui/toast';
 import Loading from '@/shared/ui/loading';
 import { useTeams } from '@/shared/hooks/team';
-import axiosInstance from '@/shared/lib/axiosInstance';
+import { getUserInfo } from '@/shared/api/user';
 
 export default function MonthlyTest({ sections = [] }: MonthlyTestProps) {
   const router = useRouter();
@@ -20,10 +21,13 @@ export default function MonthlyTest({ sections = [] }: MonthlyTestProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [draftId, setDraftId] = useState<number | null>(null);
   const hasLoadedRef = useRef(false);
-  const [monthlyReports, setMonthlyReports] = useState<any[]>([]);
+  const [userType, setUserType] = useState<string | null>(null);
+  
+  // 교사용 상태
+  const [selectedTeamId, setSelectedTeamId] = useState<number | null>(null);
+  const [reports, setReports] = useState<MonthReportSimpleResponse[]>([]);
   
   const { teams: majorTeams } = useTeams("전공동아리");
-  const { teams: networkTeams } = useTeams("네트워크");
   
   // 폼 데이터 상태 (sections 순서: 주제, 목표, 사용언어·기술스택, 발생문제, 담당교사피드백, 멘토교사피드백)
   const [formData, setFormData] = useState({
@@ -35,14 +39,62 @@ export default function MonthlyTest({ sections = [] }: MonthlyTestProps) {
     mentorFeedback: ''
   });
 
-  // 페이지 진입 시 임시 저장된 데이터 및 월말평가 데이터 불러오기
+  // 사용자 타입 확인
   useEffect(() => {
-    if (hasLoadedRef.current) return;
+    const fetchUserType = async () => {
+      try {
+        const userInfo = await getUserInfo();
+        setUserType(userInfo.user_type);
+      } catch (error) {
+        console.error('Failed to fetch user type:', error);
+      }
+    };
+    fetchUserType();
+  }, []);
+
+  // 교사용: 기본값을 "전체"(null)로 설정
+  useEffect(() => {
+    if (userType === "TEACHER" && selectedTeamId === null && majorTeams.length === 0) {
+      // 팀 목록이 로드되기 전에는 null 유지
+      return;
+    }
+  }, [userType, majorTeams, selectedTeamId]);
+
+  // 교사용: 선택된 팀의 월말평가 목록 조회
+  useEffect(() => {
+    if (userType !== "TEACHER") return;
+
+    const fetchReports = async () => {
+      try {
+        setIsLoading(true);
+        const data = await getTeacherReportList(selectedTeamId);
+        console.log("Fetched reports data:", data);
+        // 데이터가 배열인지 확인하고 설정
+        if (Array.isArray(data)) {
+          setReports(data);
+        } else {
+          console.error("Reports data is not an array:", data);
+          setReports([]);
+        }
+      } catch (error) {
+        console.error("월말평가 목록 조회 실패:", error);
+        showToast.error("월말평가 목록을 불러오는데 실패했습니다");
+        setReports([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchReports();
+  }, [userType, selectedTeamId]);
+
+  // 학생용: 페이지 진입 시 임시 저장된 데이터 불러오기
+  useEffect(() => {
+    if (userType !== "STUDENT" || hasLoadedRef.current) return;
     hasLoadedRef.current = true;
 
     const loadData = async () => {
       try {
-        // 임시 저장 데이터 불러오기
         const draftData = await getDraftReport();
         if (draftData) {
           setDraftId(draftData.reportId);
@@ -56,28 +108,6 @@ export default function MonthlyTest({ sections = [] }: MonthlyTestProps) {
           });
           showToast.success('임시 저장된 데이터를 불러왔습니다');
         }
-
-        // 월말평가 데이터 불러오기
-        const currentMonth = new Date().getMonth() + 1;
-        const allTeams = [...majorTeams, ...networkTeams];
-        
-        if (allTeams.length > 0) {
-          const reportRequests = allTeams.map(team =>
-            axiosInstance.get(`/tch/major/report`, {
-              params: {
-                team: team.id,
-                month: currentMonth
-              }
-            }).catch(err => {
-              console.error(`Failed to fetch report for team ${team.id}:`, err);
-              return null;
-            })
-          );
-
-          const reports = await Promise.all(reportRequests);
-          const validReports = reports.filter(r => r !== null).map(r => r?.data);
-          setMonthlyReports(validReports);
-        }
       } catch (error) {
         console.error('데이터 로드 실패:', error);
       } finally {
@@ -86,7 +116,7 @@ export default function MonthlyTest({ sections = [] }: MonthlyTestProps) {
     };
 
     loadData();
-  }, [majorTeams, networkTeams]);
+  }, [userType]);
 
   const handleInputChange = (field: keyof typeof formData, value: string | string[]) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -193,17 +223,94 @@ export default function MonthlyTest({ sections = [] }: MonthlyTestProps) {
     return null;
   };
 
+  const handleReportClick = (reportId: number) => {
+    router.push(`/monthWatch?report_id=${reportId}`);
+  };
+
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case "DRAFT":
+        return "임시저장";
+      case "SUBMITTED":
+        return "제출완료";
+      case "REVIEWED":
+        return "검토완료";
+      default:
+        return status;
+    }
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "DRAFT":
+        return "#999";
+      case "SUBMITTED":
+        return "#4A90E2";
+      case "REVIEWED":
+        return "#27AE60";
+      default:
+        return "#333";
+    }
+  };
+
   // sections 순서에 맞게 field 매핑
   const fieldMapping = ['topic', 'goal', 'tech', 'problem', 'teacherFeedback', 'mentorFeedback'];
 
   if (isLoading) {
     return (
       <_.Container>
-        <div>.<Loading /></div>
+        <Loading />
       </_.Container>
     );
   }
 
+  // 교사용 UI
+  if (userType === "TEACHER") {
+    const allTeams = [{ id: null, name: "전체" }, ...majorTeams];
+
+    return (
+      <_.Container>
+        <_.TeamSelector>
+          {allTeams.map((team) => (
+            <_.TeamText
+              key={team.id ?? 'all'}
+              isActive={selectedTeamId === team.id}
+              onClick={() => setSelectedTeamId(team.id)}
+            >
+              {team.name}
+            </_.TeamText>
+          ))}
+        </_.TeamSelector>
+
+        <_.ReportsContainer>
+          {!Array.isArray(reports) || reports.length === 0 ? (
+            <_.EmptyMessage>월말평가가 없습니다</_.EmptyMessage>
+          ) : (
+            reports.map((report) => (
+              <_.ReportCard
+                key={report.reportId}
+                onClick={() => handleReportClick(report.reportId)}
+              >
+                <_.ReportHeader>
+                  <_.ReportTopic>{report.topic}</_.ReportTopic>
+                  <_.ReportStatus color={getStatusColor(report.status)}>
+                    {getStatusText(report.status)}
+                  </_.ReportStatus>
+                </_.ReportHeader>
+                {report.submittedAt && (
+                  <_.ReportDate>
+                    제출일: {new Date(report.submittedAt).toLocaleDateString()}
+                  </_.ReportDate>
+                )}
+              </_.ReportCard>
+            ))
+          )}
+        </_.ReportsContainer>
+      </_.Container>
+    );
+  }
+
+  // 학생용 UI
   return (
     <_.Container>
       {sections.map((section, i) => (

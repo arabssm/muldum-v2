@@ -61,25 +61,13 @@ export const useNotion = (teamId: string) => {
     };
 
     const updateBanner = async (url: string) => {
-        try {
-            await updateTeamBanner(Number(teamId), url);
-            setCover(url);
-            showToast.success("배너가 수정되었습니다.");
-        } catch (error) {
-            console.error("배너 수정 실패:", error);
-            showToast.error("배너 수정 실패");
-        }
+        await updateTeamBanner(Number(teamId), url);
+        setCover(url);
     };
 
     const updateIcon = async (url: string) => {
-        try {
-            await updateTeamIcon(Number(teamId), url);
-            setIcon(url);
-            showToast.success("아이콘이 수정되었습니다.");
-        } catch (error) {
-            console.error("아이콘 수정 실패:", error);
-            showToast.error("아이콘 수정 실패");
-        }
+        await updateTeamIcon(Number(teamId), url);
+        setIcon(url);
     };
 
     return { 

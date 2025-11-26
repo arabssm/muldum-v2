@@ -12,6 +12,13 @@ const axiosInstance = axios.create({
 });
 
 axiosInstance.interceptors.request.use(async (config) => {
+    // /ara로 시작하는 조회 API는 인증 토큰 없이 요청
+    const isPublicAraApi = config.url?.startsWith('/ara');
+    
+    if (isPublicAraApi) {
+        return config;
+    }
+
     let token = getCookie('access_token');
     const refreshToken = getCookie('refresh_token');
 
@@ -91,10 +98,17 @@ axiosInstance.interceptors.response.use(
             return Promise.reject(error);
         }
 
-        if (original?.url?.includes('/user/me')) {
-            deleteCookie('access_token');
-            deleteCookie('refresh_token');
+        // /ara로 시작하는 공개 API는 401 에러 처리 스킵
+        const isPublicAraApi = original?.url?.startsWith('/ara');
+        if (isPublicAraApi && error.response?.status === 401) {
             return Promise.reject(error);
+        }
+
+        // /user/me는 401, 403 에러 시 쿠키 삭제하지 않고 그냥 에러 반환
+        if (original?.url?.includes('/user/me')) {
+            if (error.response?.status === 401 || error.response?.status === 403) {
+                return Promise.reject(error);
+            }
         }
 
         if (error.response?.status === 401 && original && !original._retry) {

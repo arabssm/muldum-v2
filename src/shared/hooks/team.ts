@@ -15,9 +15,15 @@ export const useTeams = (activeGroup: GroupType) => {
       try {
         let response: ApiTeam[] = [];
 
-        // 사용자 role 확인
-        const userInfo = await getUserInfo();
-        const isTeacher = userInfo.user_type === 'TEACHER';
+        // 사용자 role 확인 (에러 시 학생으로 간주)
+        let isTeacher = false;
+        try {
+          const userInfo = await getUserInfo();
+          isTeacher = userInfo.user_type === 'TEACHER';
+        } catch (error) {
+          console.log('getUserInfo failed, treating as student:', error);
+          isTeacher = false;
+        }
 
         if (activeGroup === "전공동아리") {
           if (isTeacher) {

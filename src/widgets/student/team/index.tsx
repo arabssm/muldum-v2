@@ -76,18 +76,25 @@ export default function Team() {
         }
 
         try {
+            let response;
             if (modalType === 'student') {
-                await axiosInstance.post('/tch/student/invite', {
+                response = await axiosInstance.post('/tch/student/invite', {
                     googleSheetUrl: googleSheetUrl,
                 });
             } else {
-                await axiosInstance.post('/tch/teamspace/invite', {
+                response = await axiosInstance.post('/tch/teamspace/invite', {
                     googleSheetUrl: googleSheetUrl,
                 });
             }
+            
             setGoogleSheetUrl("");
             setIsModalOpen(false);
             showToast.success("추가되었습니다!");
+            
+            // 201 응답이면 새로고침
+            if (response.status === 201) {
+                window.location.reload();
+            }
         } catch (err) {
             console.error('추가 실패:', err);
             showToast.error("추가에 실패했습니다.");
@@ -184,9 +191,11 @@ export default function Team() {
                 <_.BtnGroup>
                     {userType === "TEACHER" && (
                         <>
-                            <_.MonthlyTestButton onClick={handleMonthlyTestClick}>
-                                월말평가 보러가기
-                            </_.MonthlyTestButton>
+                            {activeGroup === "전공동아리" && (
+                                <_.MonthlyTestButton onClick={handleMonthlyTestClick}>
+                                    월말평가 전체 조회
+                                </_.MonthlyTestButton>
+                            )}
                             <_.MonthlyTestButton onClick={() => openModal('student')}>
                                 학생추가
                             </_.MonthlyTestButton>

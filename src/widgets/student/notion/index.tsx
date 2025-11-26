@@ -26,8 +26,6 @@ export default function Notion({ teamId, readOnly = false }: NotionProps) {
             const { showToast } = await import('@/shared/ui/toast');
             const { getPresignedUrl, uploadFileToS3 } = await import('@/shared/api/admin/notice');
             
-            showToast.info("배너 업로드 중...");
-            
             // 1. Presigned URL 받기
             const presignedData = await getPresignedUrl(file.name);
             
@@ -37,7 +35,7 @@ export default function Notion({ teamId, readOnly = false }: NotionProps) {
             // 3. 서버에 배너 URL 업데이트
             await updateBanner(s3Url);
             
-            showToast.success("배너가 업데이트되었습니다!");
+            showToast.success("배너가 수정되었습니다");
         } catch (error) {
             console.error("배너 업로드 실패:", error);
             const { showToast } = await import('@/shared/ui/toast');
@@ -53,8 +51,6 @@ export default function Notion({ teamId, readOnly = false }: NotionProps) {
             const { showToast } = await import('@/shared/ui/toast');
             const { getPresignedUrl, uploadFileToS3 } = await import('@/shared/api/admin/notice');
             
-            showToast.info("로고 업로드 중...");
-            
             // 1. Presigned URL 받기
             const presignedData = await getPresignedUrl(file.name);
             
@@ -64,7 +60,7 @@ export default function Notion({ teamId, readOnly = false }: NotionProps) {
             // 3. 서버에 아이콘 URL 업데이트
             await updateIcon(s3Url);
             
-            showToast.success("로고가 업데이트되었습니다!");
+            showToast.success("로고가 수정되었습니다");
         } catch (error) {
             console.error("로고 업로드 실패:", error);
             const { showToast } = await import('@/shared/ui/toast');

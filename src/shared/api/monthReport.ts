@@ -84,8 +84,9 @@ export const getReportList = async (): Promise<StudentMonthReportListResponse> =
 };
 
 // 선생님용 - 팀별 월말평가 목록 조회
-export const getTeacherReportList = async (teamId: number): Promise<MonthReportSimpleResponse[]> => {
-  const { data } = await axiosInstance.get(`/tch/major/report?team=${teamId}`);
+export const getTeacherReportList = async (teamId?: number | null): Promise<MonthReportSimpleResponse[]> => {
+  const url = teamId ? `/tch/major/report?team=${teamId}` : '/tch/major/report';
+  const { data } = await axiosInstance.get(url);
   return data;
 };
 
