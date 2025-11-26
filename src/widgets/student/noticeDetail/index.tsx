@@ -164,7 +164,7 @@ export default function NoticeDetailPage({ id }: NoticeDetailProps) {
                 <_.Group>
                     <_.Subtitle>등록일: {formatDate(notice.updatedAt)}</_.Subtitle>
                     <_.Subtitle>마감일: {notice.deadlineDate || '-'}.</_.Subtitle>
-                    <_.Subtitle>작성자: {notice.teacher || '-'}</_.Subtitle>
+                    <_.Subtitle>작성자: {notice.teacher || '-'} 선생님</_.Subtitle>
                 </_.Group>
                 <div>
                     {(() => {

@@ -110,7 +110,7 @@ export default function SliderComponent() {
               <_.DDay>{item.dday}</_.DDay>
               <_.Title>{item.notice}</_.Title>
               <_.Date>{item.date}</_.Date>
-              <_.SubTitle>{item.teacher}</_.SubTitle>
+              <_.SubTitle>{item.teacher}선생님</_.SubTitle>
               <_.Index>
                 {index + 1}/{notices.length}
               </_.Index>
