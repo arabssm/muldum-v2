@@ -2,13 +2,11 @@
 
 import * as _ from './style'
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import Loading from '@/shared/ui/loading';
 import { getCurrentGeneration, getHistoryClubs, HistoryClub } from '@/shared/api/history';
 
 export default function Clubs() {
-  const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
   const [isMounted, setIsMounted] = useState(false);
   const [currentGeneration, setCurrentGeneration] = useState<number | null>(null);
@@ -23,6 +21,7 @@ export default function Clubs() {
       try {
         const generation = await getCurrentGeneration();
         setCurrentGeneration(generation);
+        setSelectedGeneration(generation); // 최신 기수를 자동으로 선택
       } catch (error) {
         console.error('Failed to fetch current generation:', error);
       }
