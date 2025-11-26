@@ -68,7 +68,6 @@ export default function MonthlyTest({ sections = [] }: MonthlyTestProps) {
       try {
         setIsLoading(true);
         const data = await getTeacherReportList(selectedTeamId);
-        console.log("Fetched reports data:", data);
         // 데이터가 배열인지 확인하고 설정
         if (Array.isArray(data)) {
           setReports(data);

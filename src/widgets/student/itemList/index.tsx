@@ -26,7 +26,6 @@ export default function ItemList() {
             try {
                 const isTemp = activeGroup === "임시신청";
                 const data = await getItemList(isTemp);
-                console.log('물품 목록:', data);
                 
                 // API 데이터를 UI 형식에 맞게 변환
                 // 원본 데이터 저장

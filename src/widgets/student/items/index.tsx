@@ -61,25 +61,17 @@ export default function Items() {
 
       try {
         const guide = await getLatestItemGuide(active);
-        console.log("Fetched guide:", guide);
         
         if (guide && guide.content) {
           // localStorage에서 마지막으로 본 가이드 정보 가져오기
           const storageKey = `${GUIDE_STORAGE_KEY}_${active}`;
           const lastSeenData = localStorage.getItem(storageKey);
-          console.log("Last seen data:", lastSeenData);
           
           let shouldShow = true;
 
           if (lastSeenData) {
             try {
               const lastSeen = JSON.parse(lastSeenData);
-              console.log("Parsed last seen:", lastSeen);
-              console.log("Comparison:", {
-                guideId: { saved: lastSeen.guideId, current: guide.id, match: lastSeen.guideId === guide.id },
-                projectType: { saved: lastSeen.projectType, current: active, match: lastSeen.projectType === active },
-                updatedAt: { saved: lastSeen.updatedAt, current: guide.updatedAt, match: lastSeen.updatedAt === guide.updatedAt }
-              });
               
               // 같은 가이드 ID이고, projectType이 같으면 보여주지 않음
               if (
@@ -93,8 +85,6 @@ export default function Items() {
               shouldShow = true;
             }
           }
-
-          console.log("Should show modal:", shouldShow);
           
           if (shouldShow) {
             setGuideContent(guide.content);
@@ -122,7 +112,6 @@ export default function Items() {
         updatedAt: guideUpdatedAt,
         timestamp: new Date().toISOString(),
       };
-      console.log("Saving to localStorage:", storageKey, lastSeenData);
       localStorage.setItem(storageKey, JSON.stringify(lastSeenData));
     }
     setIsGuideModalOpen(false);

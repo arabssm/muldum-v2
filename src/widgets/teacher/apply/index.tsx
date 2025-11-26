@@ -115,7 +115,6 @@ export default function Apply() {
                 setItems(items);
                 setNewCount(count);
                 setLocalChecked(items.map(() => false));
-                console.log('Fetched items:', items, 'New count:', count);
             } catch (error) {
                 console.error('Failed to fetch items:', error);
             } finally {
@@ -188,7 +187,6 @@ export default function Apply() {
                     dates = await getRejectedDates();
                 }
                 setAvailableDates(dates);
-                console.log('Available dates:', dates);
             } catch (error) {
                 console.error('Failed to fetch available dates:', error);
                 setAvailableDates([]);

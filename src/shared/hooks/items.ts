@@ -116,7 +116,6 @@ export function useItemForm(handleSubmit?: ItemFormProps["handleSubmit"], initia
         deliveryPrice: drivePrice,
         deliveryTime: expectDrive,
       };
-      console.log('물품 신청 데이터:', requestData);
       
       await createItemRequest(requestData, isTemp);
 

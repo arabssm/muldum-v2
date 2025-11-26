@@ -26,7 +26,6 @@ export default function TopAppBar() {
           const type = userInfo.user_type.toLowerCase() as 'student' | 'teacher';
           setUserType(type);
           setUserId(userInfo.name || userInfo.email || '사용자');
-          console.log('User type:', type);
         } catch (error) {
           console.error('Failed to fetch user type:', error);
         }

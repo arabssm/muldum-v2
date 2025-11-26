@@ -54,7 +54,6 @@ export default function TeamDetail() {
       try {
         setIsLoading(true);
         const data = await getTeacherReportList(teamId);
-        console.log('API 응답:', data);
         if (Array.isArray(data)) {
           setReports(data);
         } else if (data && typeof data === 'object' && 'reports' in data) {

@@ -17,10 +17,6 @@ export default function NoticeDetailPage({ id }: NoticeDetailProps) {
     const params = useParams<{ id: string }>();
     const noticeId = params?.id || id;
 
-    console.log('NoticeDetailPage - props id:', id);
-    console.log('NoticeDetailPage - params:', params);
-    console.log('NoticeDetailPage - noticeId:', noticeId);
-
     const [notice, setNotice] = useState<NoticeDetail | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [userRole, setUserRole] = useState<string | null>(null);
@@ -39,7 +35,6 @@ export default function NoticeDetailPage({ id }: NoticeDetailProps) {
                     const userInfo = await getUserInfo();
                     setUserRole(userInfo.user_type);
                 } catch (userErr) {
-                    console.log('사용자 정보 없음 (비로그인 상태)');
                     setUserRole(null);
                 }
                 
@@ -149,7 +144,6 @@ export default function NoticeDetailPage({ id }: NoticeDetailProps) {
                     {userRole === "TEACHER" && (
                         <div style={{ display: 'flex', gap: '0.5rem' }}>
                             <_.DeleteBtn onClick={() => {
-                                console.log('수정하기 버튼 클릭 - noticeId:', noticeId);
                                 router.push(`/noticeEdit/${noticeId}`);
                             }}>
                                 수정하기

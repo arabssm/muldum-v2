@@ -166,8 +166,6 @@ export const useNotion = (teamId: string) => {
                 if (error.message?.includes('JSON') || error.message?.includes('Unexpected token')) {
                     console.error("서버가 잘못된 응답을 반환했습니다.");
                     showToast.error("서버 응답 오류가 발생했습니다.");
-                } else {
-                    console.log("팀 페이지 데이터를 불러오지 못했지만 페이지 표시 가능");
                 }
                 // 기본 값 유지
             } finally {

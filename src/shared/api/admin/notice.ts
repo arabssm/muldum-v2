@@ -13,9 +13,6 @@ export const getPresignedUrl = async (fileName: string) => {
 };
 
 export const uploadFileToS3 = async (presignedUrl: string, file: File) => {
-  console.log('uploadFileToS3 호출 - presignedUrl:', presignedUrl);
-  console.log('uploadFileToS3 호출 - file:', file.name);
-  
   if (!presignedUrl) {
     throw new Error('presignedUrl이 undefined입니다.');
   }
@@ -47,14 +44,7 @@ export const updateNotice = async (
   files: FilePayload[],
   deadlineDate: string
 ) => {
-  console.log('updateNotice API 호출');
-  console.log('URL:', `/tch/notice/${noticeId}`);
-  console.log('요청 데이터:', { title, content, files, deadlineDate });
-  
   const { data, status } = await axiosInstance.patch(`/tch/notice/${noticeId}`, { title, content, files, deadlineDate });
-  
-  console.log('응답 status:', status);
-  console.log('응답 data:', data);
   
   if (status < 200 || status >= 300) throw new Error(`수정 실패 (status: ${status})`);
   return data;

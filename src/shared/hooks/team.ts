@@ -21,7 +21,6 @@ export const useTeams = (activeGroup: GroupType) => {
           const userInfo = await getUserInfo();
           isTeacher = userInfo.user_type === 'TEACHER';
         } catch (error) {
-          console.log('getUserInfo failed, treating as student:', error);
           isTeacher = false;
         }
 

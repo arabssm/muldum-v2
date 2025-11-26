@@ -55,20 +55,15 @@ export default function VideoChat() {
 
             setLoadingCall(true);
             try {
-                console.log('Starting video chat for team:', teamId);
-                
                 // 팀 방 찾거나 생성
                 const room = await findOrCreateTeamRoom(teamId);
-                console.log('Room found/created:', room);
                 
                 setInputRoomId(room.roomId);
                 
                 // 잠시 대기 후 방 입장 (방 생성이 완료될 시간 확보)
-                console.log('Waiting before joining room...');
                 await new Promise(resolve => setTimeout(resolve, 1500));
                 
                 // 방 입장
-                console.log('Now joining room:', room.roomId);
                 await joinRoom(room.roomId);
                 setIsCallActive(true);
             } catch (error) {
@@ -81,61 +76,22 @@ export default function VideoChat() {
     };
 
     useEffect(() => {
-        console.log('Video display update:', { 
-            selectedParticipant, 
-            hasRemoteStream: selectedParticipant ? !!remoteStreams[selectedParticipant] : false,
-            hasLocalStream: !!localStream,
-            videoRefHasStream: !!videoRef.current?.srcObject
-        });
-        
         if (selectedParticipant && remoteStreams[selectedParticipant] && remoteVideoRef.current) {
             const stream = remoteStreams[selectedParticipant];
-            const videoTracks = stream.getVideoTracks();
-            const audioTracks = stream.getAudioTracks();
-            
-            console.log('Showing remote video for:', selectedParticipant, {
-                videoTracks: videoTracks.length,
-                audioTracks: audioTracks.length,
-                videoEnabled: videoTracks[0]?.enabled,
-                videoReadyState: videoTracks[0]?.readyState,
-                videoMuted: videoTracks[0]?.muted,
-                streamActive: stream.active,
-                streamId: stream.id
-            });
-            
-            // 비디오 엘리먼트 속성 확인
-            console.log('Remote video element before:', {
-                srcObject: remoteVideoRef.current.srcObject,
-                paused: remoteVideoRef.current.paused,
-                readyState: remoteVideoRef.current.readyState,
-                videoWidth: remoteVideoRef.current.videoWidth,
-                videoHeight: remoteVideoRef.current.videoHeight
-            });
             
             remoteVideoRef.current.srcObject = stream;
             
             // 비디오 재생 강제 시도
-            remoteVideoRef.current.play().then(() => {
-                console.log('Remote video playing successfully');
-                console.log('Remote video element after play:', {
-                    paused: remoteVideoRef.current?.paused,
-                    readyState: remoteVideoRef.current?.readyState,
-                    videoWidth: remoteVideoRef.current?.videoWidth,
-                    videoHeight: remoteVideoRef.current?.videoHeight
-                });
-            }).catch(err => {
+            remoteVideoRef.current.play().catch(err => {
                 console.error('Failed to play remote video:', err);
             });
         } else if (remoteVideoRef.current) {
-            console.log('Clearing remote video ref');
             remoteVideoRef.current.srcObject = null;
         }
         
         // 로컬 화면으로 전환할 때 videoRef에 스트림이 있는지 확인
         if (!selectedParticipant && videoRef.current) {
-            console.log('Showing local video, current stream:', videoRef.current.srcObject);
             if (!videoRef.current.srcObject && localStream) {
-                console.log('Reconnecting local stream to videoRef');
                 videoRef.current.srcObject = localStream;
             }
         }
@@ -159,9 +115,7 @@ export default function VideoChat() {
                 remoteAudioRefs.current[userId] = audio;
                 
                 // 명시적으로 재생 시도
-                audio.play().then(() => {
-                    console.log(`Audio playing for user ${userId}`);
-                }).catch(error => {
+                audio.play().catch(error => {
                     console.error(`Failed to play audio for user ${userId}:`, error);
                 });
             }
@@ -174,7 +128,6 @@ export default function VideoChat() {
                 audio.pause();
                 audio.srcObject = null;
                 delete remoteAudioRefs.current[userId];
-                console.log(`Audio element removed for user ${userId}`);
             }
         });
     }, [remoteStreams, headsetOn]);
@@ -343,14 +296,10 @@ export default function VideoChat() {
                             ref={remoteVideoRef}
                             autoPlay
                             playsInline
-                            onLoadedMetadata={() => {
-                                console.log('Remote video loaded for:', selectedParticipant);
-                            }}
                             onError={(e) => {
                                 console.error('Remote video error:', e);
                             }}
                             onClick={() => {
-                                console.log('Clicked remote video, switching to local');
                                 setSelectedParticipant(null);
                             }}
                             style={{
@@ -368,9 +317,6 @@ export default function VideoChat() {
                             autoPlay
                             muted
                             playsInline
-                            onLoadedMetadata={() => {
-                                console.log('Local video loaded, stream:', videoRef.current?.srcObject);
-                            }}
                             style={{
                                 width: "100%",
                                 height: "100%",
@@ -482,7 +428,6 @@ export default function VideoChat() {
                             <_.Name
                                 onClick={(e) => {
                                     e.stopPropagation();
-                                    console.log('Clicked "나 (로컬)", setting selectedParticipant to null');
                                     setSelectedParticipant(null);
                                 }}
                                 style={{
@@ -500,7 +445,6 @@ export default function VideoChat() {
                                     key={participant.id}
                                     onClick={(e) => {
                                         e.stopPropagation();
-                                        console.log('Clicked participant:', participant.name, participant.id);
                                         setSelectedParticipant(participant.id);
                                     }}
                                     style={{

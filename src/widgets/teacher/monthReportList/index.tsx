@@ -23,7 +23,6 @@ export default function MonthReportList() {
       try {
         setReportsLoading(true);
         const data = await getTeacherReportList(selectedTeamId);
-        console.log('API 응답:', data);
         // 배열인지 확인하고 처리
         if (Array.isArray(data)) {
           setReports(data);

@@ -39,7 +39,7 @@ export function useNoticeEdit(noticeId: string) {
                             }
                         }
                     } catch (e) {
-                        console.log('BlockNote JSON 파싱 실패, 빈 에디터로 시작합니다.');
+                        // BlockNote JSON 파싱 실패, 빈 에디터로 시작
                     }
                 }
                 
@@ -106,12 +106,6 @@ export function useNoticeEdit(noticeId: string) {
     };
 
     const handleSubmit = async () => {
-        console.log('수정하기 버튼 클릭됨');
-        console.log('제목:', title);
-        console.log('내용:', content);
-        console.log('마감일:', deadlineDate);
-        console.log('파일:', files);
-
         if (!title.trim()) {
             showToast.warning('제목을 입력해주세요.');
             return;
@@ -135,9 +129,7 @@ export function useNoticeEdit(noticeId: string) {
                 }
 
                 // 새로 추가된 파일만 업로드
-                console.log('파일 업로드 시작:', filePreview.file.name);
                 const presignedData = await getPresignedUrl(filePreview.file.name);
-                console.log('presignedData:', presignedData);
                 
                 const presignedUrl = presignedData?.presignedUrl || presignedData;
                 if (!presignedUrl) {
@@ -145,15 +137,10 @@ export function useNoticeEdit(noticeId: string) {
                 }
                 
                 const fileUrl = await uploadFileToS3(presignedUrl, filePreview.file);
-                console.log('업로드된 파일 URL:', fileUrl);
                 uploadedFiles.push({ name: filePreview.file.name, url: fileUrl });
             }
 
-            console.log('API 호출 전 - noticeId:', noticeId);
-            console.log('API 호출 전 - uploadedFiles:', uploadedFiles);
-
             const result = await updateNotice(noticeId, title, content, uploadedFiles, deadlineDate);
-            console.log('API 응답:', result);
 
             showToast.success('공지사항이 수정되었습니다!');
             setTimeout(() => {

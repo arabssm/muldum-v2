@@ -23,10 +23,8 @@ export const getItemPreview = async (url: string): Promise<ItemPreview> => {
 };
 
 export const createItemRequest = async (data: ItemRequest, isTemp: boolean = true) => {
-  console.log('API 요청 전송:', data);
   const endpoint = isTemp ? '/std/items/temp' : '/std/items';
   const res = await axiosInstance.post(endpoint, data);
-  console.log('API 응답:', res.data);
   return res.data;
 };
 

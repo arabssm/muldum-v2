@@ -20,9 +20,7 @@ function GoogleLoginContent() {
           return;
         }
         
-        console.log('Google OAuth code detected:', code);
         await handleGoogleCallback(code);
-        console.log('Google login successful');
         router.replace('/');
       } catch (error) {
         console.error('Google 로그인 실패:', error);

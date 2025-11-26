@@ -59,7 +59,6 @@ export default function Main() {
         
         // 4. 상품명을 전달하여 추천 물품 가져오기
         const recommendations = await getCrawlRecommendations(targetItem.product_name, 10);
-        console.log('추천 물품:', recommendations);
         
         // 5. 추천 결과를 화면에 표시
         if (recommendations.items && recommendations.items.length > 0) {
