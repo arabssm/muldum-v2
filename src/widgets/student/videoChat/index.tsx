@@ -245,8 +245,12 @@ export default function VideoChat() {
         try {
             const result = await getSummary();
             if (result) {
-                setSummaryData(result);
-                setShowSummary(true);
+                // 5초 후에 요약 표시
+                setTimeout(() => {
+                    setSummaryData(result);
+                    setShowSummary(true);
+                    setLoadingSummary(false);
+                }, 5000);
                 
                 // 요약 후 회의 종료
                 await leaveRoom();
@@ -255,7 +259,6 @@ export default function VideoChat() {
         } catch (error) {
             console.error('Failed to get summary:', error);
             showToast.error('현재 AI 서버가 꺼져있어 사용이 불가능합니다.');
-        } finally {
             setLoadingSummary(false);
         }
     };
@@ -274,7 +277,7 @@ export default function VideoChat() {
             <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
                 <_.IconGroup onClick={handleToggleCall} style={{ cursor: "pointer" }}>
                     <Image
-                        src={isCallActive ? "/assets/nonopen.svg" : "/assets/open.svg"}
+                        src={isCallActive ? "/assets/open.svg" : "/assets/nonopen.svg"}
                         alt="화상통화 아이콘"
                         width={24}
                         height={24}
