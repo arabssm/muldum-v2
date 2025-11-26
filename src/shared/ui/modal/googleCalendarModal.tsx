@@ -35,21 +35,43 @@ export default function GoogleCalendarModal({ isOpen, onClose, onSubmit }: Googl
         <Title>구글 캘린더 연동</Title>
         
         <Description>
-          구글 캘린더 ID를 입력하여<br />
-          공유 캘린더를 연동하세요
+          구글 캘린더를 연동하려면<br />
+          아래 단계를 따라주세요
         </Description>
 
+        <WarningBox>
+          <WarningIcon>⚠️</WarningIcon>
+          <WarningText>
+            <strong>중요:</strong> 캘린더를 서비스 계정에 공유해야 연동이 가능합니다
+          </WarningText>
+        </WarningBox>
+
         <InstructionBox>
-          <InstructionTitle>캘린더 ID 찾는 방법</InstructionTitle>
+          <InstructionTitle>📌 연동 방법</InstructionTitle>
           <InstructionList>
-            <li>구글 캘린더 접속</li>
-            <li>설정 {'>'} 내 캘린더 설정 선택</li>
-            <li>연동할 캘린더 선택</li>
-            <li>"캘린더 통합" 섹션에서 캘린더 ID 확인</li>
+            <li>
+              <StepLink onClick={handleOpenGoogleCalendar}>
+                구글 캘린더 열기 →
+              </StepLink>
+            </li>
+            <li>왼쪽에서 연동할 캘린더에 마우스 올리고 <strong>⋮</strong> → <strong>설정</strong> 클릭</li>
+            <li>아래로 스크롤하여 <strong>"특정 사용자와 공유"</strong> 섹션 찾기</li>
+            <li>
+              다음 이메일 추가:
+              <EmailBox>
+                <EmailText>calender@muldum.iam.gserviceaccount.com</EmailText>
+                <CopyButton onClick={() => {
+                  navigator.clipboard.writeText('calender@muldum.iam.gserviceaccount.com');
+                  alert('이메일이 복사되었습니다!');
+                }}>
+                  복사
+                </CopyButton>
+              </EmailBox>
+            </li>
+            <li>권한을 <strong>"변경 및 공유 관리"</strong>로 설정</li>
+            <li>저장 후, <strong>"캘린더 통합"</strong> 탭에서 캘린더 ID 복사</li>
+            <li>아래 입력창에 캘린더 ID 붙여넣기</li>
           </InstructionList>
-          <HelpButton onClick={handleOpenGoogleCalendar}>
-            구글 캘린더 열기 →
-          </HelpButton>
         </InstructionBox>
 
         <Input
@@ -145,11 +167,40 @@ const Description = styled.p`
   line-height: 1.5;
 `;
 
+const WarningBox = styled.div`
+  background-color: #fff3e0;
+  border-left: 4px solid #ff9800;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+`;
+
+const WarningIcon = styled.span`
+  font-size: 1.25rem;
+  line-height: 1;
+`;
+
+const WarningText = styled.p`
+  font-size: 0.875rem;
+  color: #e65100;
+  margin: 0;
+  line-height: 1.5;
+
+  strong {
+    font-weight: 600;
+  }
+`;
+
 const InstructionBox = styled.div`
   background-color: #f8f9fa;
   border-radius: 8px;
   padding: 1.25rem;
   margin-bottom: 1.5rem;
+  max-height: 400px;
+  overflow-y: auto;
 `;
 
 const InstructionTitle = styled.div`
@@ -163,15 +214,19 @@ const InstructionList = styled.ol`
   font-size: 0.875rem;
   color: #666;
   padding-left: 1.25rem;
-  margin-bottom: 0.75rem;
-  line-height: 1.6;
+  line-height: 1.8;
 
   li {
-    margin-bottom: 0.25rem;
+    margin-bottom: 0.75rem;
+
+    strong {
+      color: #323232;
+      font-weight: 600;
+    }
   }
 `;
 
-const HelpButton = styled.button`
+const StepLink = styled.button`
   background: none;
   border: none;
   color: #ff9b62;
@@ -184,6 +239,42 @@ const HelpButton = styled.button`
 
   &:hover {
     color: #ff8640;
+  }
+`;
+
+const EmailBox = styled.div`
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 0.5rem 0.75rem;
+  margin-top: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+`;
+
+const EmailText = styled.code`
+  font-size: 0.75rem;
+  color: #323232;
+  word-break: break-all;
+  flex: 1;
+`;
+
+const CopyButton = styled.button`
+  background-color: #ff9b62;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: #ff8640;
   }
 `;
 
