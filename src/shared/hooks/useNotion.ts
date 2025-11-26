@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { getTeamPage, updateTeamPage, updateTeamBanner, updateTeamIcon } from "@/shared/api/index";
+import { importNotionPage } from "@/shared/api/notion";
 import { showToast } from "@/shared/ui/toast";
 
 const DEFAULT_BANNER = "https://muldumarabucket.s3.ap-northeast-2.amazonaws.com/%E1%84%80%E1%85%B5%E1%84%87%E1%85%A9%E1%86%AB+%E1%84%80%E1%85%A9%E1%86%BC%E1%84%8C%E1%85%B5+%E1%84%87%E1%85%A2%E1%84%80%E1%85%A7%E1%86%BC.svg";
@@ -70,6 +71,28 @@ export const useNotion = (teamId: string) => {
         setIcon(url);
     };
 
+    const importFromNotion = async (notionUrl: string) => {
+        try {
+            setLoading(true);
+            const data = await importNotionPage(notionUrl, Number(teamId));
+            
+            // 가져온 데이터로 상태 업데이트
+            if (data.content) {
+                setContent(data.content);
+            }
+            if (data.title) {
+                setTitle(data.title);
+            }
+            
+            showToast.success("Notion 페이지를 가져왔습니다.");
+        } catch (error: any) {
+            console.error("Notion import 실패:", error);
+            showToast.error(error.message || "Notion 페이지를 가져오는데 실패했습니다.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return { 
         title, 
         setTitle, 
@@ -82,6 +105,7 @@ export const useNotion = (teamId: string) => {
         loading, 
         saveNotion,
         updateBanner,
-        updateIcon
+        updateIcon,
+        importFromNotion
     };
 };

@@ -12,10 +12,11 @@ import Notion from '@/widgets/student/notion';
 import MonthlyTest from '@/widgets/student/monthlyTest';
 import Calendar from '@/widgets/student/calendar';
 import VideoChat from '@/widgets/student/videoChat';
+import ProjectManagement from '@/widgets/student/projectManagement';
 import { sections } from '@/widgets/student/monthlyTest/data';
 import Loading from '@/shared/ui/loading';
 
-type TabType = '노션' | '월말평가' | '캘린더' | '화상통화';
+type TabType = '노션' | '월말평가' | '캘린더' | '화상통화' | '프로젝트 관리';
 
 export default function TeamDetail() {
   const params = useParams();
@@ -108,9 +109,9 @@ export default function TeamDetail() {
   // 본인 팀인지 확인
   const isMyTeam = userTeamId === teamId;
   
-  // 본인 팀이면 4개 탭, 아니면 노션만
+  // 본인 팀이면 5개 탭 (프로젝트 관리 추가), 아니면 노션만
   const tabs: TabType[] = isMyTeam 
-    ? ['노션', '월말평가', '캘린더', '화상통화']
+    ? ['노션', '월말평가', '캘린더', '화상통화', '프로젝트 관리']
     : ['노션'];
   
   // 선생님이면 노션, 월말평가 2개 탭
@@ -154,6 +155,9 @@ export default function TeamDetail() {
       
       case '화상통화':
         return <VideoChat />;
+      
+      case '프로젝트 관리':
+        return <ProjectManagement />;
       
       default:
         return null;

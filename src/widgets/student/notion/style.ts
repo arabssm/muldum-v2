@@ -170,3 +170,132 @@ export const EditorWrapper = styled.div`
     border-radius: 4px;
   }
 `;
+exp
+ort const ButtonGroup = styled.div`
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+`;
+
+export const ModalOverlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+`;
+
+export const ModalContent = styled.div`
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+`;
+
+export const ModalTitle = styled.h2`
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  color: #333;
+`;
+
+export const ModalInput = styled.input`
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  margin-bottom: 1.5rem;
+  outline: none;
+  transition: border-color 0.2s;
+
+  &:focus {
+    border-color: #4a90e2;
+  }
+
+  &::placeholder {
+    color: #999;
+  }
+`;
+
+export const ModalButtons = styled.div`
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+`;
+
+export const CancelButton = styled.button`
+  padding: 0.75rem 1.5rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: white;
+  color: #666;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    background: #f5f5f5;
+  }
+`;
+
+export const TabContainer = styled.div`
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid #e0e0e0;
+`;
+
+export const Tab = styled.button<{ active: boolean }>`
+  padding: 0.75rem 1rem;
+  border: none;
+  background: none;
+  color: ${props => props.active ? '#4a90e2' : '#666'};
+  font-weight: ${props => props.active ? '600' : '400'};
+  border-bottom: 2px solid ${props => props.active ? '#4a90e2' : 'transparent'};
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    color: #4a90e2;
+  }
+`;
+
+export const InfoText = styled.div`
+  font-size: 0.9rem;
+  color: #666;
+  line-height: 1.6;
+  margin-bottom: 1rem;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+`;
+
+export const PasteArea = styled.textarea`
+  width: 100%;
+  min-height: 200px;
+  padding: 1rem;
+  border: 2px dashed #ddd;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-family: inherit;
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.2s;
+
+  &:focus {
+    border-color: #4a90e2;
+    border-style: solid;
+  }
+
+  &::placeholder {
+    color: #999;
+  }
+`;
