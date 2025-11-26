@@ -16,7 +16,7 @@ export default function VideoChat() {
         showParticipants, setShowParticipants, chatWidth, chatScrollRef,
         videoRef, message, setMessage, messages, participants, remoteStreams,
         selectedParticipant, setSelectedParticipant, localStream, roomId,
-        isConnected, connectionStatus, isScreenSharing, isListening,
+        isConnected, connectionStatus, isScreenSharing,
         handleResize, handleKeyDown, createRoom, joinRoom, leaveRoom, findOrCreateTeamRoom, 
         toggleCamera, toggleMicrophone, startScreenShare, stopScreenShare, getSummary
     } = useVideoChat();
